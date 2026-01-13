@@ -1,0 +1,5 @@
+
+/* 리눅스 웹서버에서 2차서버 MSSQL 접속설정 */
+
+$driverOptions2 = [PDO::ATTR_CASE => PDO::CASE_NATURAL,PDO::ATTR_TIMEOUT => 600,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+$database2 = new PDO ("dblib:host=$DbServerName2:$port2;dbname=$base_db2;charset=utf8","$DbID2","$DbPW2", $driverOptions2);

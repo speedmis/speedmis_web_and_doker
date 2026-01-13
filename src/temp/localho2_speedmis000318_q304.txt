@@ -1,0 +1,45 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisBoardArticle table_m 
+left outer join MisMenuList_Member table_member on table_member.RealPid = table_m.RealPid and table_member.userid = 'gadmin'
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid = table_m.RealPid
+ and table_RealPid.MenuType='02' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = 'gadmin')
+ where 9=9  and table_m.useflag='1'
+and table_m.RealPid='speedmis000318' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = 'gadmin' and table_member.AuthorityLevel<>9)
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.b_ref as "b_ref"
+,table_RealPid.MenuName as "table_RealPidQnMenuName"
+,table_m.RealPid as "RealPid"
+,table_m.title as "title"
+,table_m.b_step as "b_step"
+,table_m.b_level as "b_level"
+-- ,nULL as "contents"
+,table_m.boardattach1 as "boardattach1"
+,table_m.comment_count as "comment_count"
+,table_m.hit as "hit"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_Station_NewNum.stationname as "table_Station_NewNumQmstationname"
+from MisBoardArticle table_m
+left outer join MisMenuList_Member table_member on table_member.RealPid = table_m.RealPid and table_member.userid = 'gadmin'
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid = table_m.RealPid
+ and table_RealPid.MenuType='02' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = 'gadmin')
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+left outer join MisStation table_Station_NewNum on table_wdater.station_newnum=table_Station_NewNum.num
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.RealPid='speedmis000318' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = 'gadmin' and table_member.AuthorityLevel<>9) order by table_m.idx desc limit 5) aaa order by idx desc) bbb where rowNumber between 1 and 5
+
+--app Sql :
+
+-----------------------------------------------
+    

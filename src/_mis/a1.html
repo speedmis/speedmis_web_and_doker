@@ -1,0 +1,1059 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>SpeedMIS 소개 - 그리드기반의 맞춤형 웹빌더 DEMO</title>
+    <base href="/_mis/"/>
+    <link href='//fonts.googleapis.com/css?family=Roboto+Slab:400,700' rel='stylesheet'>
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+
+
+    <link rel="stylesheet" href="../_mis_kendo/examples/content/integration/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../_mis_kendo/styles/kendo.common.min.css" />
+    <script src="../_mis_kendo/js/jquery.min.js"></script>
+    <script src="../_mis_kendo/js/kendo.all.min.js?a=1"></script>
+
+
+    
+<link rel='stylesheet' href='toast/toastr.min.css'/>
+<link href="css/examples.css?20250505.014155" rel="stylesheet" />
+<link rel="stylesheet" href="codemirror-5.52.0/lib/codemirror.css">
+<link href="cssJs/common_top.css?20250505.014155ds" rel="stylesheet"/>
+
+
+<script src="../_mis_kendo/js/jszip.min.js"></script>
+<script src="../_mis_kendo/js/kendo.timezones.min.js"></script>
+<script src="downloadJS/download2.js"></script>
+<script src="codemirror-5.52.0/lib/codemirror.js"></script>
+<script src="codemirror-5.52.0/addon/edit/matchbrackets.js"></script>
+<script src="codemirror-5.52.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="codemirror-5.52.0/mode/xml/xml.js"></script>
+<script src="codemirror-5.52.0/mode/javascript/javascript.js"></script>
+<script src="codemirror-5.52.0/mode/css/css.js"></script>
+<script src="codemirror-5.52.0/mode/clike/clike.js"></script>
+<script src="codemirror-5.52.0/mode/php/php.js"></script>
+<script id="id_js" name="name_js" src="java_conv.js?20250505.014155"></script>
+<script src='toast/toastr.min.js'></script>
+
+        <link id="kendoTheme_css" rel="stylesheet"/>
+    <link id="codemirror_theme" rel="stylesheet"/>
+    <script>
+
+                    document.getElementById('kendoTheme_css').href = '../_mis_kendo/styles/kendo.highcontrast.min.css'; 
+            $('#kendoTheme_css').attr('kendoTheme', 'highcontrast');
+            document.getElementById('codemirror_theme').href = 'codemirror-5.52.0/theme/3024-night.css'; 
+        
+    </script>
+
+    <script src="../_mis_kendo/js/cultures/kendo.culture.ko-KR.min.js"></script>
+    <script src="../_mis_kendo/js/messages/kendo.messages.ko-KR.min.js"></script>
+    <script src="../_mis_uniqueInfo/local_ko-KR.js"></script>
+    <script src="cssJs/simple_top.js?20250505.014155zzw"></script>
+    <link id="link_simple" href="cssJs/simple_top.css?20250505.014155ee" rel="stylesheet"/>
+    	<style id="list_css"></style>
+
+        <link rel="manifest" href="/_mis_uniqueInfo/pwa/manifest.json?20250505.014155" />
+    <meta name="theme-color" content="#000000" />
+    <script>    
+install_speedmis_app_load();
+      
+    </script>
+    
+    <link id="rframe_main" rel="stylesheet"/>
+    <link href="/_mis_uniqueInfo/user_define.css?20250505.014155" rel="stylesheet"/>
+    <script id="script_user_define" src="../_mis_uniqueInfo/user_define.js?20250505.014155"></script>
+    
+
+    <style id="left_menu_hide"> </style>
+
+
+
+<style>
+
+
+li.TK-bn.user a.TK-Aside-Menu-Button::after {
+    content: "gadmin";
+    width: 200px;
+    left: -77px;
+}
+    
+html {
+    overflow: hidden;
+}
+div#main {
+    height: auto!important;
+}
+
+    
+
+
+
+
+
+body[ismobile="N"][screenmode="2"] div#example-sidebar {
+    height: calc(100vh - 60px)!important;    /***60***/
+}
+
+
+
+
+
+
+
+    </style>
+
+
+    <script src="cssJs/common_top.js?20250505.014155w20sq21"></script>
+    
+
+<textarea id="txt_themechooser_style" style="display:none;">
+.themechooser {
+    height: auto!important;
+    max-height: 153px!important;
+    min-height: 53px;
+    overflow-y: auto;
+}
+body[screenname="fullScreen"] .themechooser {
+    min-height: 52px;
+}
+.themechooser::-webkit-scrollbar {
+    display: none;
+}
+#example-search-wrapper {
+    height: auto!important;
+    padding-right: 0!important;
+}
+#toolbarRound {
+    width: 100%!important;
+    height: 100%!important;
+    display: block!important;
+}
+div#toolbar {
+    display: inline-block!important;
+    width: 100%;
+}
+
+a#btn_help,a#btn_alert {
+    display: inherit!important;
+}
+</textarea>
+<style id="themechooser_style">
+
+
+</style>
+
+
+<script>
+kendo.culture("ko-KR");
+if(isMainFrame()) setCookie('viewTarget','right',1000);
+
+
+</script>
+
+
+</head>
+<body class="k-content" screenname="normalScreen" 
+isMobile="N"
+isPhoneMobile="N"
+screenMode="2"
+MenuType="22" 
+style="visibility:hidden;"
+ActionFlag="simple" 
+BodyType="" 
+psize="100" 
+RealP="speedmis" 
+RealPid="speedmis001032" 
+topRealPid="speedmis000865" 
+logicPid="speedmis001032" 
+parent_RealPid="" 
+UserID="gadmin" 
+isAuthW="Y"
+ChkOnlySum=""
+isMenuIn0="Y"
+actionInc="">
+
+<button id="installBtn" style="display: none;" class="install-button">📱 앱 설치하기</button>
+<script>
+    let deferredPrompt;
+    install_speedmis_app_try();
+</script>
+
+<iframe id="ifr_treat" name="ifr_treat" src="about:blank" style="display:none;"></iframe>
+<textarea id="txt_window" style="display: none;">
+<div id="window{popCnt}" class="windowPop">
+    <iframe id="ifr_window{popCnt}" style="width:100%;height:100%;border:0;"></iframe>
+    <input id="txt_windowIdx{popCnt}" type="hidden"/>
+    <input id="txt_windowRowIndx{popCnt}" type="hidden"/>
+</div>
+</textarea>
+<form id="treatForm" name="treatForm" method="post" action="commandTreat.php" 
+class="form " target="ifr_treat">
+
+<div id="div_temp1" style="display:none;"></div>
+<input id="top_dir" type="hidden" value="v6"/>
+<input id="index_main_YN" type="hidden" value="N"/>
+<input id="grid_load_once_event" type="hidden" value="N"/>
+<input id="grid_dataBound_once_event" type="hidden" value="N"/>
+<input id="document_load_once_event" type="hidden" value="N"/>
+<input id="command" name="nmCommand" type="hidden"/>
+<input id="nmOpenPopup" name="nmOpenPopup" type="hidden"/>
+<input id="MisSession_UserID" name="nmMisSession_UserID" type="hidden" value="gadmin"/>
+<input id="MisSession_UserName" name="nmMisSession_UserName" type="hidden" value="gadmin"/>
+<input id="ActionFlag" name="nmActionFlag" type="hidden" value="simple"/>
+<input id="RealPid" name="nmRealPid" type="hidden" value="speedmis001032"/>
+<input id="MisJoinPid" name="nmMisJoinPid" type="hidden" value=""/>
+<input id="logicPid" type="hidden" value="speedmis001032"/>
+<input id="gubun" name="nmGubun" type="hidden" value="1032"/>
+
+<input id="viewTarget_once" type="hidden" value=""/>
+<input id="MS_MJ_MY" type="hidden" value="MJ"/>
+<input id="addDir" type="hidden" value=""/>
+
+<input id="parent_gubun" name="nmParent_gubun" type="hidden" value=""/>
+<input id="parent_RealPid" name="nmParent_RealPid" type="hidden" value=""/>
+<input id="parent_idx" name="nmparent_idx" type="hidden" value=""/>
+<input id="thisAlias_parent_idx" type="hidden" value=""/>
+
+
+<input id="isMenuIn" name="nmIsMenuIn" type="hidden" value="Y"/>
+<input id="idx" name="nmIdx" type="hidden" value=""/>
+<input id="key_aliasName" name="nmKey_aliasName" type="hidden"/>
+
+<input id="jsonUrl" type="hidden" value=""/>
+
+<input id="BodyType" type="hidden" value=""/>
+
+<input id="MenuName" type="hidden" value="SpeedMIS 소개"/>
+
+<input id="jsonname" type="hidden" value=""/>
+<input id="ChkOnlySum" type="hidden" value=""/>
+<input id="group_field" type="hidden" value=""/>
+<input id="bot_name" type="hidden" value="speedmis_com_bot"/>
+
+
+<input id="isAuthW" type="hidden" value="Y"/>
+<input id="isAuthR" type="hidden" value="Y"/>
+<input id="MisSession_IsAdmin" type="hidden" value="Y"/>
+<input id="keyidx_123" type="hidden" value="N"/>
+<input id="Anti_SortWrite" type="hidden"/>
+<input id="MenuType" type="hidden" value="22"/>
+<textarea id="AddURL" style="display:none;"></textarea>
+<input id="last_frameElementId" type="hidden"/>
+<input id="toolbarDropdownlist" type="hidden"/>
+<input id="isDeleteList" type="hidden" value=""/>
+<input id="flag" name="nmFlag" type="hidden" value=""/>
+<input id="app" name="nmApp" type="hidden" value=""/>
+<input id="pre" type="hidden" value=""/>
+<input id="addParam" type="hidden" value=""/>
+<input id="screenMode" name="nmScreenMode" type="hidden" value="2"/>
+<input id="pageSizes" name="nmPageSizes" type="hidden" value="100"/>
+<input id="ServerVariables_QUERY_STRING" name="nmServerVariables_QUERY_STRING" type="hidden" value="gubun=1032&isMenuIn=Y"/>
+
+
+<input id="brief_insertsql" name="nmBrief_insertsql" type="hidden" value=""/>
+<input id="brief_insertline" name="nmBrief_insertline" type="hidden" value=""/>
+<input id="isIframe" name="nmIsIframe" type="hidden" value=""/>
+<input id="tempDir" name="nmTempDir" type="hidden" value="gadmin_1746447389"/>
+
+<input id="stopUpdate" type="hidden" value=""/>
+<input id="sel_aliasName" type="hidden" value=""/>
+<input id="sel_idx" type="hidden" value=""/>
+<input id="loadingEnd" type="hidden" value="N"/>
+
+<input id="displayLoading" type="hidden" value=""/>
+<input id="temp1" name="nmTemp1" type="hidden" value=""/>
+<input id="temp2" name="nmTemp2" type="hidden" value=""/>
+<input id="temp3" name="nmTemp3" type="hidden" value=""/>
+</form>
+<textarea id="allFilter" style="display:none;"></textarea>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="../_mis_kendo/telerik-navigation/metric.min.css" xhref="https://d6vtbcy3ong79.cloudfront.net/fonts/1.1.5/css/metric.min.css">
+<link rel="stylesheet" type="text/css" href="../_mis_kendo/telerik-navigation/index.min.css?v=11" xhref="https://d6vtbcy3ong79.cloudfront.net/telerik-navigation/2.0.3/css/index.min.css">
+<nav id="js-tlrk-nav" class="TK-Nav TK-Nav--Shadow TK-Nav--Loading TK-Nav--Fluid" data-tlrk-nav-version="2.0.3">
+
+<section class="TK-Bar"><div class="TK-container TK-Bar-container">
+
+
+<div class="TK-TLRK-Brand"><a href="/v6/index.php?RealPid=speedmis000988&isMenuIn=Y" class="TK-TLRK-Logo"></a></div>
+
+
+    <div class="TK-Search">
+        <div class="k-textbox k-space-right search" style="padding-right: 0; width: 100%; border:0;">
+            <input id="txtSearch" class="root-nav" title="프로그램 검색" placeholder="SpeedMIS 소개"/>
+            <label for="txtSearch" class="k-icon k-i-search">&nbsp;</label>
+        </div>
+    </div>
+
+
+
+
+    <div class="TK-Drawer" id="js-tlrk-nav-drawer">
+
+        <ul class="TK-Context-Menu TK-Menu">
+
+        <li class="TK-Menu-Item"><a class="TK-Menu-Item-Link" data-match-exact-path>loading...</a></li>
+        </ul>
+
+
+        <ul class="TK-Aside-Menu">
+
+
+        <li class="TK-Aside-Menu-Item TK-bn gnb"><a onclick="pushAlim();" class="TK-Aside-Menu-Button" title="최근 7일간 알림내역입니다." data-match-starts-with-path>
+            <span class="k-icon k-i-notification"></span>
+
+             
+        <span class="TK-Counter TK-Counter--SC TK-Counter--Visible TK-Counter--Empty">0</span>
+            
+        </a></li>
+        
+        <li class="TK-Aside-Menu-Item TK-bn user"><a onclick="$(`button#js-tlrk-nav-drawer-button`).click();go_mis_gubun('338');" xhref="index.php?RealPid=speedmis000338&isMenuIn=Y" class="TK-Aside-Menu-Button" 
+        title="개인정보수정" data-match-starts-with-path><span class="k-icon k-i-user"></span></a></li>
+
+                <li class="TK-Aside-Menu-Item TK-bn sos"><a onclick="$(`button#js-tlrk-nav-drawer-button`).click();sendMsg_opinion();" class="TK-Aside-Menu-Button" title="관리자에게 문의 / 불편신고" 
+        data-match-starts-with-path><img src="img/sos.png" style="width: 18px;"></a></li>
+                
+        <li class="TK-Aside-Menu-Item TK-bn tip"><a onclick='$(`button#js-tlrk-nav-drawer-button`).click();openTip();'
+        class="TK-Aside-Menu-Button" title="사용Tip & 개발Tip" style="padding: 0 7px 0 11px; font-weight: bold; top: -1px;"
+        data-match-starts-with-path><span class="k-icon" style="width: 25px;">TIP</span></a></li>
+
+
+            <li class="TK-Aside-Menu-Item TK-bn logout"><a onclick='$(`button#js-tlrk-nav-drawer-button`).click();if(confirm(document.getElementById("MisSession_UserName").value+iif(document.getElementById("MisSession_UserName").value!=document.getElementById("MisSession_UserID").value," (ID: "+document.getElementById("MisSession_UserID").value+")","")+ " 님, 로그아웃을 하시겠습니까?")) { stop(); location.href = "logout.php"; }' class="TK-Aside-Menu-Button" title="gadmin 님, 로그아웃" data-match-starts-with-path><span class="k-icon k-i-logout"></span></a></li>
+
+
+
+    </ul></div><div class="TK-Drawer-Extension"></div><div class="TK-Aside TK-Mobile"><ul class="TK-Aside-Menu"><li class="TK-Aside-Menu-Item"><button type="button" class="TK-Aside-Menu-Button TK-Aside-Menu-Button--Toggle-Drawer" id="js-tlrk-nav-drawer-button"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 512 512" fill="#4d4f52"><path d="M0 91h512v60H0zM0 237.3h512v60H0zM0 383.5h512v60H0z"/></svg></button></li></ul></div></div></section><button type="button" class="TK-Nav-Overlay" id="js-tlrk-nav-overlay">close mobile menu</button></nav>
+
+
+
+
+<div  id="gnb" class="gnb_one gnb_notice_li gnb_lst" style="display: none;">
+    <div class="demo-section k-content gnb_notice_li gnb_lyr_opened" id="gnb_notice_layer" style="display: inline-block;">
+        <div class="gnb_notice_lyr" id="gnb_notice_lyr">
+        <div class="svc_noti svc_panel">
+            <div class="svc_scroll">
+                <div class="svc_head"><strong class="gnb_tit">최근 7일간 알림</strong>
+                <div class="task_right">
+                <button onclick="gnbDelete('read');" id="gnb_btn_read_noti_del">
+                처리된 알림 삭제</button>
+                <button onclick="gnbDelete('all');" id="gnb_btn_all_noti_del">모두 삭제</button>
+                </div></div>
+                <div class="svc_body" id="gnb_naverme_layer">
+
+             
+                <div class="svc_blank"><div class="svc_msg_box"><h4 class="gnb_tit">새로운 알림이 없습니다.</h4><p class="gnb_desc"><br></p></div><span class="gnb_v_guide"></span></div>
+<style>
+#gnb button {
+    pointer-events: none;
+}    
+</style>  
+                
+
+                </div>
+            </div>
+            <a href="/v6/index.php?RealPid=speedmis000980&isMenuIn=Y" class="gnb_notice_all">내 알림 전체보기</a>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+
+/*
+toastr.warning("안녕하세요?", "제목", {progressBar: true, timeOut: 5000});
+toastr.success("안녕하세요?", "제목", {progressBar: true, timeOut: 3000});
+toastr.error("안녕하세요?", "제목", {progressBar: true, timeOut: 0, closeButton: false, positionClass: "toast-bottom-right"});
+
+
+    "closeButton": false,
+    "debug": false,
+    "positionClass": "toast-bottom-right",
+
+*/
+
+(function ($) {
+    function endsWith(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+    var banner = $("#webinar-banner");
+    var bannerLink = banner.find("a");
+    var trackingAttribute = "data-gtm-event";
+    var uniqueLocalStorageBannerKey = "KendoUI2018R1";
+    var bannerExpiresAt = Date.UTC(2019, 0, 25); // 25th of Jan, 2019
+    var showWebinarBanner = true;
+    var suites = {
+        // "suite": "trackingAttribute"
+        "/kendo-demos/":    "yellow-strip, KendoUI2018R1ExportWebinar, kendo-overview-page", // for localhost only
+        "kendo-demos/":     "yellow-strip, KendoUI2018R1ExportWebinar, kendo-demos-page", // for localhost only
+        "https://demos.telerik.com/kendo-ui/":       "yellow-strip, KendoUI2018R1ExportWebinar, kendo-overview-page", // Kendo UI Demos Overview page only
+        "kendo-ui/":        "yellow-strip, KendoUI2018R1ExportWebinar, kendo-demos-page",
+        "aspnet-mvc/":      "yellow-strip, KendoUI2018R1ExportWebinar, mvc-demos-page",
+        "php-ui/":          "yellow-strip, KendoUI2018R1ExportWebinar, php-demos-page",
+        "jsp-ui/":          "yellow-strip, KendoUI2018R1ExportWebinar, jsp-demos-page"
+    };
+
+    for (var j in suites) {
+        var isOverviewKey = (j === "https://demos.telerik.com/kendo-ui/" || j === "/kendo-demos/" || j ===  "/php-ui/" || j ===  "/jsp-ui/");
+        var containsKey = location.href.indexOf(j) > 0;
+        var endsWithKey = endsWith(location.href, j);
+
+        if (containsKey && (isOverviewKey && endsWithKey || !isOverviewKey && !endsWithKey)) {
+            try {
+                showWebinarBanner = (typeof bannerExpiresAt == "undefined" || bannerExpiresAt > (new Date()).getTime()) && ("1" !== localStorage.getItem(uniqueLocalStorageBannerKey));
+            } catch (e) {
+            }
+            if (showWebinarBanner) {
+                bannerLink.attr(trackingAttribute, suites[j]);
+                banner.show().find(".close").click(function () {
+                    try {
+                        localStorage.setItem(uniqueLocalStorageBannerKey, 1);
+                        banner.animate({ marginTop: "-40px", height: 0 }, function () {
+                            banner.hide();
+                            $(window).resize();
+                        });
+                        return true;
+                    } catch (e) {
+                    }
+                });
+            }
+            break;
+        }
+    }
+})($);
+</script>
+
+
+<script>
+    window.kendoTheme = $('#kendoTheme_css').attr('kendoTheme');
+    $('body').attr('kendoTheme', window.kendoTheme);
+    if(window.kendoTheme=='highcontrast') {
+        document.documentElement.classList.toggle('invert-mode');
+    }
+</script>
+
+
+
+<script>
+    var NAV_JSON_URL = '';
+    var navProduct = "online";
+    var product = "kendo-ui";
+</script>
+<script src="../_mis_kendo/examples/content/shared/js/example-datasources_speedmis.js" xsrc="https://demos.telerik.com/kendo-ui/content/shared/js/example-datasources.js"></script>
+<script src="../_mis_kendo/examples/content/shared/js/web-examples.js" xsrc="https://demos.telerik.com/kendo-ui/content/shared/js/web-examples.js"></script>
+<div id="main-wrap" class="normalScreen" isMainFrame="Y">
+
+
+
+    <div id="example-sidebar">
+        <div id="example-nav-bar">
+            <a href="#" title="전체 메뉴 보기" id="back-forward" class="back-nav">전체 메뉴</a>
+        </div>
+        <div id="nav-wrapper" style="padding-top: 12px;">
+            <div id="nav">
+                <div id="root-nav">
+                    
+                </div>
+
+
+
+
+
+
+                <div id="example-nav">
+                </div>
+
+
+
+ 
+
+
+            </div>
+ 
+
+  <script>
+    $("input.root-nav").on("input", function() {
+
+      var query = this.value.toLowerCase();
+      var dataSource = $("#root-nav").data("kendoTreeView").dataSource;
+      
+
+      filter(dataSource, query);
+
+      if($("#back-forward").hasClass("back-nav")) $("#back-forward").click();
+      if(query=="" && !$("#back-forward").hasClass("back-nav")) $("#back-forward").click();
+    });
+        
+    var myMenuListAll = JSON.parse(localStorage.getItem("myMenuListAll_gadmin"));
+
+    if(getCookie("authVersion_em5nem5hZHpubWlu")!="" && myMenuListAll==null) {
+        console.log("오류로 쿠키 삭제 후 재호출합니다.");
+        //쿠키 초기화는 아래와 같이 setTimeout 로 해야 제대로 반영됨.
+
+
+       
+        setTimeout( function() { setCookie("newLogin", "Y"); setCookie("authVersion_em5nem5hZHpubWlu",""); location.href = replaceAll(location.href,"#",""); },0);
+    }
+    
+    if(myMenuListAll!=null) {
+
+        var myMenuListThis = [];
+        var TK_Menu_Html = '';
+
+        //우측상단 대메뉴
+        myMenuListAll[0].items.forEach(function (el, i, arr) {
+            if(el.gubun=="01") {
+                myMenuListThis = [myMenuListAll[0].items[i]];
+                if(myMenuListAll[0].items[i].items) {
+                    myMenuListAll[0].items[i].items.forEach( function(a) {
+                        if(a.expanded==true) a.expanded = false;
+                    });
+                }
+                TK_Menu_Html = TK_Menu_Html+ '<li class="TK-Menu-Item"><a xhref="/v6/index.php?gubun='+el.id+'&isMenuIn='+$('input#isMenuIn').val()+'" onclick="$(`button#js-tlrk-nav-drawer-button`).click();go_mis_gubun('+el.id+');" class="TK-Menu-Item-Link TK-Item--Selected" data-match-exact-path>'+el.text+'</a></li>';
+            } else if(el.MenuType=='11') {
+                TK_Menu_Html = TK_Menu_Html+ '<li class="TK-Menu-Item"><a href=\''+el.AddURL+'\' onclick="$(`button#js-tlrk-nav-drawer-button`).click();" class="TK-Menu-Item-Link" data-match-exact-path>'+el.text+'</a></li>';
+            } else if(el.MenuType=='12') {
+                TK_Menu_Html = TK_Menu_Html+ '<li class="TK-Menu-Item"><a target=_blank href=\''+el.AddURL+'\' onclick="$(`button#js-tlrk-nav-drawer-button`).click();" class="TK-Menu-Item-Link" data-match-exact-path>'+el.text+'</a></li>';
+            } else {
+                TK_Menu_Html = TK_Menu_Html+ '<li class="TK-Menu-Item"><a xhref="/v6/index.php?gubun='+el.id+'&isMenuIn='+$('input#isMenuIn').val()+'" onclick="$(`button#js-tlrk-nav-drawer-button`).click();go_mis_gubun('+el.id+');" class="TK-Menu-Item-Link" data-match-exact-path>'+el.text+'</a></li>';
+            }
+        });
+
+        if(myMenuListThis.length==0) myMenuListThis = [myMenuListAll[0].items[0]];
+        $("ul.TK-Context-Menu").html(TK_Menu_Html);
+        
+
+        $("#root-nav").kendoTreeView({
+            loadOnDemand: false,
+            dataSource: {
+                data: myMenuListAll
+            },
+        });
+
+
+
+        var rootNav = $("#root-nav").data("kendoTreeView");
+
+        /* 현재메뉴의 briefTitle 노출 */
+        make_example_nav();
+        /* 현재메뉴의 briefTitle 노출 end */
+
+
+        
+
+    }
+
+    
+    function mobile_line() {
+
+        $("#panelbar-left")[0].outerHTML = '<div id="panelbar-left"></div>';
+
+        var mMenu_json = myMenuListAll[0].items;
+        mMenu_json = replaceAll(JSON.stringify(mMenu_json),'"expanded":true','"expanded":false');
+        var selMenuName = '';
+        var selAutogubun = '';
+        temp = InStr(mMenu_json, '","id":"'+document.getElementById('gubun').value+'"');
+        if(temp > 0) {
+            selMenuName = mMenu_json.split('","id":"'+document.getElementById('gubun').value+'"')[0];
+            selMenuName = selMenuName.split('"text":"').pop(-1);
+            selAutogubun = mMenu_json.split(',"text":"'+selMenuName+'","id":"'+document.getElementById('gubun').value+'"')[0];
+            selAutogubun = selAutogubun.split('"gubun":"').pop(-1);
+            selAutogubun = selAutogubun.split('"')[0];
+            if(selAutogubun.length >= 2) {
+                mMenu_json = replaceAll(mMenu_json, '"gubun":"'+Left(selAutogubun,2)+'","expanded":false', '"gubun":"'+Left(selAutogubun,2)+'","expanded":true, "selected":true');
+                if(selAutogubun.length >= 4) {
+                    mMenu_json = replaceAll(mMenu_json, '"gubun":"'+Left(selAutogubun,4)+'","expanded":false', '"gubun":"'+Left(selAutogubun,4)+'","expanded":true, "selected":true');
+                    if(selAutogubun.length >= 6) mMenu_json = replaceAll(mMenu_json, '"gubun":"'+Left(selAutogubun,6)+'"', '"gubun":"'+Left(selAutogubun,6)+'", "selected":true');
+                }
+            }
+        }
+        mMenu_json = JSON.parse(mMenu_json);
+
+        forMax = mMenu_json.length;
+        for(ii=0;ii<forMax;ii++) {
+            mMenu_json[ii].expanded = false;
+        }
+
+        var inlineDefault = new kendo.data.HierarchicalDataSource({
+                data: mMenu_json
+        });
+        $("#panelbar-left").kendoPanelBar({
+            dataSource: inlineDefault,
+            expandMode: "single",
+            select: expandCollapse
+        });
+        var panelBar = $("#panelbar-left").data("kendoPanelBar");
+        panelBar.expand($("#panelbar-left .k-state-selected").closest('li'));
+
+        
+        $("#panelbar-left").append(
+`<li role="treeitem" aria-expanded="false" class="k-item k-state-default k-last">
+
+<ul class="TK-Aside-Menu">
+
+
+<li class="TK-Aside-Menu-Item TK-bn gnb"><a onclick="pushAlim();" class="TK-Aside-Menu-Button" title="최근 7일간 알림내역입니다." data-match-starts-with-path>
+<span class="k-icon k-i-notification"></span>
+
+ 
+<span class="TK-Counter TK-Counter--SC TK-Counter--Visible TK-Counter--Empty">0</span>
+
+</a></li>
+
+<li class="TK-Aside-Menu-Item TK-bn user"><a href="/v6/index.php?RealPid=speedmis000338" class="TK-Aside-Menu-Button" title="개인정보관리" 
+data-match-starts-with-path><span class="k-icon k-i-user"></span></a></li>
+
+<li class="TK-Aside-Menu-Item TK-bn sos"><a onclick="sendMsg_opinion();" class="TK-Aside-Menu-Button" title="관리자에게 문의 / 불편신고" 
+data-match-starts-with-path><img src="img/sos.png" style="width: 18px;"></a></li>
+
+<li class="TK-Aside-Menu-Item TK-bn tip"><a onclick='openTip();'
+class="TK-Aside-Menu-Button" title="사용Tip & 개발Tip" style="padding: 0 7px 0 11px; font-weight: bold; top: -1px;"
+data-match-starts-with-path><span class="k-icon" style="width: 25px;">TIP</span></a></li>
+
+
+<li class="TK-Aside-Menu-Item TK-bn logout"><a onclick='if(confirm(document.getElementById("MisSession_UserName").value+iif(document.getElementById("MisSession_UserName").value!=document.getElementById("MisSession_UserID").value," (ID: "+document.getElementById("MisSession_UserID").value+")","")+ " 님, 로그아웃을 하시겠습니까?")) { stop(); location.href = "logout.php"; }' class="TK-Aside-Menu-Button" title="gadmin 님, 로그아웃" data-match-starts-with-path><span class="k-icon k-i-logout"></span></a></li>
+
+
+
+</ul></li>`
+
+        );
+    
+    }
+
+    $("#back-forward").on("click", function (e) {
+        if ($(this).hasClass("back-nav")) {
+            $(this).removeClass("back-nav").addClass("forward-nav").text(myMenuListThis[0].text).attr("title", "현재 메뉴 보기");
+            $("#nav").addClass("root");
+
+            /* 전체메뉴의 briefTitle 노출 */
+            if($("#back-forward").attr("rootNavLoad_YN")!="Y") {
+                
+                $("#back-forward").attr("rootNavLoad_YN","Y");  //한번만 실행하기 위한 조치
+
+                var briefTitleClass = ['new-widget', 'updated-widget', 'beta-widget', 'pro-widget'];
+                var cnt = rootNav.dataSource._data["0"].items.length;
+                for(i=0;i<cnt;i++) {
+                    if(rootNav.dataSource._data["0"].items[i].briefTitle!="") {
+                        barDataItem = rootNav.dataSource.get(rootNav.dataSource._data["0"].items[i].id);
+                        if(barDataItem) {
+                            barElement = rootNav.findByUid(barDataItem.uid);
+                            barElement.find('.k-in').before('<span class="'+briefTitleClass[barDataItem.briefTitle.charCodeAt() % 4]+'">'+barDataItem.briefTitle+'</span>');
+                        }
+                    }
+                    if(rootNav.dataSource._data["0"].items[i].items) {
+                        var cntQ = rootNav.dataSource._data["0"].items[i].items.length;
+
+                        for(iQ=0;iQ<cntQ;iQ++) {
+                            if(rootNav.dataSource._data["0"].items[i].items[iQ].briefTitle!="") {
+                                barDataItemQ = rootNav.dataSource.get(rootNav.dataSource._data["0"].items[i].items[iQ].id);
+                                if(barDataItemQ) {
+                                    barElementQ = rootNav.findByUid(barDataItemQ.uid);
+                                    barElementQ.find('.k-in').before('<span class="'+briefTitleClass[barDataItemQ.briefTitle.charCodeAt() % 4]+'">'+barDataItemQ.briefTitle+'</span>');
+                                }
+                            }
+
+                            if(rootNav.dataSource._data["0"].items[i].items[iQ].items) {
+                                var cntQQ = rootNav.dataSource._data["0"].items[i].items[iQ].items.length;
+
+                                for(iQQ=0;iQQ<cntQQ;iQQ++) {
+                                    if(rootNav.dataSource._data["0"].items[i].items[iQ].items[iQQ].briefTitle!="") {
+                                        barDataItemQQ = rootNav.dataSource.get(rootNav.dataSource._data["0"].items[i].items[iQ].items[iQQ].id);
+                                        if(barDataItemQQ) {
+                                            barElementQQ = rootNav.findByUid(barDataItemQQ.uid);
+                                            barElementQQ.find('.k-in').before('<span class="'+briefTitleClass[barDataItemQQ.briefTitle.charCodeAt() % 4]+'">'+barDataItemQQ.briefTitle+'</span>');
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            /* 전체메뉴의 briefTitle 노출 end */
+
+        }
+        else {
+            $(this).removeClass("forward-nav").addClass("back-nav").text("전체 메뉴").attr("title", "전체 메뉴 보기");
+            $("#nav").removeClass("root");
+        }
+
+        e.preventDefault();
+    });
+
+
+            </script>
+        </div>
+    </div>
+
+    
+    <div id="main">
+        <a href="#" id="sidebar-toggle"><span></span></a>
+
+        <div class="themechooser" data-rel="themechooser" data-role="details">
+
+
+    <div id="example-search-wrapper" class="k-content search-wrapper">
+
+
+    <div id="toolbarRound">
+        <div id="toolbar"></div>
+    </div>
+
+    </div>
+
+
+
+
+    <div id="panelbar-left"></div>
+
+    
+    <span class="tc-activator k-content">설정</span>
+    
+    <div class="tc-theme-list k-content k-button.k-state-active">
+    </div>
+
+
+
+
+</div>
+
+<script id="theme-item-template" type="text/x-kendo-template">
+    <li class="tc-item #: iif(themeName()==name,'k-state-selected','') #">
+        # for (var i = 0; i < colors.length; i++) { #
+            <span class="tc-color" style="background-color: #= colors[i] #"></span>
+        # } #
+        <span class="tc-name">#: name #</span>
+    </li>
+</script>
+
+<script id="size-item-template" type="text/x-kendo-template">
+    <li class="tc-item">
+        <span class="tc-name">#: name #</span>
+        # if ('relativity' in data) { #
+            <span class="tc-relativity">
+                (#: relativity #)
+            </span>
+        # } #
+    </li>
+</script>
+
+
+
+<script type="x/kendo-template" id="pdf-template">
+  <div class="pdf-template">
+    <div class="header">
+      <div style="float: right">Page #: pageNum # of #: totalPages #</div>
+      <span>SpeedMIS 소개</span>
+    </div>
+    <div class="watermark">SpeedMIS</div>
+    <div class="footer">
+      Page #: pageNum # of #: totalPages #
+    </div>
+  </div>
+</script>
+
+<div id="help_contents_top" style="display:none;"></div>
+<div id="help_contents" style="display:none;">
+<div class="help_MenuName">SpeedMIS 소개</div>
+<div class="help_contents"><p>이 소개페이지는 iframe 과 javascript , style 을 직접 넣어 구성한 것입니다.</p></div>
+</div>
+
+<div id="exampleWrap">
+
+
+
+<div id="example" style="padding-top: 0;">
+
+    <style>
+    body[parentmenutype="22"][menutype="22"] .k-overflow-anchor.k-button {
+        display: none;
+    }
+    body[parentmenutype="22"][menutype="22"] .k-page {
+        width: 100%!important;
+    }
+a#btn_reload, .k-button-group {
+    display: none;
+}
+    </style>
+
+<div id="div_pdf"></div>
+    
+<script>
+    var url = 'https://www.speedmis.com/SpeedMIS_intro.pdf';
+    if(isMobile()) {
+
+        $.when(
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"),
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.entry.min.js"),
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js")
+                )
+                .done(function () {
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';           
+                }).then(function() {
+                    $('div#div_pdf').kendoPDFViewer({
+                        pdfjsProcessing: {
+                            file: url
+                        },
+                        render: function(e) {
+                            setTimeout( function(p_e) {
+                                if($('div#div_pdf').data('kendoPDFViewer')._events.render[0]) {
+                                    p_e.sender.toolbar.zoom.combobox.value("actual");
+                                    p_e.sender.toolbar.zoom.combobox.trigger("change");
+                                    $('div#div_pdf').data('kendoPDFViewer')._events.render[0] = null;
+                                }
+                            },0,e);
+                        },
+                        width: "calc(100% - 0px)",
+                        height: "calc(100vh - 0px)"
+                    });
+                });
+                
+    } else {
+		setTimeout( function() {
+			$('div#main')[0].innerHTML = `
+				<iframe src="`+url+`" style="width:100%; height: calc(100% - 4px);" frameborder="0" allowfullscreen></iframe>
+			`;
+		});
+	}
+</script>
+
+
+<script>
+
+var p_columns;
+
+if(getCookie("modify_YN")=="") setCookie('modify_YN','N');
+
+$(document).ready(function() {
+    
+
+    $("#toolbar").kendoToolBar({
+        items: [
+                { id: "btn_mMenu", icon: "k-icon k-i-menu", type: "button", togglable: true, overflow: "never" },
+                { id: "btn_leftVibile", icon: "k-icon k-i-thumbnails-left", type: "button", overflow: "never" },
+                { id: "btn_fullScreen", icon: "k-icon k-i-full-screen", type: "button", togglable: true, overflow: "never" },
+            { id: "btn_reload", icon: "k-icon k-i-reload", type: "button", overflow: "never" },
+            
+            {
+                type: "buttonGroup",
+                buttons: [
+                    { id: "btn_view", group: "view", selected: getCookie("modify_YN")!="Y", togglable: true, text: "조회", icon: "k-icon k-i-eye", type: "button" },
+                                        { id: "btn_modify", group: "view", selected: getCookie("modify_YN")=="Y", togglable: true, text: "수정", icon: "k-icon k-i-track-changes-enable", type: "button" },
+                                    ]
+            },
+            { id: "btn_1", text: "", type: "button", overflow: "never" },
+            { id: "btn_2", text: "", type: "button", overflow: "never" },
+            { id: "btn_3", text: "", type: "button", overflow: "never" },
+            { id: "btn_4", text: "", type: "button", overflow: "never" },
+            { id: "btn_5", text: "", type: "button", overflow: "never" },
+            
+
+
+
+            { id: "btn_alert", icon: "k-icon k-i-question", type: "button" },
+
+
+                        { id: "btn_menuView", text: "메뉴삽입", icon: "k-icon k-i-thumbnails-left", type: "button" },
+            
+            
+            {
+                id: "btn_urlCopy",
+                type: "button",
+                text: "URL 복사",
+                overflow: "always"
+            },
+            {
+                id: "btn_alim",
+                type: "button",
+                text: "알림창",
+                overflow: "always"
+            },
+            { id: "btn_reopen", text: "다시열기", type: "button", overflow: "always" },
+            { id: "btn_newopen", text: "새창열기", type: "button", overflow: "always" },
+
+
+            
+            { id: "btn_mConfig", type: "button", text: "설정", togglable: true },
+            { id: "btn_menuName", text: "SpeedMIS 소개", attributes: { title: "관리자 권한" }, type: "button", class: "info" },
+
+
+
+                { id: "btn_help", 
+                    text: "Guide: 사용자 정의 서버로직을 통해 독립적인 프로그램을 개발하고 구성할 수 있습니다.", type: "button", overflow: "never" },
+        
+                {
+            id: "btn_editHelp",
+            type: "button",
+            text: "도움말 작성",
+            overflow: "always"
+        },
+        
+            
+            { id: "btn_menuRefresh", text: "메뉴새로고침", type: "button", overflow: "always" },
+                        { id: "btn_webSourceOpen", text: "해당 웹소스 열기", type: "button", overflow: "always" },
+                                                    { id: "btn_devQueryOff", text: "실사용 모드", type: "button", overflow: "always" },
+                                                    { id: "btn_opinion", text: "관리자문의/불편신고", type: "button", overflow: "always" },
+            
+            { id: "btn_logout", text: "로그아웃", type: "button", overflow: "always" },
+        ],
+        click: toolbar_onClick,
+        toggle: onToggle,
+    });
+
+
+    if(typeof thisLogic_toolbar=="function") {
+        thisLogic_toolbar();
+    } 
+    if($("#btn_alert")[0]) {
+        if($("#btn_alert")[0].style.background!="yellow") { $("#btn_alert").remove(); $("#btn_alert_overflow").remove(); }
+    }
+    if($("a#btn_1").text()=="") { $("#btn_1").remove(); }
+    if($("a#btn_2").text()=="") { $("#btn_2").remove(); }
+    if($("a#btn_3").text()=="") { $("#btn_3").remove(); }
+    if($("a#btn_4").text()=="") { $("#btn_4").remove(); }
+    if($("a#btn_5").text()=="") { $("#btn_5").remove(); }
+
+
+
+    $("div#toolbar a").focus( function() {
+        $(this).blur();
+    });
+
+    $('li[data-overflow="always"] a').focus( function() {
+        $(this).blur();
+    });
+    
+
+
+
+});
+
+
+
+    </script>
+</div>
+
+
+
+        </div>
+
+    </div>
+
+<input id='spreadsheets_url' value='' type='hidden'/>
+
+
+</div>
+</div>
+
+
+
+
+
+<script id="template_help" type="text/x-kendo-template">
+    <div class="template-wrapper help">
+        <p>A cheese made in the La Mancha region of Spain from the milk of sheep of the Manchega breed</p>
+    </div>
+</script>
+
+
+
+
+<script src="cssJs/common_bottom.js?20250505.014155sds"></script>
+<script src="cssJs/simple_bottom.js?20250505.014155333"></script>
+
+
+
+<script>
+
+
+if(!isMainFrame()) {
+    if(parent.document.getElementById("MenuType")) {
+        if(parent.document.getElementById("MenuType")) $('body').attr('parentMenuType', parent.document.getElementById("MenuType").value);
+        $('body').attr('parentIsMainFrame', iif(parent.isMainFrame(),"Y","N"));
+        $('body').attr('parentActionFlag', parent.document.getElementById('ActionFlag').value);
+    }
+}
+
+
+
+
+
+</script>
+
+
+
+   <!-- Open the example in Dojo and select version prior to 2022 R1 to see the difference in the appearance -->
+   <div id="fab">
+
+<div id="dev_ctrl"></div>
+<table class="dev_table k-table"><tbody><tr><th style="width:60px;background:#ddd;color:#000;font-size:11px;">선택 :</th>
+<th style="border-left:none;width:80px;"><a id="dev_page_view_real" onclick="dev_page_view('real');" href="javascript:;">실사용 보기</a></th>
+<th style="border-left:none;width:78px;background:#ddd;color:#000;font-size:11px;">복제 / 적용<br>
+<a href="javascript:;" onclick="open_design();" style="color:blue">실디</a> ▼ <a href="javascript:;" onclick="open_design('pre');" style="color:#000">테디</a>
+</th>
+<th style="border-left:none;width:80px;background:#000;"><a id="dev_page_view_pre" onclick="dev_page_view('pre');" href="javascript:;">테스트 보기</a></th>
+</tr>
+<tr><td style="border-top:none;background:#ddd;color:#000;font-size:11px;">상세내역</td>
+<td style="border-top:none;border-left:none;"><a id="real_detail" href="javascript:;" onclick="dev_source_open('real','detail');"></a></td>
+<td rowspan="2" style="border-top:none;"><a href="javascript:;" onclick="dev_source_copyTo_pre();">테스트로 복제</a><br /><br />
+<a href="javascript:;" onclick="dev_source_applyTo_real();">실사용에 적용</a><br /><br />
+<a href="javascript:;" onclick="dev_source_delete_pre();">테스트 삭제</a></td>
+<td style="border-top:none;border-left:none;background:#000;"><a id="pre_detail" href="javascript:;" onclick="dev_source_open('pre','detail');"></a></td>
+</tr>
+<tr><td style="border-top:none;background:#ddd;color:#000;font-size:11px;">PHP로직</td>
+<td style="border-top:none;border-left:none;"><a id="real_php" href="javascript:;" onclick="dev_source_open('real','php');"></a></td>
+<td style="border-top:none;border-left:none;background:#000;"><a id="pre_php" href="javascript:;" onclick="dev_source_open('pre','php');"></a></td>
+</tr>
+</tbody></table>
+
+   </div>
+
+    <script>
+        if(getCookie('dev_ctrl_on')==null) {
+            setCookie('dev_ctrl_on','off',999);
+        }
+        
+        $('div#dev_ctrl').click( function() {
+            dev_ctrl_apply(1);
+            draw_program_info();
+            dev_page_view();
+        });
+        
+
+        var devTarget = getCookie('devTarget');     //1=실사용, 2=테스트
+        if(devTarget!='1' && devTarget!='2') {
+            devTarget = '1';
+            setCookie('devTarget',devTarget,1000);
+        }
+        if(getCookie('dev_ctrl_on')!='off') {
+            draw_program_info();
+            dev_page_view();
+        }
+
+
+    </script>
+
+
+
+
+</body>
+</html>
+
+

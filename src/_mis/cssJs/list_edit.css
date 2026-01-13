@@ -1,0 +1,34 @@
+﻿
+#example .box:first-child {
+    margin-top: 0;
+}
+.box {
+    margin: 0;
+    padding: 5px 5px 5px 10px;
+}
+
+.k-spreadsheet-view {
+    height: calc(100vh - 77px)!important;
+}
+
+div#spreadsheet {
+    height: calc(100vh - 68px);
+}
+
+
+html {
+    overflow: hidden;
+}
+
+.comment {
+    display: inline-block;
+    margin-left: 15px;
+    color: blue;
+    background: antiquewhite;
+    padding: 0 10px;
+}
+
+.k-state-disabled, .k-spreadsheet-active-cell.k-single {
+    color: #000;
+}
+

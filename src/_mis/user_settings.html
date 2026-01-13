@@ -1,0 +1,312 @@
+
+    <div class="user-settings k-widget">
+        <ul>
+          <li style="border-top:0;">DARK MODE  
+            <div id="select-kendoTheme" class="select">
+
+                <span class="k-button silver" title="LIGHT1">
+                    LIGHT1
+                </span>
+
+                <span class="k-button blueopal" title="LIGHT2">
+                    LIGHT2
+                </span>
+
+                <span class="k-button highcontrast" title="DARK">
+                    DARK
+                </span>
+
+                <span class="k-button default" title="SYSTEM">
+                    SYSTEM
+                </span>
+            </div>
+          </li>
+          
+          <li class="screen-mode">SCREEN MODE 
+            <div id="select-screenMode" class="select">
+              <span>
+                PC
+              </span>
+              <span>
+                MOBILE
+              </span>
+            </div>
+          </li>
+
+          <!--
+          <li>FORM WIDTH'S BUTTON  <input id="select-device"/></li>
+           -->
+           <li>LOADING RIGHT OPEN
+            <div id="select-poistion" class="select">
+              <span>
+                ON CLICK
+              </span>
+              <span>
+                AUTO RIGHT
+              </span>
+              <!--
+              <span>
+                BOTTOM
+              </span>
+              -->
+            </div>
+          </li>
+           
+          <li class="only-mobile hide">APP INSTALL (PWA)
+            <div id="select-pwa" class="select">
+              <span class="k-button" title="앱설치" onclick="triggerPWAInstall();">
+                    INSTALL
+              </span>
+            </div>
+          </li>
+           
+          <li class="only-pc hide">REMOTE SUPPORT
+            <div id="select-poistion" class="select">
+              <span class="k-button" title="원격지원" onclick="alert('다운로드 후 별도 설치없이 실행할 수 있습니다.');location.href = 'https://download.anydesk.com/AnyDesk.exe';">
+                AnyDesk Download
+              </span>
+            </div>
+          </li>
+           
+          <li style="text-align: center;"><a class="_close k-button k-state-active">CLOSE</a></li>
+          
+          
+        </ul>
+    </div>
+
+    <style>
+
+div#select-kendoTheme span {
+    display: inline-block;
+    height: 29px;
+    width: auto;
+    margin-left: 10px;
+    padding: 4px;
+}
+span.default {
+    background: #f36616!important;
+}
+span.silver {
+    background: #fff!important;
+    color: #000!important;
+}
+span.blueopal {
+    background: #7bd2f6!important;
+    color: #003f59!important;
+}
+span.highcontrast {
+    background: #1b141a!important;
+    color: #fff!important;
+}
+
+.k-tooltip-closable .k-tooltip-content {
+    padding-right: 0;
+}
+        .user-settings ul {
+            margin: 0;
+            padding: 0;
+        }
+    .select {
+        float: right;
+    }
+            .user-settings ul li {
+                list-style-type: none;
+                margin: 0;
+                padding: 10px;
+                min-height: 28px;
+                line-height: 28px;
+                vertical-align: middle;
+                border-top: 1px solid rgba(128,128,128,.5);
+            }
+
+            body[ismobile="Y"] .user-settings ul li {
+                font-size: 10px;
+                padding: 10px 5px 10px 10px;
+            }
+
+        .user-settings {
+            min-width: 220px;
+            padding: 0;
+        }
+
+            .user-settings ul li .k-switch {
+                float: right;
+            }
+            a._close {
+                float: initial;
+            }
+
+            .select_round {
+                border:5px solid yellow!important;
+                padding-top: 2px!important;
+                height: 32px!important;
+                top: -1px!important;
+            }
+    </style>
+
+<script>
+    $(function () {
+        if(isMobile()==true) {
+            if(document.getElementById('push_endpoint')) {
+                $('.only-mobile').removeClass('hide');
+            }
+            if($('body').attr('isphonemobile')=='Y') {
+                $('.screen-mode').addClass('hide');
+                setCookie('screenMode', '1', 1000);  //MOBILE 로 전환
+                if(isMobile()==true) {
+                    setCookie('isMobile', 'Y', 1000);  //MOBILE 로 전환
+                    setCookie('pageSizes', '20', 1000);
+                    setCookie('header_filter_display','none');
+                }
+            }
+        } else {
+            $('.only-pc').removeClass('hide');
+        }
+        kendoTheme = getCookie('kendoTheme');
+        
+        if(kendoTheme=='silver') {
+            p_index = 0;
+        } else if(kendoTheme=='blueopal') {
+            p_index = 1;
+        } else if(kendoTheme=='highcontrast') {
+            p_index = 2;
+        } else if(kendoTheme=='default') {
+            p_index = 3;
+        } else {
+            p_index = 3;
+            kendoTheme = 'silver';
+            setCookie('kendoTheme',kendoTheme,1000);
+            setCookie('kendoThemeSystem','N',1000);
+        }
+        kendoThemeSystem = getCookie('kendoThemeSystem');
+        $('span.'+kendoTheme).addClass('select_round');
+        if(kendoThemeSystem=='Y') {
+            $('span.default').addClass('select_round');
+        }
+        $("#select-kendoTheme").kendoButtonGroup({
+            index: p_index,
+            select: function (e) {
+                if(e.indices==0) {
+                    setCookie('kendoTheme','silver',1000);
+                    setCookie('kendoThemeSystem','N',1000);
+                } else if(e.indices==1) {
+                    setCookie('kendoTheme','blueopal',1000);
+                    setCookie('kendoThemeSystem','N',1000);
+                } else if(e.indices==2) {
+                    setCookie('kendoTheme','highcontrast',1000);
+                    setCookie('kendoThemeSystem','N',1000);
+                } else if(e.indices==3) {
+                    setCookie('kendoThemeSystem','Y',1000);
+                }
+                kendoTheme = getCookie('kendoTheme');
+                kendoThemeSystem = getCookie('kendoThemeSystem');
+                $('span.select_round').removeClass('select_round');
+                $('span.'+kendoTheme).addClass('select_round');
+                if(kendoThemeSystem=='Y') {
+                    $('span.default').addClass('select_round');
+                }
+                change_dark_mode();
+                
+                //location.href = location.href.split('#')[0];
+            },
+        });
+
+
+
+
+        $("#select-screenMode").kendoButtonGroup({
+            index: iif(getCookie('screenMode')=='1',1,0),
+            select: function (e) {
+                url = location.href.split('#')[0];
+                url = replaceAll(url, '&isMenuIn=Y', '');
+                url = replaceAll(url, '&isMenuIn=N', '');
+                setCookie('pageSizes', '100', 1000);
+                //setCookie('header_filter_display','table-row');
+                if(e.indices==1) {
+                    setCookie('screenMode', '1', 1000);  //MOBILE 로 전환
+                    if(isMobile()==true) {
+                        setCookie('isMobile', 'Y', 1000);  //MOBILE 로 전환
+                        setCookie('pageSizes', '20', 1000);
+                        setCookie('header_filter_display','none');
+                    } else {
+                        setCookie('isMobile', 'N', 1000);  //MOBILE 로 전환
+                    }
+                    
+                    location.href =  url;
+                } else if(e.indices==0) {
+                    setCookie('screenMode', '2', 1000);  //PC 로 전환
+                    if(isMobile()==true) {
+                        setCookie('isMobile', 'Y', 1000);  //MOBILE 로 전환
+                        setCookie('pageSizes', '20', 1000);
+                        setCookie('header_filter_display','none');
+                    } else {
+                        setCookie('isMobile', 'N', 1000);  //MOBILE 로 전환
+                    }
+                    location.href =  url + '&isMenuIn=Y';
+                }
+
+            }
+        });
+
+
+        setCookie('select_device_on', '1',1000);
+        /*
+        $("#select-device").kendoSwitch({
+            checked: getCookie('select_device_on')=='1',
+            messages: {
+                checked: "ON",
+                unchecked: "OFF"
+            },
+            change: function (e) {
+                
+                if(e.checked) {
+                    setCookie('select_device_on', '1',1000);
+                    select_device_load();
+                } else {
+                    setCookie('select_device_on', '0',1000);
+                    if($("#select_device")[0]) {
+                        $("#select_device")[0].outerHTML = '';
+                    }
+                }
+            }
+        });
+        */
+        
+        if(getCookie('viewTarget')=='bottom') {
+            p_index = 2;
+        } else if(getCookie('rframe')=='12') {
+            p_index = 1;
+            setCookie('viewTarget','right',1000);
+        } else {
+            p_index = 0;
+            setCookie('viewTarget','right',1000);
+        }
+        $("#select-poistion").kendoButtonGroup({
+            index: p_index,
+            select: function (e) {
+                if(e.indices==2) {
+                    setCookie('viewTarget','bottom',1000);
+                } else if(e.indices==1) {
+                    setCookie('viewTarget','right',1000);
+                    setCookie('rframe','12',1000);
+                } else {
+                    setCookie('viewTarget','right',1000);
+                    setCookie('rframe','',1000);
+                }
+                location.href = location.href.split('#')[0];
+            },
+        });
+        $('a._close').click( function() {
+            $('a.k-icon.k-i-close').click();
+        });
+        if(isMobile()==true) {
+            setTimeout( function() {
+                obj = $('.user-settings').parent().parent();
+                obj.parent().css('max-width','calc(100% - 15px)');
+                obj.parent().css('top','50px');
+                obj.parent().css('right','10px');
+                obj.css('max-width','100%');
+            });
+        }
+    });
+</script>

@@ -1,0 +1,8 @@
+
+/* 윈도우IIS 웹서버에서 2차 DB 서버 오라클 접속설정 */
+
+//foreach(PDO::getAvailableDrivers() as $driver)
+$database2 = new PDO("oci:dbname=//$DbServerName2/$base_db2;charset=UTF8","$DbID2","$DbPW2");
+$database2->setAttribute( PDO::ATTR_CASE, PDO::CASE_NATURAL );
+$database2->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+$database2->setAttribute( PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE, true );

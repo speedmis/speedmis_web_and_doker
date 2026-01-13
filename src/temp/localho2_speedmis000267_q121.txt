@@ -1,0 +1,130 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList_Detail table_m 
+ where 9=9  and table_m.useflag='1'
+ and table_m.RealPid = 'speedmis001333' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.RealPid as "RealPid"
+,table_m.aliasName as "aliasName"
+,table_m.SortElement as "SortElement"
+,table_m.Grid_Columns_Title as "Grid_Columns_Title"
+,table_m.Grid_FormGroup as "Grid_FormGroup"
+,table_m.Grid_Columns_Width as "Grid_Columns_Width"
+,table_m.Grid_Align as "Grid_Align"
+,table_m.Grid_Orderby as "Grid_Orderby"
+,table_m.Grid_Select_Tname as "Grid_Select_Tname"
+,table_m.Grid_Select_Field as "Grid_Select_Field"
+,table_m.Grid_GroupCompute as "Grid_GroupCompute"
+,table_m.Grid_CtlName as "Grid_CtlName"
+,table_m.Grid_Schema_Type as "Grid_Schema_Type"
+,table_m.Grid_MaxLength as "Grid_MaxLength"
+,table_m.Grid_PrimeKey as "Grid_PrimeKey"
+,table_m.Grid_Items as "Grid_Items"
+,table_m.Grid_Default as "Grid_Default"
+,table_m.Grid_Pil as "Grid_Pil"
+,table_m.Grid_ListEdit as "Grid_ListEdit"
+,table_m.Grid_Schema_Validation as "Grid_Schema_Validation"
+,table_m.Grid_IsHandle as "Grid_IsHandle"
+,table_m.Grid_Templete as "Grid_Templete"
+,table_m.Grid_Alim as "Grid_Alim"
+,table_m.remark as "remark"
+,table_m.Grid_Columns_Title as "table_mQmGrid_Columns_Title"
+,table_COLUMNS.DATA_TYPE as "table_COLUMNSQnDATA_TYPE"
+,table_COLUMNS.CHARACTER_MAXIMUM_LENGTH as "table_COLUMNSQnCHARACTER_MAXIMUM_LENGTH"
+,table_COLUMNS.COLUMN_DEFAULT as "table_COLUMNSQnCOLUMN_DEFAULT"
+,table_COLUMNS.IS_NULLABLE as "table_COLUMNSQnIS_NULLABLE"
+-- ,nULL as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,BIN(table_m.Grid_View_Fixed) as "Grid_View_Fixed"
+,BIN(table_m.Grid_Enter) as "Grid_Enter"
+,case when table_m.Grid_Columns_Width<=-1 then 'N' else 'Y' end as "znaeyongnochuryeobu"
+,table_m.Grid_View_XS as "Grid_View_XS"
+,table_m.Grid_View_SM as "Grid_View_SM"
+,table_m.Grid_View_MD as "Grid_View_MD"
+,table_m.Grid_View_LG as "Grid_View_LG"
+,table_m.Grid_View_Hight as "Grid_View_Hight"
+,
+        CONCAT(case 
+        when table_next.Grid_CtlName='dropdownlist' then
+            case 
+            when table_next.Grid_Columns_Width >= 50 or replace(table_next.Grid_MaxLength,'!','')*1 >= 50 then 'col-xs-12 col-sm-6 col-md-6 col-lg-6'
+            else 'col-xs-6 col-sm-3 col-md-3 col-lg-3'
+            end
+        when table_m.Grid_CtlName='dropdownitem' then
+            case 
+            when table_m.Grid_Columns_Width >= 50 or replace(table_m.Grid_MaxLength,'!','')*1 >= 50 then 'col-xs-12 col-sm-6 col-md-6 col-lg-6'
+            else 'col-xs-6 col-sm-3 col-md-3 col-lg-3'
+            end
+        when table_m.Grid_Columns_Width<>-1 and INSTR(table_m.Grid_Columns_Title,':')>0 then
+            'col-xs-12 col-sm-12 col-md-12 col-lg-12'
+            
+        when table_m.Grid_Schema_Validation='code' then
+            'col-xs-12 col-sm-12 col-md-12 col-lg-12'
+        when table_m.Grid_CtlName='textarea' then
+            'col-xs-12 col-sm-12 col-md-12 col-lg-6'
+        when table_m.Grid_Select_Field='' and table_m.Grid_Templete='Y' then
+            'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+            
+        when table_m.Grid_CtlName='textdecrypt2' then
+            'col-xs-12 col-sm-12 col-md-6 col-lg-4'
+        when table_m.Grid_CtlName='text' and (table_m.Grid_Schema_Validation='zipcode' or table_prev.Grid_Schema_Validation='zipcode' or table_prev2.Grid_Schema_Validation='zipcode') then
+            case 
+            when table_m.Grid_Schema_Validation<>'zipcode' and table_prev.Grid_Schema_Validation='zipcode' then 'col-xs-12 col-sm-8 col-md-5 col-lg-5'
+            when table_m.Grid_Schema_Validation='zipcode' then 'col-xs-12 col-sm-4 col-md-3 col-lg-3'
+            else 'col-xs-12 col-sm-12 col-md-4 col-lg-4'
+            end
+        
+        when left(table_m.Grid_CtlName,4)='text' then
+            case 
+            when table_m.Grid_Columns_Width >= 500 or replace(table_m.Grid_MaxLength,'!','') >= 500 then 'col-xs-12 col-sm-12 col-md-12 col-lg-12'
+            when table_m.Grid_Columns_Width >= 200 or replace(table_m.Grid_MaxLength,'!','') >= 100 then 'col-xs-12 col-sm-12 col-md-12 col-lg-6'
+            when table_m.Grid_Columns_Width >= 100 or replace(table_m.Grid_MaxLength,'!','') >= 100 or length(ifnull(table_m.Grid_Alim,''))>20 then 'col-xs-12 col-sm-12 col-md-6 col-lg-6'
+            when table_m.Grid_Columns_Width >= 50 or replace(table_m.Grid_MaxLength,'!','')*1 >= 50 then 'col-xs-12 col-sm-6 col-md-3 col-lg-3'
+            else 'col-xs-6 col-sm-6 col-md-3 col-lg-3'
+            end
+            
+        else
+            
+            case when table_m.Grid_Columns_Width >= 100 or replace(table_m.Grid_MaxLength,'!','') >= 100 then 'col-xs-12 col-sm-12 col-md-12 col-lg-12'
+            when table_m.Grid_CtlName='attach' or table_m.Grid_Columns_Width >= 50 or replace(table_m.Grid_MaxLength,'!','')*1 >= 50 then 'col-xs-12 col-sm-6 col-md-6 col-lg-6'
+            else 'col-xs-6 col-sm-3 col-md-3 col-lg-3'
+            end
+            
+        end 
+        ,
+        case 
+        when table_m.Grid_CtlName='attach' or table_m.Grid_CtlName='dropdowntree' then ' row-54'
+        when table_m.Grid_Schema_Validation='code' then ' row-0'
+        when table_m.Grid_CtlName='textarea' then ' row-3'
+        when table_m.Grid_CtlName='html' then ' row-60'
+        else ' row-1'
+        end 
+        ) 
+         as "zgwonjangkeullaeseu"
+,concat('col-xs-', table_m.Grid_View_XS, ' col-sm-', table_m.Grid_View_SM, ' col-md-', table_m.Grid_View_MD, ' col-lg-', table_m.Grid_View_LG, ' row-', table_m.Grid_View_Hight) as "zseoljeongkeullaeseu"
+,concat('col-xs-', table_m.Grid_View_XS, case when table_m.Grid_View_XS<>table_m.Grid_View_SM then concat(' col-sm-', table_m.Grid_View_SM) else '' end , case when table_m.Grid_View_SM<>table_m.Grid_View_MD then concat(' col-md-', table_m.Grid_View_MD) else '' end, case when table_m.Grid_View_MD<>table_m.Grid_View_LG or table_m.Grid_View_LG='12' then concat(' col-lg-', table_m.Grid_View_LG) else '' end, ' row-', table_m.Grid_View_Hight) as "zseoljeongSIMPLE"
+,table_m.Grid_View_Class as "Grid_View_Class"
+from MisMenuList_Detail table_m
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid = table_m.RealPid
+left outer join INFORMATION_SCHEMA.COLUMNS table_COLUMNS on table_COLUMNS.TABLE_SCHEMA='speedmis_db_demo' and table_COLUMNS.TABLE_NAME='MisMenuList_Detail' and table_m.Grid_Select_Field=table_COLUMNS.COLUMN_NAME
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+left outer join MisMenuList_Detail table_prev on table_prev.RealPid = table_m.RealPid and table_prev.SortElement = table_m.SortElement-1
+left outer join MisMenuList_Detail table_next on table_next.RealPid = table_m.RealPid and table_next.SortElement = table_m.SortElement+1
+left outer join MisMenuList_Detail table_prev2 on table_prev2.RealPid = table_m.RealPid and table_prev2.SortElement = table_m.SortElement-2
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ and table_m.RealPid = 'speedmis001333'  order by table_m.SortElement limit 200) aaa order by SortElement) bbb where rowNumber between 1 and 200
+
+--app Sql :
+
+-----------------------------------------------
+    

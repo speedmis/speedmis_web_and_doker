@@ -1,0 +1,33 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisGroup_Master table_m 
+ where 9=9  and table_m.useflag='1'
+ and table_m.idx = N'97' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.gname as "gname"
+,(select count(table_new_gidx.idx) from MisMenuList table_new_gidx where table_new_gidx.new_gidx=table_m.idx) as "zmenyusayonghoetsu"
+,(select count(table_gidx.idx) from MisGroup_Member table_gidx where table_gidx.gidx=table_m.idx) as "zmembeojeonguisu"
+,'' as "zmembeojijeong"
+,table_m.remark as "remark"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,case when table_m.idx<=94 then 1 else 0 end as "read_only_condition"
+from MisGroup_Master table_m
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ and table_m.idx = N'97'  order by table_m.idx desc limit 100) aaa order by idx desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

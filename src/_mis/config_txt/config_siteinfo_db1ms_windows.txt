@@ -1,0 +1,11 @@
+
+/* 윈도우IIS 웹서버에서 1차 DB서버 MSSQL 접속설정 */
+if($MS_MJ_MY=='MY') {
+    $externalDB['1st'] = "MY(@)$DbServerName(@)$base_db(@)$DbID(@)$DbPW";
+} else {
+    $database = new PDO( "sqlsrv:server=$DbServerName; Database=$base_db","$DbID","$DbPW");  
+    $database->setAttribute( PDO::ATTR_CASE, PDO::CASE_NATURAL );
+    //$database->setAttribute( PDO::ATTR_TIMEOUT, 600 );
+    $database->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    $database->setAttribute( PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE, true );			//이거 있어야 int 형이 따옴표 없어짐!!
+}

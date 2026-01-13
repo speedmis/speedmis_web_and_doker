@@ -1,0 +1,4 @@
+
+-- update sql :
+
+ update MisGroup_Master set gname='운영자',remark='',lastupdate=CURRENT_TIMESTAMP,lastupdater='gadmin' where idx='97';

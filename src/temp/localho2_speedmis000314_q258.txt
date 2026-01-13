@@ -1,0 +1,4 @@
+
+-- update sql :
+
+ update MisMenuList set upRealPid='speedmis000001',MenuName='업무관리',briefTitle='',isMenuHidden='N',SortG2=1,SortG4=0,SortG6=0,new_gidx=21,AuthCode='01',MenuType='00',MisJoinPid='',AddURL='',remark='',isCoreProgram='N',help_update_deny=0,help_title='',help_contents='',lastupdate=CURRENT_TIMESTAMP,lastupdater='gadmin' where idx='865';

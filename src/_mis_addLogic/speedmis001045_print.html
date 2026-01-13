@@ -1,0 +1,480 @@
+
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 15">
+<link rel=File-List href="SpeedMIS_Daemon.files/filelist.xml">
+<style id="SpeedMIS_Daemon_8650_Styles">
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+.font58650
+	{color:windowtext;
+	font-size:8.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"맑은 고딕", monospace;
+	mso-font-charset:129;}
+.font68650
+	{color:#1F497D;
+	font-size:20.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"Malgun Gothic", monospace;
+	mso-font-charset:129;}
+.font78650
+	{color:#366092;
+	font-size:16.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"Malgun Gothic", monospace;
+	mso-font-charset:129;}
+.font88650
+	{color:#343434;
+	font-size:11.0pt;
+	font-weight:700;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Arial, sans-serif;
+	mso-font-charset:0;}
+.font98650
+	{color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Arial, sans-serif;
+	mso-font-charset:0;}
+.font108650
+	{color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:돋움, monospace;
+	mso-font-charset:129;}
+.font118650
+	{color:#343434;
+	font-size:11.0pt;
+	font-weight:700;
+	font-style:normal;
+	text-decoration:none;
+	font-family:돋움, monospace;
+	mso-font-charset:129;}
+.xl158650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:black;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"맑은 고딕", monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:general;
+	vertical-align:middle;
+	mso-background-source:auto;
+	mso-pattern:auto;
+	white-space:nowrap;}
+.xl698650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#343434;
+	font-size:11.0pt;
+	font-weight:700;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Arial, sans-serif;
+	mso-font-charset:0;
+	mso-number-format:General;
+	text-align:center;
+	vertical-align:middle;
+	border-top:1.0pt solid #E8E8EA;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:#F5F5F6;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl708650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#343434;
+	font-size:11.0pt;
+	font-weight:700;
+	font-style:normal;
+	text-decoration:none;
+	font-family:돋움, monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:center;
+	vertical-align:middle;
+	border-top:1.0pt solid #E8E8EA;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:#F5F5F6;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl718650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:돋움, monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:center;
+	vertical-align:middle;
+	border-top:none;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:white;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl728650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Arial, sans-serif;
+	mso-font-charset:0;
+	mso-number-format:General;
+	text-align:center;
+	vertical-align:middle;
+	border-top:1.0pt solid #E8E8EA;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:white;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl738650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#366092;
+	font-size:16.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"Malgun Gothic", monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:general;
+	vertical-align:bottom;
+	mso-background-source:auto;
+	mso-pattern:auto;
+	white-space:nowrap;}
+.xl748650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Arial, sans-serif;
+	mso-font-charset:0;
+	mso-number-format:General;
+	text-align:general;
+	vertical-align:middle;
+	border-top:1.0pt solid #E8E8EA;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:white;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl758650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#323332;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:돋움, monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:general;
+	vertical-align:middle;
+	border-top:1.0pt solid #E8E8EA;
+	border-right:none;
+	border-bottom:1.0pt solid #E8E8EA;
+	border-left:none;
+	background:white;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl768650
+	{padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:#1F497D;
+	font-size:20.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"Malgun Gothic", monospace;
+	mso-font-charset:129;
+	mso-number-format:General;
+	text-align:center;
+	vertical-align:bottom;
+	mso-background-source:auto;
+	mso-pattern:auto;
+	white-space:nowrap;}
+ruby
+	{ruby-align:left;}
+rt
+	{color:windowtext;
+	font-size:8.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:"맑은 고딕", monospace;
+	mso-font-charset:129;
+	mso-char-type:none;}
+-->
+</style>
+</head>
+
+<body>
+<!--[if !excel]><![endif]-->
+<!--다음 내용은 Microsoft Excel의 웹 페이지로 게시 마법사를 사용하여 작성되었습니다.-->
+<!--같은 내용의 항목이 다시 게시되면 DIV 태그 사이에 있는 내용이 변경됩니다.-->
+<!----------------------------->
+<!--Excel의 웹 페이지 마법사로 게시해서 나온 결과의 시작 -->
+<!----------------------------->
+
+<div id="SpeedMIS_Daemon_8650" align=center x:publishsource="Excel">
+
+<table border=0 cellpadding=0 cellspacing=0 width=957 style='border-collapse:
+ collapse;table-layout:fixed;width:717pt'>
+ <col width=143 style='mso-width-source:userset;mso-width-alt:4576;width:107pt'>
+ <col width=103 style='mso-width-source:userset;mso-width-alt:3296;width:77pt'>
+ <col width=368 style='mso-width-source:userset;mso-width-alt:11776;width:276pt'>
+ <col width=171 style='mso-width-source:userset;mso-width-alt:5472;width:128pt'>
+ <col width=172 style='mso-width-source:userset;mso-width-alt:5504;width:129pt'>
+ <tr height=42 valign=middle style='height:31.5pt'>
+  <td colspan=5 height=42 class=xl768650 align=center valign=bottom width=957
+  style='height:31.5pt;width:717pt'><a name="RANGE!A1:E19"><font
+  class="font68650" face="Malgun Gothic" size="5">{메뉴명} OPEN API 명세</font></a></td>
+ </tr>
+ <tr height=22 style='height:16.5pt'>
+  <td height=22 class=xl158650 style='height:16.5pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=35 valign=middle style='height:26.25pt'>
+  <td height=35 class=xl738650 valign=bottom style='height:26.25pt'><font
+  class="font78650" face="Malgun Gothic" size="5">1. 서비스 명세</font></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl158650 style='height:17.25pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl698650 bgcolor="#F5F5F6" align=center width=143
+  style='height:17.25pt;width:107pt'><font face="Arial"><b>메서드</b></font></td>
+  <td class=xl698650 bgcolor="#F5F5F6" align=center width=103 style='width:
+  77pt'><font face="Arial"><b>인증</b></font></td>
+  <td class=xl698650 bgcolor="#F5F5F6" align=center width=368 style='width:
+  276pt'><font face="Arial"><b>요청 URL</b></font></td>
+  <td class=xl698650 bgcolor="#F5F5F6" align=center width=171 style='width:
+  128pt'><font face="Arial"><b>출력 포맷</b></font></td>
+  <td class=xl698650 bgcolor="#F5F5F6" align=center width=172 style='width:
+  129pt'><font face="Arial"><b>설명</b></font></td>
+ </tr>
+ <tr height=39 valign=middle style='height:29.25pt'>
+  <td height=39 class=xl728650 bgcolor="#FFFFFF" align=center width=143
+  style='height:29.25pt;border-top:none;width:107pt'><font face="Arial">GET /
+  POST</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" align=center width=103 style='border-top:
+  none;width:77pt'><font face="Arial">OAuth 2.0</font></td>
+  <td class=xl748650 bgcolor="#FFFFFF" width=368 style='border-top:none;
+  width:276pt'><font face="Arial">https://www.speedmis.com/_mis/list_json.php?flag=read&RealPid={RealPid}&$callback=a</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" align=center width=171 style='border-top:
+  none;width:128pt'><font face="Arial">json</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" align=center width=172 style='border-top:
+  none;width:129pt'><font face="Arial">조회</font></td>
+ </tr>
+ <tr height=22 style='height:16.5pt'>
+  <td height=22 class=xl158650 style='height:16.5pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=35 valign=middle style='height:26.25pt'>
+  <td height=35 class=xl738650 colspan=2 valign=bottom style='height:26.25pt'><font
+  class="font78650" face="Malgun Gothic" size="5">2. 요청 메시지 명세</font></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl158650 style='height:17.25pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td colspan=2 height=23 class=xl698650 bgcolor="#F5F5F6" align=center
+  width=246 style='height:17.25pt;width:184pt'><font class="font118650"
+  face="돋움"><b>항목명</b></font><font class="font88650" face="Arial"><b>(</b></font><font
+  class="font118650" face="돋움"><b>영문</b></font><font class="font88650"
+  face="Arial"><b>)</b></font></td>
+  <td class=xl708650 bgcolor="#F5F5F6" align=center width=368 style='width:
+  276pt'><font face="돋움"><b>값</b></font></td>
+  <td colspan=2 class=xl708650 bgcolor="#F5F5F6" align=center width=343
+  style='width:257pt'><font face="돋움"><b>항목설명</b></font></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl728650 bgcolor="#FFFFFF" align=center width=143
+  style='height:17.25pt;border-top:none;width:107pt'><font face="Arial">$top</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" width=103 style='border-top:none;
+  width:77pt'><font face="Arial" color="#323332"></font></td>
+  <td class=xl748650 bgcolor="#FFFFFF" width=368 style='border-top:none;
+  width:276pt'><font face="Arial">min : 1, max : 1000<span
+  style='mso-spacerun:yes'>  </span>(default : 100)</font></td>
+  <td colspan=2 class=xl748650 bgcolor="#FFFFFF" width=343 style='width:257pt'><font
+  face="Arial">post </font><font class="font108650" face="돋움">방식</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">선택사항</font></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl728650 bgcolor="#FFFFFF" align=center width=143
+  style='height:17.25pt;border-top:none;width:107pt'><font face="Arial">$skip</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" width=103 style='border-top:none;
+  width:77pt'><font face="Arial" color="#323332"></font></td>
+  <td class=xl748650 bgcolor="#FFFFFF" width=368 style='border-top:none;
+  width:276pt'><font face="Arial" color="#323332"></font></td>
+  <td colspan=2 class=xl748650 bgcolor="#FFFFFF" width=343 style='width:257pt'><font
+  face="Arial">post </font><font class="font108650" face="돋움">방식</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">선택사항</font></td>
+ </tr>
+ <tr height=23 valign=middle style='mso-height-source:userset;height:17.25pt'>
+  <td height=23 class=xl728650 bgcolor="#FFFFFF" align=center width=143
+  style='height:17.25pt;border-top:none;width:107pt'><font face="Arial">$orderby</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" width=103 style='border-top:none;
+  width:77pt'><font face="Arial" color="#323332"></font></td>
+  <td class=xl748650 bgcolor="#FFFFFF" width=368 style='border-top:none;
+  width:276pt'><font face="Arial">ex) AutoGubun desc,wdate</font></td>
+  <td colspan=2 class=xl748650 bgcolor="#FFFFFF" width=343 style='width:257pt'><font
+  face="Arial">post </font><font class="font108650" face="돋움">방식</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">선택사항</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">정렬항목나열</font></td>
+ </tr>
+ <tr height=23 valign=middle style='mso-height-source:userset;height:17.25pt'>
+  <td height=23 class=xl728650 bgcolor="#FFFFFF" align=center width=143
+  style='height:17.25pt;border-top:none;width:107pt'><font face="Arial">recently</font></td>
+  <td class=xl728650 bgcolor="#FFFFFF" width=103 style='border-top:none;
+  width:77pt'><font face="Arial" color="#323332"></font></td>
+  <td class=xl748650 bgcolor="#FFFFFF" width=368 style='border-top:none;
+  width:276pt'><font face="Arial">Y or blank</font></td>
+  <td colspan=2 class=xl748650 bgcolor="#FFFFFF" width=343 style='width:257pt'><font
+  face="Arial">post </font><font class="font108650" face="돋움">방식</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">선택사항</font><font
+  class="font98650" face="Arial"> / </font><font class="font108650" face="돋움">최근등록순</font><font
+  class="font98650" face="Arial"> </font><font class="font108650" face="돋움">정렬여부</font></td>
+ </tr>
+ <tr height=22 style='height:16.5pt'>
+  <td height=22 class=xl158650 style='height:16.5pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=35 valign=middle style='height:26.25pt'>
+  <td height=35 class=xl738650 colspan=2 valign=bottom style='height:26.25pt'><font
+  class="font78650" face="Malgun Gothic" size="5">3. 응답 메시지 명세</font></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td height=23 class=xl158650 style='height:17.25pt'></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+  <td class=xl158650></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td colspan=2 height=23 class=xl698650 bgcolor="#F5F5F6" align=center
+  width=246 style='height:17.25pt;width:184pt'><font class="font118650"
+  face="돋움"><b>항목명</b></font><font class="font88650" face="Arial"><b>(</b></font><font
+  class="font118650" face="돋움"><b>영문</b></font><font class="font88650"
+  face="Arial"><b>)</b></font></td>
+  <td class=xl708650 bgcolor="#F5F5F6" align=center width=368 style='width:
+  276pt'><font face="돋움"><b>값</b></font></td>
+  <td colspan=2 class=xl708650 bgcolor="#F5F5F6" align=center width=343
+  style='width:257pt'><font face="돋움"><b>항목설명</b></font></td>
+ </tr>
+ <tr height=23 valign=middle style='height:17.25pt'>
+  <td colspan=2 height=23 class=xl758650 bgcolor="#FFFFFF" width=246
+  style='height:17.25pt;width:184pt'><font face="돋움">{상세내역:시작}{상세내역:끝}{상세내역.aliasName}</font></td>
+  <td class=xl718650 bgcolor="#FFFFFF" align=center width=368 style='width:
+  276pt'><font face="돋움">{상세내역.데이터타입}</font></td>
+  <td colspan=2 class=xl758650 bgcolor="#FFFFFF" width=343 style='width:257pt'><font
+  face="돋움">{상세내역.항목명}</font></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=143 style='width:107pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td width=368 style='width:276pt'></td>
+  <td width=171 style='width:128pt'></td>
+  <td width=172 style='width:129pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</div>
+
+
+<!----------------------------->
+<!--Excel의 웹 페이지 마법사로 게시해서 나온 결과의 끝-->
+<!----------------------------->
+</body>
+
+</html>

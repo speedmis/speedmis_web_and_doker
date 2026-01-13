@@ -1,0 +1,28 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisReadList table_m 
+ where 9=9  and 123=123 
+and ifnull(table_m.userid,'')<>''
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_userid.username as "table_useridQnusername"
+,table_m.userid as "userid"
+,table_RealPid.MenuName as "table_RealPidQnMenuName"
+,table_m.RealPid as "RealPid"
+,table_m.widx as "widx"
+,table_m.자격 as "jagyeok"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+from MisReadList table_m
+left outer join MisUser table_userid on table_userid.UniqueNum = table_m.userid
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid=table_m.RealPid
+, (select @RANKT := 0) XX where 9=9  and 123=123 
+and ifnull(table_m.userid,'')<>'' order by table_m.idx desc limit 5) aaa order by idx desc) bbb where rowNumber between 1 and 5
+
+--app Sql :
+
+-----------------------------------------------
+    

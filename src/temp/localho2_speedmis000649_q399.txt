@@ -1,0 +1,34 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisLog table_m 
+ where 9=9  and table_m.useflag='1'
+
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,DATE_FORMAT(table_m.wdate, '%Y-%m-%d %H:%i:%s') as "zjeopsogilsi"
+,table_logType.kname as "table_logTypeQnkname"
+,table_m.logType as "logType"
+,table_menuIdx.MenuName as "table_menuIdxQnMenuName"
+,table_m.menuIdx as "menuIdx"
+,table_m.query as "query"
+,table_m.HTTP_REFERER as "HTTP_REFERER"
+,table_m.ip as "ip"
+,table_m.remark as "remark"
+from MisLog table_m
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisCommonTable table_logType on table_logType.kcode = table_m.logType
+ and table_logType.gcode='speedmis000598'
+left outer join MisMenuList table_menuIdx on table_menuIdx.idx = table_m.menuIdx
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ order by table_m.idx desc limit 100) aaa order by idx desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

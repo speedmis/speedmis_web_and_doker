@@ -1,0 +1,166 @@
+﻿
+
+/* &isMenuIn=S */
+div.col-xs-6 {
+    max-width: 50%;
+}
+
+.themechooser {
+    display: none;
+}
+.k-tabstrip-top>.k-tabstrip-items-wrapper {
+    display: none;
+}
+.k-widget.k-tabstrip.k-floatwrap.k-tabstrip-top {
+    border: 0;
+    background-color: inherit;
+}
+div.k-content.k-state-active {
+    height: auto!important;
+}
+body div#main {
+    height: auto!important;
+}
+
+
+body {
+    background-color: rgb(255, 219, 217)!important;
+    padding: 20px 0;
+}
+
+
+body[ismobile="Y"] div[role="tabpanel"] > div.form-group {
+    width: 100%;
+}
+
+
+
+
+div#exampleWrap {
+    height: auto!important;
+    max-width: 1200px;
+    margin-left: calc(50% - 600px)!important;
+    border-radius: 10px;
+    border: 3px solid #fff!important;
+    background-color: #fff!important;
+}
+body[ismobile="Y"] div#exampleWrap {
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+}
+div#help_contents {
+    max-width: 1200px;
+    display: block!important;
+    margin-left: calc(50% - 600px)!important;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #fff;
+}
+body[ismobile="Y"] div#help_contents {
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+}
+
+
+
+div#help_contents_top {
+    display: block!important;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    height: 10px;
+    background-color: rgb(255, 16, 0);
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+}
+.help_MenuName {
+    text-align: center;
+    padding-bottom: 7px;
+    font-size: 25px;
+}
+
+.help_button a {
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+.help_button {
+    display: block!important;
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+    padding: 22px 0 0;
+    position: sticky;
+    bottom: 0;
+    background: transparent;
+    min-height: 60px;
+}
+body[ismainframe="N"] div[tabnumber="1"] {
+	height: calc(100vh - 136px)!important;
+    overflow-y: auto!important;
+    padding-bottom: 20px;
+}
+
+body[ispopup="Y"] .help_button {
+    max-width: 600px;
+    margin-left: calc(50% - 300px)!important;
+}
+body[ispopup="Y"][ismainframe="N"] div[tabnumber="1"] {
+	height: calc(100vh - 210px)!important;
+}
+
+
+
+body[ismainframe="N"] div#main {
+    height: calc(100vh - 0px)!important;
+    padding-bottom: 30px;
+}
+body[ismainframe="N"] #exampleWrap {
+    background: rgb(255, 219, 217)!important;
+}
+
+body[isauthw="N"] .help_button {
+	display: none!important;
+}
+body[isauthw="N"][isMainFrame="N"] #exampleWrap {
+    height: calc(100% - 5px)!important;
+}
+body[isauthw="N"][ismainframe="N"] div[tabnumber="1"] {
+    height: calc(100vh - 84px)!important;
+}
+a.k-button.save {
+    background-color: rgb(251, 0, 0);
+    color: #fff;
+}
+a.k-button.modify {
+    background-color: rgb(63, 0, 251);
+    color: #fff;
+    margin-left: calc(50% - 27px);
+}
+a.k-button.reset {
+    float: right;
+    color: rgb(251, 0, 0);
+    border: 0;
+}
+
+.k-autocomplete .k-input, .k-autocomplete.k-state-focused .k-input {
+    border-bottom: 1px solid #bfbfbf;
+}
+div#intrannet_name {
+    display: block;
+    text-align: center;
+    margin: 20px 0px;
+    font-size: 26px;
+}
+div.k-content.k-state-active {
+    overflow-y: hidden;
+}
+
+@media screen and (max-width: 660px) {
+    div#exampleWrap, div#help_contents, div#help_contents_top, .help_button, .help_button {
+        margin-left: 10px!important;
+        margin-right: 10px!important;
+    }
+
+    .textdecrypt2 input[type=text] {
+        max-width: 130px;
+    }
+}

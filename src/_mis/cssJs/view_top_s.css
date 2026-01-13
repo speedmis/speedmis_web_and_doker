@@ -1,0 +1,201 @@
+﻿
+
+/* &isMenuIn=S */
+div.col-xs-3 {
+    max-width: 24.94%;
+}
+div.col-xs-4 {
+    max-width: 33.271%
+}
+div.col-xs-5 {
+    max-width: 41.616%
+}
+div.col-xs-6 {
+    max-width: 49.941%;
+}
+div.col-xs-7 {
+    max-width: 58.3%
+}
+div.col-xs-8 {
+    max-width: 66.657%
+}
+div.col-xs-9 {
+    max-width: 74.985%
+}
+div.col-xs-10 {
+    max-width: 83.323%
+}
+div.col-xs-11 {
+    max-width: 91.657%
+}
+div.col-xs-12 {
+    max-width: 99.89%
+}
+
+
+.themechooser {
+    display: none;
+}
+.k-tabstrip-top>.k-tabstrip-items-wrapper {
+    display: none;
+}
+.k-widget.k-tabstrip.k-floatwrap.k-tabstrip-top {
+    border: 0;
+    background-color: inherit;
+}
+div#exampleWrap {
+    height: auto!important;
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+    border-radius: 10px;
+    border: 3px solid #fff!important;
+    background-color: #fff!important;
+}
+div.k-content.k-state-active {
+    height: auto!important;
+}
+body div#main {
+    height: auto!important;
+}
+
+body {
+    background-color: rgb(255, 219, 217)!important;
+    padding: 20px 0;
+}
+div[role="tabpanel"] > div.form-group {
+    width: 100%;
+}
+
+div#help_contents {
+    display: block!important;
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #fff;
+}
+
+div#help_contents_top {
+    display: block!important;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    height: 10px;
+    background-color: rgb(255, 16, 0);
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+}
+.help_MenuName {
+    text-align: center;
+    padding-bottom: 7px;
+    font-size: 25px;
+}
+
+.help_button a {
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+.help_button {
+    display: block!important;
+    max-width: 640px;
+    margin-left: calc(50% - 320px)!important;
+    padding: 22px 0 0;
+    position: sticky;
+    bottom: 0;
+    background: transparent;
+    min-height: 60px;
+}
+body[isMobile="N"] :hover::-webkit-scrollbar {
+    height: 8px;
+}
+body[ismainframe="N"] div[tabnumber="1"] {
+	height: calc(100% - 136px)!important;
+    overflow-y: auto!important;
+    padding-bottom: 20px;
+}
+body[ismainframe="N"] div#main {
+    height: calc(100% - 0px)!important;
+    padding-bottom: 0px;
+}
+body[isMenuIn="N"] div.k-content.k-state-active {
+    border: 0;
+}
+body[ismainframe="N"] #exampleWrap {
+    xbackground: rgb(255, 219, 217)!important;
+    height: calc(100% - 82px)!important;
+}
+
+body[isauthw="N"] .help_button {
+	display: none!important;
+}
+body[isauthw="N"][isMainFrame="N"] #exampleWrap {
+    height: calc(100% - 5px)!important;
+}
+body[isauthw="N"][ismainframe="N"] div[tabnumber="1"] {
+    height: calc(100% - 84px)!important;
+}
+a.k-button.save {
+    background-color: rgb(251, 0, 0);
+    color: #fff;
+}
+a.k-button.modify {
+    background-color: rgb(63, 0, 251);
+    color: #fff;
+    margin-left: calc(50% - 27px);
+}
+a.k-button.reset {
+    float: right;
+    color: rgb(251, 0, 0);
+    border: 0;
+}
+
+.k-autocomplete .k-input, .k-autocomplete.k-state-focused .k-input {
+    border-bottom: 1px solid #bfbfbf;
+}
+div#intrannet_name {
+    display: block;
+    text-align: center;
+    margin: 20px 0px;
+    font-size: 26px;
+}
+div.k-content.k-state-active {
+    overflow-y: hidden;
+}
+
+body {
+    height: 100%;
+    overflow-y: auto;
+}
+
+body[ismainframe="N"][ispopup="Y"] div[tabnumber="1"] {
+    height: calc(100% - 131px)!important;
+    border: 0;
+}
+
+body[isMainFrame="N"][ispopup="Y"] #exampleWrap {
+    height: calc(100% - 83px)!important;
+}
+
+
+body[isMainFrame="N"][ispopup="Y"] .help_button {
+    position: relative;
+    bottom: 58px;
+    z-index: 9;
+    padding: 0;
+    background: #ffdbd9;
+
+}
+body[isMainFrame="N"][ispopup="Y"] .help_button a {
+    top: 2px;
+}
+
+@media screen and (max-width: 660px) {
+    div#exampleWrap, div#help_contents, div#help_contents_top, .help_button, .help_button {
+        margin-left: 10px!important;
+        margin-right: 10px!important;
+    }
+
+    .textdecrypt2 input[type=text] {
+        max-width: 130px;
+    }
+}

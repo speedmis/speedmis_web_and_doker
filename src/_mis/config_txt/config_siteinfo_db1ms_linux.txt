@@ -1,0 +1,8 @@
+
+/* 리눅스 웹서버에서 1차 DB 서버 MSSQL 접속설정 */
+if($MS_MJ_MY=='MY') {
+    $externalDB['1st'] = "MY(@)$DbServerName(@)$base_db(@)$DbID(@)$DbPW";
+} else {
+    $driverOptions = [PDO::ATTR_CASE => PDO::CASE_NATURAL,PDO::ATTR_TIMEOUT => 600,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+    $database = new PDO ("dblib:host=$DbServerName;dbname=$base_db;charset=utf8","$DbID","$DbPW", $driverOptions);
+}

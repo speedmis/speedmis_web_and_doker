@@ -1,0 +1,64 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList_UserAuth table_m 
+left outer join MisUser table_userID on table_userID.UniqueNum = table_m.userID
+left outer join MisMenuList table_realpid on table_realpid.realpid=table_m.realpid
+ where 9=9  and table_m.useflag='1'
+and table_realpid.useflag='1' and table_m.userID in (select UniqueNum from MisUser where delchk<>'D')
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_userID.username as "table_userIDQnusername"
+,table_m.userID as "userID"
+,concat(table_userID.username,'/',table_m.userID) as "zgwallihaljigwonseongmyeongID"
+,table_m.RealPid as "RealPid"
+,table_realpid.MenuName as "table_realpidQnMenuName"
+,table_upRealPid.MenuName as "table_upRealPidQnMenuName"
+,table_realpid.upRealPid as "table_realpidQnupRealPid"
+,table_SortG2.menuname as "table_SortG2Qmmenuname"
+,case when table_realpid.depth=1 then '' when table_realpid.depth=2 then table_realpid.MenuName else table_upRealPid.MenuName end as "zsangwimenyu"
+,table_realpid.MenuName as "table_realpidQmMenuName"
+,table_realpid.idx as "table_realpidQnidx"
+,table_realpid.depth as "table_realpidQndepth"
+,table_new_gidx.gname as "table_new_gidxQngname"
+,table_realpid.new_gidx as "table_realpidQnnew_gidx"
+,table_AuthCode.kname as "table_AuthCodeQnkname"
+,table_realpid.AuthCode as "table_realpidQnAuthCode"
+,table_MenuType.kname as "table_MenuTypeQnkname"
+,table_realpid.MenuType as "table_realpidQnMenuType"
+,case (select isAdminS from MisGroup_Member where userid=table_m.userID and gidx=table_realpid.new_gidx) when '' then '읽기쓰기' when 'Y' then 'Admin' else case when ifnull(table_realpid.new_gidx,0)=0 and table_realpid.AuthCode in ('','01') then '읽기쓰기' when ifnull(table_realpid.new_gidx,0)>0 and table_realpid.AuthCode in ('','01') then '읽기전용' else '거부' end end as "zgibonggwonhan"
+,table_menuAuthCode.kname as "table_menuAuthCodeQnkname"
+,table_m.menuAuthCode as "menuAuthCode"
+-- ,nULL as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_realpid.autogubun as "table_realpidQnautogubun"
+from MisMenuList_UserAuth table_m
+left outer join MisUser table_userID on table_userID.UniqueNum = table_m.userID
+left outer join MisMenuList table_realpid on table_realpid.realpid=table_m.realpid
+left outer join MisMenuList table_upRealPid on table_upRealPid.RealPid = table_realpid.upRealPid
+ and (table_upRealPid.useflag='1' and (table_upRealPid.autogubun='00' or length(table_upRealPid.autogubun)<=4 and table_upRealPid.MenuType='00'))
+left outer join MisMenuList table_SortG2 on table_SortG2.autogubun=left(table_realpid.autogubun,2) and table_SortG2.useflag='1'
+left outer join MisGroup_Master table_new_gidx on table_new_gidx.idx = table_realpid.new_gidx
+ and table_new_gidx.idx not in (90, 52, 96, 97, 98, 99, 21, 83)
+left outer join MisCommonTable table_AuthCode on table_AuthCode.kcode = table_realpid.AuthCode
+ and table_AuthCode.gcode='speedmis000338'
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_realpid.MenuType
+ and table_MenuType.gcode='speedmis000306'
+left outer join MisCommonTable table_menuAuthCode on table_menuAuthCode.kcode = table_m.menuAuthCode
+ and table_menuAuthCode.gcode='speedmis000740'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_realpid.useflag='1' and table_m.userID in (select UniqueNum from MisUser where delchk<>'D') order by table_realpid.autogubun,table_new_gidx.gname limit 100) aaa order by table_realpidQnautogubun,table_new_gidxQngname) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

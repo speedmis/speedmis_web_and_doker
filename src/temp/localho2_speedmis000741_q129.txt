@@ -1,0 +1,20 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select 1 as fff
+
+--select sql :
+select zchoegeunjeommang from (select distinct 2 as nnn, (select sub_code.kname from MisCustCounsel_Detail sub_meet left outer join MisCommonTable sub_code on sub_code.kcode = sub_meet.계약전망코드 and sub_code.gcode='speedmis000724' where sub_meet.midx=table_m.idx and sub_meet.useflag='1' order by sub_meet.idx desc limit 1) as "zchoegeunjeommang" from MisCustCounsel_Master table_m 
+left outer join MisCommonTable table_방문경로코드 on table_방문경로코드.kcode = table_m.방문경로코드
+ and table_방문경로코드.gcode='speedmis000714'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_m.lastupdater=table_lastupdater.UniqueNum
+where 9=9  and table_m.useflag='1'
+) aaa order by nnn, zchoegeunjeommang limit 31
+
+--app Sql :
+
+-----------------------------------------------
+    

@@ -1,0 +1,2668 @@
+﻿var char_34 = String.fromCharCode(34);			//"
+var char_39 = String.fromCharCode(39);			//'
+var char_92 = String.fromCharCode(92);			//\
+var char_nbsp = "&nbsp;";
+
+const __entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': '&quot;', "'": '&#39;', "/": '&#x2F;' };
+String.prototype.escapeHTML = function () { return String(this).replace(/[&<>"'\/]/g, function (s) { return __entityMap[s]; }); }
+
+// 웹 페이지 내부의 JavaScript (www.speedmis.com/v6)
+function onGoogleLoginButtonClicked() {
+  // AndroidApp은 위에서 addJavascriptInterface로 정의한 이름입니다.
+  if (typeof AndroidApp !== 'undefined' && AndroidApp.startGoogleAuth) {
+    AndroidApp.startGoogleAuth();
+  } else {
+    // 네이티브 앱 환경이 아님 (일반 브라우저 접속)
+    console.log("네이티브 로그인 인터페이스를 찾을 수 없습니다.");
+    // 웹 기반 OAuth 로그인 로직을 실행하도록 폴백(Fallback) 처리
+  }
+}
+
+// ⭐️ 안드로이드앱 웹뷰 구글 OAuth 로그인 성공 후 호출될 JS 함수
+window.onGoogleAuthSuccess = function (data) {
+
+  console.log('ID Token:', data.idToken);
+  console.log('Email:', data.email);
+  console.log('Name:', data.displayName);
+  const loginData = {
+    app_email: data.email,       // 실제 이메일 값으로 대체
+    app_displayName: data.displayName       // 실제 표시 이름 값으로 대체
+  };
+
+  const targetUrl = '/_mis/google_oauth/callback.php';
+
+  const form = document.createElement('form');
+  form.setAttribute('method', 'post'); // POST 방식으로 설정
+  form.setAttribute('action', targetUrl);     // 전송할 URL 설정
+
+  // 2. 현재 문서의 body에 폼 추가 (폼이 실제로 보이지는 않음)
+  document.body.appendChild(form);
+  // 3. 데이터 객체를 반복하며 Hidden Input 요소 생성 및 폼에 추가
+  for (const key in loginData) {
+    if (loginData.hasOwnProperty(key)) {
+      const hiddenField = document.createElement('input');
+      hiddenField.setAttribute('type', 'hidden'); // 사용자에게 보이지 않게 숨김
+      hiddenField.setAttribute('name', key);      // 'email' 또는 'displayName'
+      hiddenField.setAttribute('value', loginData[key]); // 실제 값
+
+      form.appendChild(hiddenField);
+    }
+  }
+  // 4. 폼을 제출(submit)하여 데이터 전송과 동시에 페이지 이동
+  form.submit();
+
+};
+
+
+// ⭐️ AuthActivity에서 최종 성공 후 토큰을 받았을 때 호출될 JS 함수
+function handleNativeLoginToken(token) {
+  console.log("네이티브로부터 ID 토큰 수신:", token);
+
+  // TODO: 이 토큰을 SpeedMIS 서버로 전송하여 최종 로그인 처리 및 세션 설정
+  // 예: fetch('/api/verify-token', { method: 'POST', body: token })...
+
+  alert("SpeedMIS 로그인 완료!");
+}
+
+
+function autocomplete_dataBound_color(e) {
+
+  v = e.sender.value();
+  if (v != '') {
+    if ($('ul.k-list.k-reset > li:contains("' + v + '")').is(":visible")) {
+      $('ul.k-list.k-reset > li:contains("' + v + '")').css("background", "blueviolet");
+      $('ul.k-list.k-reset > li:contains("' + v + '")').css("color", "white");
+    }
+  }
+
+}
+
+function install_speedmis_app_load() {
+
+  if ('serviceWorker' in navigator && isMainFrame() == true) {
+
+
+    navigator.serviceWorker.register('/_mis/service-worker.js?a=11')
+      .then(function (registration) {
+        console.log('ServiceWorker 등록 성공:', registration.scope);
+
+        // 등록이 성공하고 나서 구독 시도
+        return registration.pushManager.getSubscription().then(async function (subscription) {
+          if (subscription) {
+            console.log('이미 구독되어 있음:', subscription);
+            return subscription;
+          }
+
+          const vapidPublicKey = 'BLHNMIlgjlixE-Zqc1YcqLxplAtxJMeilyhrhzXP_aqdMxd93yY7fa_r3aNF6gLqwlk70gntuX3ZWFQMm1D7Ky8';
+          const convertedKey = urlBase64ToUint8Array(vapidPublicKey);
+
+          return registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedKey
+          });
+        });
+      })
+      .then(function (subscription) {
+        console.log('✅ 푸시 구독 성공 & endpoint 생성완료');
+        document.getElementById('push_endpoint').value = subscription.endpoint;
+        document.getElementById('push_p256dh').value = subscription.toJSON().keys.p256dh;
+        document.getElementById('push_auth').value = subscription.toJSON().keys.auth;
+
+        //신규endpoint save
+        const send_data = {
+          endpoint: document.getElementById('push_endpoint').value,
+          p256dh: document.getElementById('push_p256dh').value,
+          auth: document.getElementById('push_auth').value
+        };
+
+        fetch('push_info_save.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(send_data)
+        })
+          .then(response => response.json())  // response.json()을 반환해야 Promise가 제대로 처리됨
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+
+
+      })
+      .catch(function (error) {
+        console.error('❌ 오류:', error);
+      });
+
+
+  }
+}
+// VAPID 키 변환 함수
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+//telegram_sendMessage.php 에서 전송되며, 텔레그램 전송우선 && 없으면 이메일 발송.
+function push_sendMessage(p_userid, p_title, p_body, p_url) {
+  const send_data = {
+    userid: p_userid,   // 이미 문자열
+    title: p_title,
+    body: p_body,
+    url: p_url || ''
+  };
+
+  fetch('push_sendMessage.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(send_data)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('✅ Success:', data);
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+    });
+}
+
+
+function install_btn_visible() {
+
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    if (isInstallHiddenRecently()) {
+      console.log('3일 제한으로 설치 버튼 숨김');
+      return;
+    }
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('beforeinstallprompt event fired');
+    document.getElementById('installBtn').style.display = 'block';
+
+
+    // 원하는 위치에서 사용자에게 설치 버튼 제공 가능
+    // deferredPrompt.prompt() 로 실행 가능
+  });
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt(); // 설치 창 띄움
+
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`사용자 선택: ${outcome}`);
+
+      if (outcome === 'dismissed') {
+        // 사용자가 거절한 경우: 현재 시간 저장
+        localStorage.setItem('installDismissedAt', Date.now().toString());
+      }
+      // 다시 사용하지 않도록 null 처리
+      deferredPrompt = null;
+
+      // 버튼 숨기기
+      document.getElementById('installBtn').style.display = 'none';
+    }
+  });
+}
+
+function triggerPWAInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    deferredPrompt.userChoice.then((choiceResult) => {
+      console.log('설치 결과:', choiceResult.outcome);
+      deferredPrompt = null;
+    });
+  } else {
+    alert('https 가 아니거나, 설치 가능한 상태가 아닙니다.');
+  }
+}
+
+
+// 날짜 계산 함수
+function isInstallHiddenRecently() {
+  const lastDismiss = localStorage.getItem('installDismissedAt');
+  if (!lastDismiss) return false;
+
+  const threeDays = 30 * 24 * 60 * 60 * 1000; // 30일 in ms
+  const now = Date.now();
+  return now - parseInt(lastDismiss, 10) < threeDays;
+}
+function isSystemDarkMode() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function isValidCarNumber(carNumber) {
+  // 정규 표현식으로 차량 번호판 규칙 검사
+  const regex = /^(?:\d{3}[가-힣]\d{4}|\d{2}[가-힣]\d{4}|\d{3}[가-힣]\d{3})$/;
+  return regex.test(carNumber);
+}
+function getEvents(element) {
+  const $element = $(element);
+  let elemEvents = $._data(element, "events");
+  const allDocEvnts = $._data(document, "events");
+
+  for (const evntType in allDocEvnts) {
+    if (Object.prototype.hasOwnProperty.call(allDocEvnts, evntType)) {
+      const evts = allDocEvnts[evntType];
+      for (let i = 0; i < evts.length; i++) {
+        if ($element.is(evts[i].selector)) {
+          if (elemEvents == null) {
+            elemEvents = {};
+          }
+          if (!Object.prototype.hasOwnProperty.call(elemEvents, evntType)) {
+            elemEvents[evntType] = [];
+          }
+          elemEvents[evntType].push(evts[i]);
+        }
+      }
+    }
+  }
+  return elemEvents;
+}
+function kendo_format_n(p_number, p_point) {
+  if (p_number == undefined) p_number = "";
+  p_number = replaceAll(p_number + "", ",", "");
+  if (!isNumeric(p_number)) return "";
+  if (p_point == undefined) p_point = "";
+  return kendo.toString(p_number * 1, "n" + p_point);
+}
+function kendoDateNumber_into_day10(p_number) {
+  if (isNumeric(p_number)) return kendo.toString(new Date(3600 * 24 * 1000 * (p_number * 1 - 25569)), "yyyy-MM-dd");
+  else return p_number;
+}
+function kendoDateNumber_into_day16(p_number) {
+  if (isNumeric(p_number)) return kendo.toString(new Date(3600 * 24 * 1000 * (p_number * 1 - 25569)), "yyyy-MM-dd HH:mm");
+  else return p_number;
+}
+function kendoDateNumber_into_time5(p_number) {
+  if (isNumeric(p_number)) {
+    const timeDiff = 3600 * (new Date().getUTCHours() - new Date().getHours()) * 1000;
+    return kendo.toString(new Date(3600 * 24 * 1000 * p_number + timeDiff), "HH:mm");
+  } else return p_number;
+}
+
+function changeText(selector, text) {
+  if (selector[0]) {
+    if (selector.text() != '') {
+      selector[0].title = selector.text();
+      selector[0].innerHTML = replaceAll(selector[0].innerHTML.toLowerCase(), selector.text().toLowerCase(), "@^^@");
+      selector[0].innerHTML = replaceAll(selector[0].innerHTML, "@^^@", text);
+    } else {
+      selector[0].title = text;
+    }
+  }
+}
+
+function getRandomArbitrary(min, max) {
+  const minInt = Math.ceil(min);
+  const maxInt = Math.floor(max);
+  return Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
+}
+
+
+function javaFuncName(fun) {
+  let result = fun;
+  const replacements = {
+    "_change": "Change",
+    "_json": "Json",
+    "_init": "Init",
+    "_load": "Load",
+    "_template": "Template",
+    "_pildok": "Pildoc",
+    "_update": "Update",
+    "_delete": "Delete",
+    "_write": "Write",
+    "_push": "Push",
+    "_sql": "Sql",
+    "_brief": "Brief",
+    "_page": "Page",
+    "_treat": "Treat",
+    "_index": "Index"
+  };
+  for (const [key, value] of Object.entries(replacements)) {
+    result = replaceAll(result, key, value);
+  }
+  return result;
+}
+
+
+function intoWord() {
+  preLoadjscssfile('jQuery-Word-Export/FileSaver.js');
+  setTimeout(function () {
+    preLoadjscssfile('jQuery-Word-Export/jquery.wordexport.js');
+    setTimeout(function () {
+      if ($('#userDefine_page_print').length == 1 && $('.viewPrint').is(':visible') == true) $('.viewPrint').wordExport($('.viewPrintTitle')[0].innerText);
+      else if ($('.viewPrintDivRound').length == 1 && $('.viewPrint').is(':visible') == true) $('.viewPrintDivRound').wordExport($('.viewPrintTitle')[0].innerText);
+      else {
+        alert('내용의 인쇄폼에서만 워드문서로 저장이 가능합니다.');
+      }
+    }, 500);
+  }, 500);
+}
+function listprint_PDF(selector, fname, paperSize, margin, scale, landscape) {
+
+  gwidth = 0;
+  if (opener) {
+    p_columns = opener.p_columns;
+    for (i = 0; i < p_columns.length; i++) {
+      if (p_columns[i].field != undefined && InStr(p_columns[i].field, "(") == 0) {
+        if (p_columns[i].width) gwidth = gwidth + p_columns[i].width;
+      } else if (p_columns[i].title != undefined && p_columns[i].field == undefined) {
+        for (j = 0; j < p_columns[i].columns.length; j++) {
+          if (p_columns[i].columns[j].width) gwidth = gwidth + p_columns[i].columns[j].width;
+        }
+      }
+    }
+  }
+  p_scale = 1;
+  p_landscape = false;
+  if (gwidth >= 1200) {
+    p_scale = 0.8 * 1200 / gwidth;
+    p_landscape = true;
+  } else {
+    p_scale = 660 / gwidth;
+  }
+  if (p_scale > 0.95) p_scale = 0.95;
+  getPDF(selector, fname, 'A4', ['5px', '40px'], p_scale, p_landscape);
+}
+
+function getPDF(selector, fname, options_pdf) {
+  //paperSize 와 margin 는 옵션이지만 동시에 값을 넣어야 함.
+  //A4, 1cm 식으로.
+  paperSize = options_pdf.paperSize;
+  margin = options_pdf.margin;
+  scale = options_pdf.scale;
+  landscape = options_pdf.landscape;
+
+  $(selector).find('.no-print').css('display', 'none');
+  kendo.drawing.drawDOM($(selector), {
+    paperSize: iif(paperSize, paperSize, "auto"),
+    margin: iif(margin, margin, 0),
+    scale: iif(scale, scale, 1),
+    landscape: iif(landscape, landscape, false)
+  }).then(function (group) {
+    setTimeout(function (p_group, p_fname) {
+      kendo.drawing.pdf.saveAs(p_group, p_fname, undefined, function () {
+        url = location.href;
+        if ($('li.k-state-active[tabid]').attr('tabid') != undefined) {
+          if (getUrlParameter('tabid') == undefined) {
+            url = url + '&tabid=' + $('li.k-state-active[tabid]').attr('tabid');
+          }
+        }
+        url = replaceAll(url, '&idx=' + getUrlParameter('idx'), '&idx=' + document.getElementById('idx').value);
+        location.href = url;
+      });
+    }, 0, group, fname);
+    $(selector).find('.no-print').css('display', 'block');
+  });
+}
+/* json 관련 함수 start */
+function getJson_commonCode(p_RealCid) {
+  var url = "commonCode_json.php?RealCid=" + p_RealCid;
+  return JSON.parse(ajax_url_return(url));
+}
+
+function isJsonString(str) {
+  if (str == null) return false;
+  try {
+    var json = JSON.parse(str);
+    return (typeof json === 'object');
+  } catch (e) {
+    return false;
+  }
+}
+
+function jsonFromIndex(json, index) {
+  let ii = 0;
+  for (const key in json) {
+    if (ii == index) {
+      return { "key": key, "value": json[key] };
+    }
+    ++ii;
+  }
+}
+function json_unempty(obj) {
+  switch (true) {
+    case obj === null:
+    case typeof obj === 'undefined':
+    case typeof obj === 'string' && obj.trim() === '':
+      return true
+
+    case Array.isArray(obj):
+      for (let i = obj.length - 1; i >= 0; i--) {
+        if (json_unempty(obj[i])) obj.splice(i, 1)
+      }
+      return obj.length === 0
+
+    case typeof obj === 'object':
+      Object.keys(obj).forEach((key) => {
+        if (json_unempty(obj[key])) delete obj[key]
+      })
+      return Object.keys(obj).length === 0
+
+    default:
+      return false
+  }
+}
+//json 의 각 value 의 length 중 0보다 크면 리턴.
+function maxArrayFromJson(json) {
+  var ii = 0;
+  for (key in json) {
+    if (json[key].length > 0) {
+      return json[key].length;
+      break;
+    }
+    ++ii;
+  }
+  return 0;
+}
+//json 의 length
+function json_length(json) {
+  var ii = 0;
+  for (key in json) {
+    ++ii;
+  }
+  return ii;
+}
+
+function getObjects(obj, key, val) {
+  var objects = [];
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'object') {
+      objects = objects.concat(getObjects(obj[i], key, val));
+    } else
+      //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+      //if (i == key && obj[i] == val || i == key && val == '') { //???????????????????????????????????
+      if (i == key && obj[i] == val) { //???????????????????????????????????
+        objects.push(obj);
+      } else if (obj[i] == val && key == '') {
+        //only add if the object is not already in the array
+        if (objects.lastIndexOf(obj) == -1) {
+          objects.push(obj);
+        }
+      }
+  }
+  return objects;
+}
+
+function getObjectsIndex(obj, key, val) {
+  var ii = -1;
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'object') {
+      if (obj[i][key] == val) {
+        ii = i;
+        break;
+      }
+    }
+  }
+  return ii * 1;
+}
+//ex : getFieldAttr(document.getElementById("key_aliasName").value, "format");
+function getFieldAttr(p_field, p_attr) {
+  return getObjects($("#grid").data("kendoGrid").columns, "field", p_field)[0][p_attr];
+}
+
+//return an array of values that match on a certain key
+function getValues(obj, key) {
+  let objects = [];
+  for (const i in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+    if (typeof obj[i] == 'object') {
+      objects = objects.concat(getValues(obj[i], key));
+    } else if (i == key) {
+      objects.push(obj[i]);
+    }
+  }
+  return objects;
+}
+
+//return an array of keys that match on a certain value
+function getKeys(obj, val) {
+  var objects = [];
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'object') {
+      objects = objects.concat(getKeys(obj[i], val));
+    } else if (obj[i] == val) {
+      objects.push(i);
+    }
+  }
+  return objects;
+}
+
+
+/* json 찾기 관련 함수 end */
+function json_char_receive(p_char) {
+  p_char = replaceAll(p_char, String.fromCharCode(65279), "");
+  p_char = replaceAll(p_char, String.fromCharCode(12288), "");
+  p_char = replaceAll(p_char, "_andShap@", "&#");
+  return p_char;
+};
+
+
+//telegram_sendMessage.php 에서 전송되며, 텔레그램 전송우선 && 없으면 이메일 발송.
+function telegram_sendMessage(p_chat_id, p_userid, p_text, p_parse_mode, p_sendername) {
+  url = "/_mis/telegram_sendMessage.php?";
+  p_text = encodeURIComponent(p_text);
+  url = url + "text=" + p_text;
+  if (p_chat_id != undefined && p_chat_id != "") url = url + "&chat_id=" + p_chat_id;
+  if (p_userid != undefined && p_userid != "") url = url + "&userid=" + encodeURIComponent(p_userid);
+  if (p_parse_mode != undefined && p_parse_mode != "") url = url + "&parse_mode=" + p_parse_mode;
+  if (p_sendername != undefined && p_sendername != "") url = url + "&sendername=" + encodeURIComponent(p_sendername);
+  r_msg = ajax_url_return(url);
+  if (Left(r_msg, 7) == '@alert:' && location.pathname == '/_mis/index.php') {
+    r_msg = Mid(r_msg, 8, 999);
+    alert(r_msg);
+  } else if (Left(r_msg, 9) == '@confirm:' && location.pathname == '/_mis/index.php') {
+    r_msg = Mid(r_msg, 10, 999);
+    if (confirm(r_msg)) {
+      window.open('index.php?gubun=338&tabid=email&isMenuIn=auto');
+    };
+  }
+}
+
+function email_sendGroupMessage(p_pushList, p_title, p_contents, p_sendername) {
+  if (p_pushList == "") return false;
+  if (p_title == "") return false;
+  if (p_contents == "") return false;
+
+
+  var values = {
+    'pushList': p_pushList,
+    'title': p_title,
+    'contents': p_contents,
+    'sendername': p_sendername
+  };
+
+  $.ajax({
+    url: "/_mis/email_sendMessage.php",
+    type: "POST",
+    data: values
+  });
+}
+function telegram_sendGroupMessage(p_pushList, p_text, p_sendername) {
+  if (p_pushList == "") return false;
+  if (p_text == "") return false;
+
+  var p = p_pushList.split(",");
+  for (i = 0; i < p.length; i++) {
+    receive_id = p[i];
+    if (receive_id != "") telegram_sendMessage("", receive_id, p_text, "HTML", p_sendername);
+  }
+}
+
+//console.log(getReadableByte(120, 2))
+function getReadableByte(count, decimal = 0, level = 0, plus = 'Y') {
+  if (!isNumeric(count)) return '';
+  let numCount = Number(count);
+  if (numCount < 0) {
+    numCount = -numCount;
+    plus = 'N';
+  }
+  const unitList = ["B", "KB", "MB", "GB", "TB", "PT"];
+
+  if (numCount >= 1024.0 && (level + 1 < unitList.length)) {
+    return getReadableByte(numCount / 1024, decimal, ++level, plus);
+  }
+
+  let vv = `${decimal ? numCount.toFixed(decimal) : Math.round(numCount)} ${unitList[level]}`;
+  if (plus == 'N') vv = '-' + vv;
+  return vv;
+}
+
+function this_debugger(p_this, p1, p2) {
+  debugger;
+  return trun;
+}
+function loadjscssfile(filename, filetype) {
+  if (filetype == "js") { //if filename is a external JavaScript file
+    // alert('called');
+    var fileref = document.createElement('script')
+    fileref.setAttribute("type", "text/javascript")
+    fileref.setAttribute("src", filename)
+  } else if (filetype == "css") { //if filename is an external CSS file
+    var fileref = document.createElement("link")
+    fileref.setAttribute("rel", "stylesheet")
+    fileref.setAttribute("type", "text/css")
+    fileref.setAttribute("href", filename)
+  }
+  if (typeof fileref != "undefined") document.getElementsByTagName("head")[0].appendChild(fileref)
+}
+function preLoadjscssfile(filename) {
+  loadjscssfile(filename, filename.split(".")[filename.split(".").length - 1]);
+}
+function downloadURI(uri, name) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
+function displayLoading(target) {   //최대10초
+
+  if ($('body').is(':visible') == false) return false;
+  if (parent.$('.k-loading-image').length > 0) return false;
+
+  if (!isMainFrame() && typeof parent.displayLoading == "function") {
+    parent.displayLoading(target);
+    return false;
+  }
+
+  if (document.getElementById("displayLoading")) document.getElementById("displayLoading").value = "Y";
+
+
+  setTimeout(function () {
+    if (target == "" || target == undefined) {
+      element = parent.$("body");
+    } else {
+      element = $(target);
+    }
+    kendo.ui.progress(element, true);
+  }, 0);
+  setTimeout(function () {
+    displayLoadingOff();
+  }, 10000);
+}
+function displayLoading_long(target) {   //최대1시간
+
+  if ($('body').is(':visible') == false) return false;
+  if (parent.$('.k-loading-image').length > 0) return false;
+
+  if (!isMainFrame() && typeof parent.displayLoading == "function") {
+    parent.displayLoading(target);
+    return false;
+  }
+
+  if (document.getElementById("displayLoading")) document.getElementById("displayLoading").value = "Y";
+
+
+  setTimeout(function () {
+    if (target == "" || target == undefined) {
+      element = parent.$("body");
+    } else {
+      element = $(target);
+    }
+    kendo.ui.progress(element, true);
+  }, 0);
+  setTimeout(function () {
+    displayLoadingOff();
+  }, 1000 * 3600);
+}
+function displayLoadingOff(p_target) {
+
+  setTimeout(function (p_target) {
+    kendo.ui.progress($('body'), false);
+    if (parent.document.getElementById("displayLoading")) parent.document.getElementById("displayLoading").value = "";
+
+    if (p_target == "" || p_target == undefined) {
+      element = parent.$("body");
+    } else {
+      element = $(p_target);
+    }
+    kendo.ui.progress(element, false);
+    kendo.ui.progress($('div'), false);
+  }, 500, p_target);
+
+  if (!isMainFrame() && typeof parent.displayLoading == "function") {
+    if (typeof p_target == "string") p_target = $(p_target);
+    if (p_target) kendo.ui.progress(p_target, false);
+    parent.displayLoadingOff(p_target);
+    return false;
+  }
+
+
+}
+
+function htmlDecode(value) {
+  return value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+}
+function print_onclick() {
+  if ($(".viewPrintDiv #getStyle").length == 0) {
+    ii = $('body style').index($('body #frm style'));
+    $(".viewPrintDiv").append('<div id="getStyle">');
+    $('body style').each(function (i, t) {
+      if (i > ii) {
+        $(".viewPrintDiv #getStyle").append(t);
+      }
+    });;
+  }
+  setTimeout(function () {
+    $(".viewPrintDiv").printThis();
+  }, 0);
+}
+
+
+function windowID() {
+  if (window.frameElement) return window.frameElement.id;
+  else return "";
+}
+
+Date.prototype.yyyymmdd = function () {
+  if (!isDateObject(this)) return '';
+  var yyyy = this.getFullYear();
+  var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
+  var dd = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+  return "".concat(yyyy).concat(mm).concat(dd);
+};
+Date.prototype.yyyymmdd10 = function () {
+  var dd = this.yyyymmdd();
+  if (dd == "") return "";
+  else return Left(dd, 4) + "-" + Mid(dd, 5, 2) + "-" + Right(dd, 2);
+};
+
+
+Date.prototype.yyyymmddhhmm = function () {
+  if (!isDateObject(this)) return '';
+  var yyyy = this.getFullYear();
+  var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
+  var dd = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+  var hh = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
+  var min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
+  return "".concat(yyyy).concat(mm).concat(dd).concat(hh).concat(min);
+};
+Date.prototype.yyyymmddhhmm16 = function () {
+  var dd = this.yyyymmddhhmm();
+  if (dd == "") return "";
+  else return Left(dd, 4) + "-" + Mid(dd, 5, 2) + "-" + Mid(dd, 7, 2) + " " + Mid(dd, 9, 2) + ":" + Right(dd, 2);
+};
+Date.prototype.yyyymmddhhmm19 = function () {
+  var dd = this.yyyymmddhhmmss();
+  if (dd == "") return "";
+  else return Left(dd, 4) + "-" + Mid(dd, 5, 2) + "-" + Mid(dd, 7, 2) + " " + Mid(dd, 9, 2) + ":" + Mid(dd, 11, 2) + ":" + Right(dd, 2);
+};
+Date.prototype.yyyymmddhhmmss = function () {
+  if (!isDateObject(this)) return '';
+  var yyyy = this.getFullYear();
+  var mm = this.getMonth() < 9 ? "0" + (this.getMonth() + 1) : (this.getMonth() + 1); // getMonth() is zero-based
+  var dd = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+  var hh = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
+  var min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
+  var ss = this.getSeconds() < 10 ? "0" + this.getSeconds() : this.getSeconds();
+  return "".concat(yyyy).concat(mm).concat(dd).concat(hh).concat(min).concat(ss);
+};
+function getWeekName(date, lang) {
+
+  if (typeof date == 'string') {
+    date = new Date(date);
+  }
+  // getDay 메소드가 반환하는 인덱스에 맞추어 일~토 순서로 요일 입력
+  const week_ko = ['일', '월', '화', '수', '목', '금', '토'];
+  const week_en = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+  if (lang == 'en') {
+    return week_en[date.getDay()];
+  } else {
+    return week_ko[date.getDay()];
+  }
+
+}
+
+function getWeek(date) {
+  var weekMap = [6, 0, 1, 2, 3, 4, 5];    //월시작
+  var now = new Date(date);
+  now.setHours(0, 0, 0, 0);
+  var monday = new Date(now);
+  monday.setDate(monday.getDate() - weekMap[monday.getDay()]);
+  var sunday = new Date(now);
+  sunday.setDate(sunday.getDate() - weekMap[sunday.getDay()] + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return [monday, sunday];
+}
+
+function getWeekSun(date) {
+  var weekMap = [0, 1, 2, 3, 4, 5, 6];    //일시작
+  var now = new Date(date);
+  now.setHours(0, 0, 0, 0);
+  var monday = new Date(now);
+  monday.setDate(monday.getDate() - weekMap[monday.getDay()]);
+  var sunday = new Date(now);
+  sunday.setDate(sunday.getDate() - weekMap[sunday.getDay()] + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return [monday, sunday];
+}
+
+
+function date10(p_date) {
+  if (typeof p_date == 'string') {
+    if (p_date.length == 8) {
+      p_date = Left(p_date, 4) + "-" + Mid(p_date, 5, 2) + "-" + Mid(p_date, 7, 2);
+    }
+    if (isDate(p_date) == false) {
+      return p_date;
+    }
+  }
+  d = new Date(p_date).yyyymmdd();
+  return Left(d, 4) + "-" + Mid(d, 5, 2) + "-" + Mid(d, 7, 2);
+}
+
+function today10() {
+  d = new Date().yyyymmdd();
+  return Left(d, 4) + "-" + Mid(d, 5, 2) + "-" + Mid(d, 7, 2);
+}
+
+
+function today8() {
+  return new Date().yyyymmdd();
+}
+
+function today14() {
+  return new Date().yyyymmddhhmmss();
+}
+function today15() {
+  d = new Date().yyyymmddhhmmss();
+  return Left(d, 8) + "_" + Mid(d, 9, 6);
+}
+
+function today19() {
+  d = new Date().yyyymmddhhmmss();
+  return Left(d, 4) + "-" + Mid(d, 5, 2) + "-" + Mid(d, 7, 2) + " " + Mid(d, 9, 2) + ":" + Mid(d, 11, 2) + ":" + Mid(d, 13, 2);
+}
+
+function isMobile() {
+  if (navigator.userAgent.match(/iPhone|iPad|iPod|Android|Windows CE|BlackBerry|Symbian|Windows Phone|webOS|Opera Mini|Opera Mobi|POLARIS|IEMobile|lgtelecom|nokia|SonyEricsson/i) != null || navigator.userAgent.match(/LG|SAMSUNG|Samsung/) != null) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+function isApple() {
+  if (navigator.userAgent.match(/iPhone|iPad|iPod|Macintosh/i) != null) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+function isGoodBrower() {
+  try {
+    b = 0;
+    var a = 'b = typeof ``';
+    eval(a);
+    return b == 'string';
+  } catch (error) {
+    return false;
+  }
+}
+//불량이면 출력한다.
+function messageBedBrower() {
+  if (isGoodBrower() == false) {
+    if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+    toastr_obj.error("업무처리용으로 사용이 불가능한 브라우저입니다.<br/><br/>크롬 또는 엣지 브라우저를 사용하세요.<br/><br/>크롬 다운로드 : <a style='font-size:14px; font-weight:bold; color:blue;' target=_blank href='https://www.google.co.kr/intl/ko/chrome/browser/desktop/index.html'>여기를 클릭하세요!!!</a>", "", { "closeButton": true, "timeOut": "0", "extendedTimeOut": "0" });
+    return true;
+  }
+  return false;
+}
+
+//좋아도 출력한다.
+function checkBedBrower() {
+  if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+  if (!messageBedBrower()) toastr_obj.success("업무처리용으로 사용가능한 브라우저입니다.");
+}
+
+
+
+function isMainFrame() {
+  return window.location == window.parent.location;
+}
+
+function window_resize() {
+  $(window).resize();
+}
+/*
+//특정 배열값 삭제. 무거워서 removeItem 로 대체함.
+Array.prototype.remByVal = function(val) {
+  for (var i = 0; i < this.length; i++) {
+      if (this[i].value!=undefined) {
+        if (this[i].value==val.value) {
+          this.splice(i, 1);
+          i--;
+        }
+      } else if (this[i] === val) {
+          this.splice(i, 1);
+          i--;
+      }
+  }
+  return this;
+}
+*/
+function DoEvents() {
+  ajax_url_return('/_mis_kendo/js/kendo.all.min.js');
+}
+
+function charLength(p_this) {
+  if (uni_len(p_this.value) > 480) p_this.value = uni_left(p_this.value, 480);
+  charMsg = location.host + ' - 제한 : ' + uni_len(p_this.value) + '/480자';
+  $(p_this).closest('.k-widget.k-window.k-dialog.k-prompt').find('span.k-window-title.k-dialog-title').text(charMsg);
+}
+
+function sendMsgForm(p_userid, p_username, p_msg) {
+
+  if (isMainFrame() == false && top.sendMsgForm) {
+    top.sendMsgForm(p_userid, p_username, p_msg);
+    return false;
+  }
+
+  p_username = p_username.split('|')[0];
+
+  setTimeout(function () {
+    $('.k-prompt-container input')[0].outerHTML = '<textarea onkeyup="charLength(this);" style="width: 350px;height: 165px;" class="k-textbox" title="Input" aria-label="Input"></textarea>';
+  }, 0);
+
+  kendo.prompt(p_username + '님에게 텔레그램으로 전송할 내용을 넣으세요(한글450자).', p_msg).then(function (msg) {
+    telegram_sendMessage('', p_userid, uni_left(msg, 450), '', '');
+    if (document.getElementById('MisSession_UserID').value != p_userid) telegram_sendMessage('', document.getElementById('MisSession_UserID').value, p_username + '님에게 보낸 메시지: ' + uni_left(msg, 450), '', '알리미');
+
+  }, function () {
+
+  })
+
+
+}
+function pushMsgForm(p_userid, p_username, p_msg) {
+
+  if (isMainFrame() == false && top.sendMsgForm) {
+    top.pushMsgForm(p_userid, p_username, p_msg);
+    return false;
+  }
+
+  p_username = p_username.split('|')[0];
+
+  setTimeout(function () {
+    $('.k-prompt-container input')[0].outerHTML = '<textarea onkeyup="charLength(this);" style="width: 350px;height: 165px;" class="k-textbox" title="Input" aria-label="Input"></textarea>';
+  }, 0);
+
+  kendo.prompt(p_username + '님에게 전송할 알림 내용을 넣으세요(한글450자).', p_msg).then(function (msg) {
+    push_sendMessage(p_userid, document.getElementById('MisSession_UserID').value + '님의 메시지', uni_left(msg, 450));
+
+  }, function () {
+
+  })
+
+
+}
+function get_filesize(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("HEAD", url, true); // Notice "HEAD" instead of "GET",
+  //  to get only the header
+  xhr.onreadystatechange = function () {
+    if (this.readyState == this.DONE) {
+      callback(parseInt(xhr.getResponseHeader("Content-Length")));
+    }
+  };
+  xhr.send();
+}
+function scrollbarVisible_X(element) {
+  return element.scrollWidth > element.clientWidth;
+}
+function scrollbarVisible_Y(element) {
+  return element.scrollHeight > element.clientHeight;
+}
+
+function sendMsg_opinion() {
+
+  setTimeout(function () {
+    $('.k-prompt-container input')[0].outerHTML = '<textarea onkeyup="charLength(this);" style="width: 350px;height: 165px;" class="k-textbox" title="Input" aria-label="Input"></textarea>';
+    $('.k-prompt-container textarea')[0].value = '성명:  \n연락처:  \n내용:\n';
+  }, 0);
+
+  kendo.prompt('관리자에게 문의하실 내용을 넣으시고, OK 를 클릭하세요(한글480자).', '').then(function (msg) {
+    telegram_sendMessage('', 'gadmin', '문의글:\n' + uni_left(msg, 450), '');
+    //telegram_sendMessage('', 'admin', '문의글: '+uni_left(msg,450), '');
+    if (document.getElementById('MisSession_UserID').value != 'gadmin') telegram_sendMessage('', document.getElementById('MisSession_UserID').value, '관리자에게 보낸 문의내용:\n' + uni_left(msg, 450), '', '알리미');
+  }, function () {
+
+  })
+
+
+}
+function topsite() {
+  if (top.document.getElementById('MisJoinPid') == null) return "notmis";
+  else return "mis";
+}
+function kendo_alert(content, title) {
+  if (title == undefined) {
+    $('<div>' + content + '</div>').kendoAlert({
+    }).data("kendoAlert").open();
+  } else {
+    $('<div>' + content + '</div>').kendoAlert({
+      messages: {
+        okText: title
+      }
+    }).data("kendoAlert").open();
+  }
+}
+
+
+function removeItem(array, item) {
+
+  for (var i = 0; i < array.length; i++) {
+    if (array[i].value != undefined) {
+      if (array[i].value == item.value) {
+        array.splice(i, 1);
+        i--;
+      }
+    } else if (array[i] === item) {
+      array.splice(i, 1);
+      i--;
+    }
+  }
+  return array;
+
+}
+
+function getFileInfo(e) {
+  return $.map(e.files, function (file) {
+    var info = file.name;
+
+    // File size is not available in all browsers
+    if (file.size > 0) {
+      info += " (" + Math.ceil(file.size / 1024) + " KB)";
+    }
+    return info;
+  }).join(", ");
+}
+
+
+var popCnt = 0;
+
+
+function toggleFullScreen(p_boolean) {
+
+  //if(p_boolean==true && event.ctrlKey==false) return false;
+  setTimeout(function () {
+    gridHeight();
+  }, 100);
+  var docEl = document.documentElement;
+
+  var fullscreenElement =
+    document.fullscreenElement ||
+    document.mozFullScreenElement ||
+    document.webkitFullscreenElement ||
+    document.msFullscreenElement;
+
+  var requestFullScreen = docEl.requestFullscreen ||
+    docEl.msRequestFullscreen ||
+    docEl.mozRequestFullScreen ||
+    docEl.webkitRequestFullscreen;
+
+  var exitFullScreen = document.exitFullscreen ||
+    document.msExitFullscreen ||
+    document.mozCancelFullScreen ||
+    document.webkitExitFullscreen;
+
+  if (p_boolean == undefined && !requestFullScreen) {
+    return;
+  }
+
+
+  if (p_boolean == undefined && !fullscreenElement || p_boolean) {
+    requestFullScreen.call(docEl, Element.ALLOW_KEYBOARD_INPUT);
+  } else {
+    if (fullscreenElement) exitFullScreen.call(document);
+  }
+}
+
+function query_popup(p_url) {
+  parent_popup_jquery(p_url, '개발을 위한 참고용 쿼리문', 800, 500);
+}
+function query_error_popup(p_this, p_url) {
+  parent_popup_jquery('about:blank', '개발을 위한 참고용 에러쿼리문', 800, 500);
+  sql_msg = '';
+  if (p_url != '') {
+    sql_msg = '\n\n' + ajax_url_return(p_url);
+  }
+  if ($('.windowPop.k-window-content')[0]) {
+    $('.windowPop.k-window-content')[$('.windowPop.k-window-content').length - 1].innerText = $(p_this).attr('msg') + sql_msg;
+    setTimeout(function () {
+      $('.windowPop.k-window-content')[$('.windowPop.k-window-content').length - 1].style.overflowY = 'auto';
+      $('.windowPop.k-window-content')[$('.windowPop.k-window-content').length - 1].style.padding = '20px 15px';
+    }, 1000);
+  } else {
+    top.$('.windowPop.k-window-content')[top.$('.windowPop.k-window-content').length - 1].innerText = $(p_this).attr('msg') + sql_msg;
+    setTimeout(function () {
+      top.$('.windowPop.k-window-content')[top.$('.windowPop.k-window-content').length - 1].style.overflowY = 'auto';
+      top.$('.windowPop.k-window-content')[top.$('.windowPop.k-window-content').length - 1].style.padding = '20px 15px';
+    }, 1000);
+  }
+}
+
+function parent_popup_jquery(p_url, p_title, p_width, p_height, p_modal) {
+
+  if (!isMainFrame() && typeof parent.parent_popup_jquery == "function") {
+    parent.parent_popup_jquery(p_url, p_title, p_width, p_height, p_modal);
+    return false;
+  }
+
+  ++popCnt;
+  var obj = document.getElementById('txt_window');
+  obj.outerHTML = obj.outerHTML + replaceAll(obj.value, "{popCnt}", popCnt);
+  document.getElementById('ifr_window' + popCnt).src = p_url;
+
+  var myWindow = $("#window" + popCnt);
+  if (p_modal == undefined) p_modal = false;
+
+  myWindow.kendoWindow({
+    width: iif(p_width, p_width, "90%"),
+    height: iif(p_height, p_height, $(window).height() * 0.9),
+    title: p_title,
+    scroll: "no",
+    resizable: false,
+    modal: p_modal,
+    visible: false,
+    actions: [
+      "Refresh",
+      "Minimize",
+      "Maximize",
+      "Close"
+    ],
+    close: function () {
+      if (typeof popup_close_run == 'function') {
+        popup_close_run(this);
+      }
+    },
+    refresh: function (e) {
+      popCnt = replaceAll(event.currentTarget.children[1].id, "window", "");
+      $("#ifr_window" + popCnt).attr("src", p_url);
+      if (Right(p_url, 4) == '.txt') {
+        $(getFrameObjBody('ifr_' + event.currentTarget.children[1].id)).css('color', theme_font());
+        $(getFrameObjBody('ifr_' + event.currentTarget.children[1].id)).css('background-color', theme_back());
+      }
+    },
+    activate: function (e) {
+      if ($(event.currentTarget).find('iframe')[0]) {
+        if (Right($(event.currentTarget).find('iframe')[0].src, 4) == '.txt') {
+          $(getFrameObjBody('ifr_' + event.currentTarget.children[1].id)).css('color', theme_font());
+          $(getFrameObjBody('ifr_' + event.currentTarget.children[1].id)).css('background-color', theme_back());
+        }
+      }
+      $(event.currentTarget).find('iframe').on('load', function () {
+        if (Right(this.src, 4) == '.txt') {
+          $(getFrameObjBody(this.id)).css('color', theme_font());
+          $(getFrameObjBody(this.id)).css('background-color', theme_back());
+        }
+      });
+    }
+
+  }).data("kendoWindow").center();
+
+  if (window.innerWidth < 1200) myWindow.data("kendoWindow").open().maximize(); else myWindow.data("kendoWindow").open();
+
+  $("span.k-i-window-minimize").attr("title", "key: Alt+↓");
+  $("span.k-i-window-maximize").attr("title", "key: Alt+↑");
+  $("span.k-i-close").attr("title", "key: ESC");
+
+}
+
+
+
+function popup_jquery(p_url, p_title, p_width, p_height, p_modal, p_maximize) {
+
+
+  ++popCnt;
+  var obj = document.getElementById('txt_window');
+  obj.outerHTML = obj.outerHTML + replaceAll(obj.value, "{popCnt}", popCnt);
+  document.getElementById('ifr_window' + popCnt).src = p_url;
+
+  var myWindow = $("#window" + popCnt);
+  if (p_modal == undefined) p_modal = false;
+
+  myWindow.kendoWindow({
+    width: iif(p_width, p_width, "90%"),
+    height: iif(p_height, p_height, $(window).height() * 0.9),
+    title: p_title,
+    scroll: "no",
+    resizable: false,
+    modal: p_modal,
+    visible: false,
+    actions: iif(p_maximize, [
+      "Refresh",
+      "Close"
+    ], [
+      "Refresh",
+      "Minimize",
+      "Maximize",
+      "Close"
+    ]),
+    close: function () {
+      if (typeof popup_close_run == 'function') {
+        popup_close_run(this);
+      }
+    },
+    refresh: function (e) {
+      popCnt = replaceAll(event.currentTarget.children[1].id, "window", "");
+      $("#ifr_window" + popCnt).attr("src", p_url);
+    },
+    activate: function (e) {
+      if ($(event.currentTarget).find('iframe')[0]) {
+        if (Right($(event.currentTarget).find('iframe')[0].src, 4) == '.txt') {
+          $(getFrameObjBody('ifr_' + event.currentTarget.children[1].id)).css('color', theme_font());
+        }
+      }
+      $(event.currentTarget).find('iframe').on('load', function () {
+        if (Right(this.src, 4) == '.txt') {
+          $(getFrameObjBody(this.id)).css('color', theme_font());
+        }
+      });
+    }
+  }).data("kendoWindow").center();
+  if (p_maximize) myWindow.data("kendoWindow").maximize();
+  myWindow.data("kendoWindow").open();
+
+  $("span.k-i-window-minimize").attr("title", "key: Alt+↓");
+  $("span.k-i-window-maximize").attr("title", "key: Alt+↑");
+  $("span.k-i-close").attr("title", "key: ESC");
+
+}
+
+if (typeof toastr == "object") {
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+}
+
+
+function toastrAlert(p_msg, p_type, p_timeOut) {
+  //http://codeseven.github.io/toastr/demo.html
+  //p_type : success,info,warning,error
+  if (p_type == undefined || p_type == "") p_type = "info";
+  if (p_timeOut == undefined || p_timeOut == "") p_timeOut = "5000";
+
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": p_timeOut,
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+  toastr.options.timeOut = p_timeOut;
+
+  Command: toastr[p_type](p_msg);
+
+}
+
+
+//iframe obj
+function getFrameObj(objid) {
+  var iFrame = document.getElementById(objid);
+  if (iFrame == undefined) return iFrame;
+  var objDoc = iFrame.contentWindow;
+  return objDoc;
+}
+
+
+//iframe obj
+function getFrameObjBody(objid) {
+  var iFrame = document.getElementById(objid);
+  var iFrameBody;
+
+  iFrameBody = iFrame.contentDocument.getElementsByTagName('body')[0];
+
+  return iFrameBody;
+}
+
+
+function getSelectTxt(obj) {
+  if (obj.selectedIndex > -1) return obj.options[obj.selectedIndex].text;
+  else return "";
+}
+
+
+
+function getRecIndx() {
+  if (!isNumeric(colM[0].dataIndx) && colM[0].dataIndx != "state" && colM[0]._nodrop == undefined) return colM[0].dataIndx;
+  else if (!isNumeric(colM[1].dataIndx) && colM[1].dataIndx != "state" && colM[1]._nodrop == undefined) return colM[1].dataIndx;
+  else return colM[2].dataIndx;
+}
+
+function makeCodeSelectTxt(p_response) {
+  var json_codeSelect = p_response.json_codeSelect;
+  var input_json_codeSelect = "";
+  for (kk = 0; kk < Object.keys(json_codeSelect).length; kk++) {
+    key = Object.keys(json_codeSelect)[kk];
+    value = json_codeSelect[key];
+    input_json_codeSelect = input_json_codeSelect + "<input id='json_" + key + "' class='json_codeSelect' type='hidden'/>";
+
+  }
+  $("#div_json_codeSelect").html(input_json_codeSelect);
+  for (kk = 0; kk < Object.keys(json_codeSelect).length; kk++) {
+    key = Object.keys(json_codeSelect)[kk];
+    value = json_codeSelect[key];
+    $("input#json_" + key).val(value);
+  }
+}
+
+
+function openPopupUrl(p_title, p_url, p_idx, p_rowIndx) {
+
+  //한번클릭에 두개창 열리는 현상 방지.
+  setTimeout("document.getElementById('pre_popupInfo').value = 'init';console.log('0초후 콘솔='+document.getElementById('pre_popupInfo').value);", 0);
+  if (document.getElementById("pre_popupInfo").value == p_title + p_url + p_idx + p_rowIndx) {
+    console.log("안열어,pre_popupInfo=" + document.getElementById("pre_popupInfo").value);
+    return false;
+  }
+  console.log("열어,pre_popupInfo=" + document.getElementById("pre_popupInfo").value);
+  document.getElementById("pre_popupInfo").value = p_title + p_url + p_idx + p_rowIndx;
+
+  ++popCnt;
+  var obj = document.getElementById('txt_window');
+  obj.outerHTML = obj.outerHTML + replaceAll(obj.value, "{popCnt}", popCnt);
+  document.getElementById('ifr_window' + popCnt).src = p_url;
+  document.getElementById('txt_windowIdx' + popCnt).value = p_idx;
+  document.getElementById('txt_windowRowIndx' + popCnt).value = p_rowIndx;
+
+  var myWindow = $("#window" + popCnt);
+
+  myWindow.css("z-index", 999999);
+  myWindow.kendoWindow({
+    width: "90%",
+    height: "85%",
+    title: p_title,
+    scroll: "no",
+    resizable: false,
+    actions: [
+      "Refresh",
+      "Minimize",
+      "Maximize",
+      "Close"
+    ],
+    close: function () {
+      //debugger;
+      if (parent.$("#select_colIndx").val() != "") {
+        parent.$("#stopEvent").val('Y');
+        rowIndx = parent.$("#select_rowIndx").val();
+        dataIndx = parent.colM[parent.$("#select_colIndx").val()].dataIndx;
+        parent.$("#grid_filter").pqGrid("setSelection", { rowIndx: rowIndx, dataIndx: dataIndx });
+        parent.$("#stopEvent").val('N');
+      }
+    },
+    refresh: function () {
+      popCnt = replaceAll(event.currentTarget.children[1].id, "window", "");
+      $("#ifr_window" + popCnt).attr("src", p_url);
+    },
+    /*
+    minimize: function() {
+      popCnt = replaceAll(event.currentTarget.children[1].id, "window", "");
+      $("div#window"+popCnt).parent().css("max-width", "270px");
+
+  $("span.k-i-window-restore").click( function() {
+        popCnt = replaceAll(event.currentTarget.parentNode.parentNode.parentNode.parentNode.children[1].id, "window", "");
+    $("div#window"+popCnt).parent().css("max-width", "inherit");
+  });
+    },
+    maximize: function() {
+      popCnt = replaceAll(event.currentTarget.children[1].id, "window", "");
+      $("div#window"+popCnt).parent().css("max-width", "inherit");
+    },
+    */
+  }).data("kendoWindow").center().open();
+
+  $("span.k-i-window-minimize").attr("title", "key: Alt+↓");
+  $("span.k-i-window-maximize").attr("title", "key: Alt+↑");
+  $("span.k-i-close").attr("title", "key: ESC");
+
+}
+
+
+
+function ajax_french(p_dataIndx, p_pre, p_RealPid) {
+
+  $('div#french_v1' + p_dataIndx + '.typeahead__result').remove();
+
+  $('.js-typeahead-french_v1' + p_dataIndx).appendTo('#form-french_v1' + p_dataIndx + ' > div.typeahead__container');    //speed: 위치이동시켜서 레이어가 가리지 않게 해줌
+
+  if ($('.js-typeahead-french_v1' + p_dataIndx).length > 0) {
+
+    $.typeahead({
+      input: '.js-typeahead-french_v1' + p_dataIndx,
+      dynamic: true,
+      delay: 500,
+      minLength: 0,
+      maxItem: 15,
+      //order: "asc",
+      hint: true,
+      accent: true,
+      searchOnFocus: true,
+
+      source: {
+        ajax: function (query) {
+          return {
+            type: "get",
+            url: "json_gridList.php?line=2504&flag=ajax_french&pre=" + p_pre + "&RealPid=" + p_RealPid,
+            path: "",
+            data: {
+              key: "{{query}}",
+              col: p_dataIndx
+            },
+            callback: {
+              done: function (data) {
+                return data;
+
+              }
+            }
+          }
+        }
+
+      },
+      callback: {
+        onClick: function (node, a, item, event) {
+          //alert(JSON.stringify(item));
+          setTimeout("$('.js-typeahead-french_v1" + p_dataIndx + "').keyup();", 0);
+
+        },
+        onSendRequest: function (node, query) {
+          searchFocus_name = this.name;
+
+          console.log('request is sent');
+        },
+        onReceiveRequest: function (node, query) {
+          console.log('onReceiveRequest');
+
+          if ($(".typeahead__result")[$(".typeahead__result").length - 1]) {
+            if ($(".typeahead__result")[$(".typeahead__result").length - 1].id == "") {
+              $(".typeahead__result")[$(".typeahead__result").length - 1].id = "french_v1" + p_dataIndx;
+
+              $("#french_v1" + p_dataIndx).prependTo("#grid_filter");
+              $("#french_v1" + p_dataIndx).css("position", "absolute");
+              $("#french_v1" + p_dataIndx).css("top", $("form#form-french_v1" + p_dataIndx + " > .typeahead__container").position().top + 23);
+              $("#french_v1" + p_dataIndx).css("left", $("form#form-french_v1" + p_dataIndx + " > .typeahead__container").position().left);
+
+            }
+            $("#french_v1" + p_dataIndx).show();
+          }
+          //console.log('request is received')
+        }
+      },
+      //debug: true
+    });
+
+
+    $(".js-typeahead-french_v1" + p_dataIndx).focus(
+      function () {
+
+        console.log('위의 포커스 초입 searchFocus_name : ' + searchFocus_name);
+        $(".js-typeahead-french_v1" + p_dataIndx).keyup();
+
+      }
+    );
+
+    $(".js-typeahead-french_v1" + p_dataIndx).blur(
+      function () {
+        console.log('위의 blur 도망 초입 searchFocus_name : ' + searchFocus_name);
+        searchFocus_name = this.name;
+        setTimeout("$('#french_v1" + p_dataIndx + "').hide();", 200);
+        ////if(this.value!='') $('.typeahead__cancel-button').css("visibility","visible");
+      }
+    );
+
+  }
+
+}
+
+
+
+function getIndxFromDataIndx(p_dataIndx) {
+
+  for (kk = 0; kk < colM.length; kk++) {
+    if (colM[kk].dataIndx == p_dataIndx) {
+      return kk;
+      break;
+    }
+  }
+  return "";
+}
+
+
+function formLoad_init() {
+
+  //form 관련 start ----------------
+  if ($('div.panel-bordered').length == 0) return false;
+
+
+  $('.panel-bordered>.panel-heading>.panel-title').html(
+    replaceAll($('.panel-bordered>.panel-heading>.panel-title').html(), '...', '')
+  );
+
+  $('.panel-bordered>.panel-heading').css('visibility', 'visible');
+
+  var panel_heading_width = $('div.panel-bordered').width() + 4;
+  var panel_heading_height = $('.panel-bordered>.panel-heading').height();
+
+  var panel_heading_top = $('div.panel-bordered').offset().top;
+  var panel_heading_left = $('div.panel-bordered').offset().left;
+  var panel_heading_outerHTML = $(".panel-bordered>.panel-heading")[0].outerHTML;
+
+  if (getCookie('isMobile') != "Y") {
+    if ($('div#formTitleAddHeight').length == 0) {
+      $(".panel-bordered>.panel-heading")[0].outerHTML = panel_heading_outerHTML + "<div id='formTitleAddHeight' style='height:" + panel_heading_height + "px;'>&nbsp;</div>";
+    }
+    $(".panel-bordered>.panel-heading").css("top", panel_heading_top + "px");
+    $(".panel-bordered>.panel-heading").css("left", panel_heading_left + "px");
+    $(".panel-bordered>.panel-heading").css("width", panel_heading_width + "px");
+  } else {
+    $(".panel-bordered>.panel-heading").css("left", panel_heading_left - 3 + "px");
+    $(".panel-bordered>.panel-heading")[0].style.setProperty("position", "relative", "important");
+    $(".panel-bordered>.panel-heading").css("width", panel_heading_width + "px");
+  }
+
+  //edit form 에서.
+  //첨부파일이 여러개일 경우, 수정필요할듯.
+  $('button.dropify-clear').click(function () {
+    var attTxt = $(this).parent().parent().find("input")[0].name;
+    $("[name='" + attTxt + "']").val('');
+    $("[name='" + attTxt + "']").change();
+  });
+
+  //아래부터는 폼타이틀의 우측 아이콘 노출 및 이벤트 설정.
+
+  var formActionFlag = Left($('.panel-bordered>.panel-heading>.panel-title').text(), 2);
+
+  if (formActionFlag == "입력") {
+    $('a.wb-check-circle[title="입력완료"]').removeClass('hide');
+  }
+
+
+  if (formActionFlag == "수정") {
+    $('a.wb-check-circle[title="저장"]').removeClass('hide');
+  }
+
+
+  if (formActionFlag == "수정") {
+    $('a.wb-eye').click(function () {
+      copy_viewRow();
+      return false;
+    });
+    $('a.wb-eye').removeClass('hide');
+  }
+
+
+  if (formActionFlag == "내용") {
+
+    $('a.wb-edit').click(function () {
+      copy_editRow();
+      return false;
+    });
+    $('a.wb-edit').removeClass('hide');
+
+    $('a.wb-plus-circle[title="새로입력"]').click(function () {
+      copy_addRow();
+      return false;
+    });
+    $('a.wb-plus-circle[title="새로입력"]').removeClass('hide');
+
+
+    $('a.wb-plus-circle[title="참조입력"]').click(function () {
+      copy_refAddRow();
+      return false;
+    });
+    $('a.wb-plus-circle[title="참조입력"]').removeClass('hide');
+
+    $('a.wb-minus-circle').removeClass('hide');
+
+
+  }
+
+
+  $('a.wb-refresh').click(function () {
+
+    if (formActionFlag == "수정") copy_editRow();
+    if (formActionFlag == "입력") copy_addRow();
+    if (formActionFlag == "내용") copy_viewRow();
+
+    return false;
+  });
+
+  $('a.wb-close').click(function () {
+    $('#popup-dialog-filter').html('');
+    $(document).scrollTop(0);
+    return false;
+  });
+
+
+
+  if (getCookie('isMobile') == "Y") $('.panel-bordered>.panel-heading>.panel-title').html('&nbsp;');
+
+  //form 관련 end ----------------
+
+}
+
+
+
+
+
+
+
+
+
+
+var getUrlParameter = function getUrlParameter(sParam) {
+  var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+    sURLVariables = sPageURL.split('&'),
+    sParameterName,
+    i;
+
+  for (i = 0; i < sURLVariables.length; i++) {
+    sParameterName = sURLVariables[i].split('=');
+
+    if (sParameterName[0] === sParam) {
+      return sParameterName[1] === undefined ? true : sParameterName[1];
+    }
+  }
+};
+
+function getStringUrlParameter(p_url, p_param) {
+  return new URLSearchParams(p_url).get(p_param);
+}
+
+function innerTEXT(obj) {
+  document.getElementById("div_temp1").innerHTML = replaceAll(replaceAll(replaceAll(obj.innerHTML, "<script>", "<!--"), "</script>", "-->"), "\n", " ");
+  return Trim(document.getElementById("div_temp1").innerText);
+}
+function innerTEXT0(obj) {  //여러 태그 중에 최상위 레벨의 text만 뽑아옴.
+  textValue = '';
+  $('<div>' + obj.outerHTML + '</div>').find('*').each(function (i, t) {
+    if (i == 0) textValue = t.outerHTML;
+    else textValue = replaceAll(textValue, t.outerHTML, '');
+  });
+  return $(textValue).text();
+}
+
+//////////// FF 문제 해결
+
+function FixPrototypeForGecko() {
+  HTMLElement.prototype.__defineGetter__("runtimeStyle", element_prototype_get_runtimeStyle);
+  window.constructor.prototype.__defineGetter__("event", window_prototype_get_event);
+  Event.prototype.__defineGetter__("srcElement", event_prototype_get_srcElement);
+  Event.prototype.__defineGetter__("fromElement", element_prototype_get_fromElement);
+  Event.prototype.__defineGetter__("toElement", element_prototype_get_toElement);
+
+}
+
+function element_prototype_get_runtimeStyle() { return this.style; }
+function window_prototype_get_event() { return SearchEvent(); }
+function event_prototype_get_srcElement() { return this.target; }
+
+function element_prototype_get_fromElement() {
+  var node;
+  if (this.type == "mouseover") node = this.relatedTarget;
+  else if (this.type == "mouseout") node = this.target;
+  if (!node) return;
+  while (node.nodeType != 1)
+    node = node.parentNode;
+  return node;
+}
+
+function element_prototype_get_toElement() {
+  var node;
+  if (this.type == "mouseout") node = this.relatedTarget;
+  else if (this.type == "mouseover") node = this.target;
+  if (!node) return;
+  while (node.nodeType != 1)
+    node = node.parentNode;
+  return node;
+}
+
+function SearchEvent() {
+  if (document.all) return window.event;
+
+  func = SearchEvent.caller;
+
+  while (func != null) {
+    var arg0 = func.arguments[0];
+
+    if (arg0 instanceof Event) {
+      return arg0;
+    }
+    func = func.caller;
+  }
+  return null;
+}
+/*******************************************************
+작성목적  :  파이어폭스에서 윈도우 이벤트 키 리스너 등록 & innertext 적용
+*******************************************************/
+if (navigator.userAgent.indexOf('Firefox') >= 0) {
+
+  if (window.addEventListener) { FixPrototypeForGecko(); }
+
+  (function () {
+    var events = ["mousedown", "mouseover", "mouseout", "mousemove",
+      "mousedrag", "click", "dblclick"];
+    for (var i = 0; i < events.length; i++) {
+      window.addEventListener(events[i], function (e) {
+        window.event = e;
+      }, true);
+    }
+    setInnerTextProperty();
+  }());
+};
+
+function setInnerTextProperty() {
+  if (typeof HTMLElement != "undefined" && typeof HTMLElement.prototype.__defineGetter__ != "undefined") {
+    HTMLElement.prototype.__defineGetter__("innerText", function () {
+      if (this.textContent) {
+        return (this.textContent)
+      }
+      else {
+        var r = this.ownerDocument.createRange();
+        r.selectNodeContents(this);
+        return r.toString();
+      }
+    });
+
+    HTMLElement.prototype.__defineSetter__("innerText", function (sText) {
+      this.innerHTML = sText
+    });
+  }
+}
+
+
+/////////////////////////////////
+
+//nnnnnnnn +n-line 후 하단프레임에서 상단프레임으로 라인추가시켜줌.
+
+
+function isMSIE() {
+  var agt = navigator.userAgent.toLowerCase();
+  if (agt.indexOf("msie") != -1) return true; else return false;
+}
+
+
+
+
+function scroll_top() {
+  var pScrollTop = parent.document.body.scrollTop;
+  if (pScrollTop == 0) pScrollTop = parent.document.documentElement.scrollTop;
+  return pScrollTop;
+
+}
+
+
+///////////////////////////////
+
+function getName(gname) {
+  return document.getElementsByName(gname)[0];
+}
+
+function getID(id) {
+  return document.getElementById(id);
+}
+//function $(id) { return document.getElementById(id); }
+
+
+
+//=== 서버소스를 textarea 안에 출력할 경우, 변환이 필요함.
+function textareaEncode(webSource) {
+  return replaceAll(replaceAll(replaceAll(replaceAll(webSource, '@lt;', '<'), '@gt;', '>'), '~^~lt;', '@lt;'), '~^~gt;', '@gt;');
+}
+
+
+
+//======= textarea 에서 tab 키 인식시키기.
+function textareaTab(objId) {
+  document.getElementById(objId).onkeydown = function (e) {
+    if (!e) {
+      if (event.keyCode == 9) {
+        event.returnValue = false;
+        insertAtCursor(document.getElementById(objId), "\t");
+      }
+    }
+    else if (e.keyCode == 9) {
+      e.preventDefault();
+      insertAtCursor(document.getElementById(objId), "\t");
+    }
+  }
+}
+
+
+
+
+//우측마우스방지함수
+function LockF5() {
+  if (event.keyCode == 116) {
+    event.keyCode = 0;
+    return false;
+  }
+}
+
+
+
+function setCookie(name, value, days) {
+  var expires = "";
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+
+
+function setLocalStorage(name, value) {
+  if (value == null) {
+    localStorage.removeItem(name);
+  } else {
+    localStorage.setItem(name, value);
+  }
+}
+function getLocalStorage(name, value) {
+  return localStorage.getItem(name);
+}
+function setSessionStorage(name, value) {
+  if (value == null) {
+    sessionStorage.removeItem(name);
+  } else {
+    sessionStorage.setItem(name, value);
+  }
+}
+function getSessionStorage(name, value) {
+  return sessionStorage.getItem(name);
+}
+function intoText(innerHTML_value) {
+  var ret = innerHTML_value;
+  ret = ret.replace(/&nbsp;/ig, " ");
+  ret = ret.replace(/<br>/ig, "\n");
+  ret = ret.replace(/<br[^>]+>/ig, "\n");
+  ret = ret.replace(/<[^>]+>/g, "");
+  return ret;
+}
+
+function TextToHtml(temp) {
+  var TextToHtml;
+  TextToHtml = replaceAll(replaceAll(replaceAll(replaceAll(temp, "<", "&lt;"), ">", "&gt;"), "\n", "<br>"), " ", "&nbsp;");
+  return TextToHtml;
+}
+
+
+String.prototype.innerText_value = function () {
+  var ret = this;
+  ret = ret.replace(/&nbsp;/ig, " ");
+  ret = ret.replace(/<br>/ig, "\n");
+  ret = ret.replace(/<br[^>]+>/ig, "\n");
+  ret = ret.replace(/<[^>]+>/g, "");
+  return ret;
+}
+
+//ajax app function-------------------------
+
+function getXmlHttpRequest() {
+  var xmlhttp = false;
+
+  if (window.XMLHttpRequest) {
+    xmlhttp = new XMLHttpRequest();
+
+  } else {
+
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    //xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");
+
+  }
+
+  return xmlhttp;
+}
+
+
+function ajax_url_innerhtml(ajax_url, div_id) {
+
+  if (document.getElementById("full_site")) {
+    if (Left(ajax_url, 1) == "/") {
+      ajax_url = document.getElementById("full_site").value + ajax_url;
+    } else if (Left(ajax_url, 4) != "http") {
+      ajax_url = document.getElementById("full_site").value + "/_mis/" + ajax_url;
+    }
+  }
+
+
+  if (InStr(ajax_url, "?") == 0) ajax_url = ajax_url + "?ts=" + new Date().getTime();
+  else ajax_url = ajax_url + "&ts=" + new Date().getTime();
+  var xmlhttp = getXmlHttpRequest();
+  xmlhttp.open("get", ajax_url, true);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        var el = document.getElementById(div_id);
+        if (el) el.innerHTML = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+
+}
+
+
+//innerHTML 을 변환시켜주면서 script 를 실행시켜줌
+function stripAndExecuteScript(text) {
+  var scripts = '';
+  var cleaned = text.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, function () {
+    scripts += arguments[1] + '\n';
+    return '';
+  });
+
+  if (window.execScript) {
+    window.execScript(scripts);
+  } else {
+    var head = document.getElementsByTagName('head')[0];
+    var scriptElement = document.createElement('script');
+    scriptElement.setAttribute('type', 'text/javascript');
+    scriptElement.innerText = scripts;
+    head.appendChild(scriptElement);
+    head.removeChild(scriptElement);
+  }
+  return cleaned;
+}
+
+
+//타사이트 끌어오면서 innerHTML 의 스크립트까지 실행시켜줌.
+function ajax_url_innerhtml_script(ajax_url, div_id) {
+
+  if (document.getElementById("full_site")) {
+    if (Left(ajax_url, 1) == "/") {
+      ajax_url = document.getElementById("full_site").value + ajax_url;
+    } else if (Left(ajax_url, 4) != "http") {
+      ajax_url = document.getElementById("full_site").value + "/_mis/" + ajax_url;
+    }
+  }
+
+  ajax_url = "GrabPage2.asp?" + ajax_url;
+  var xmlhttp = getXmlHttpRequest();
+  xmlhttp.open("get", ajax_url, true);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        var el = document.getElementById(div_id);
+        if (el) el.innerHTML = stripAndExecuteScript(unescape(xmlhttp.responseText));
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+
+}
+
+
+
+//타사이트 끌어오면서 iframe 로 스크립트까지 실행시켜줌.
+function ajax_url_iframe_script(ajax_url, div_id) {
+
+  if (document.getElementById("full_site")) {
+    if (Left(ajax_url, 1) == "/") {
+      ajax_url = document.getElementById("full_site").value + ajax_url;
+    } else if (Left(ajax_url, 4) != "http") {
+      ajax_url = document.getElementById("full_site").value + "/_mis/" + ajax_url;
+    }
+  }
+
+  var ori_ajax_url = ajax_url;
+  ajax_url = "GrabPage2.asp?" + ajax_url;
+  var xmlhttp = getXmlHttpRequest();
+  xmlhttp.open("get", ajax_url, true);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        var el = document.getElementById(div_id);
+        if (el) el.contentDocument.body.innerHTML = "<html><head><base href=\"" + ori_ajax_url + "\"/><base target='_blank'/>"
+          + stripAndExecuteScript(unescape(xmlhttp.responseText));
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+}
+
+
+
+//비동기이며, 리턴값없음.
+function ajax_url_touch(ajax_url) {
+
+  if (InStr(ajax_url, "?") == 0) ajax_url = ajax_url + "?ts=" + new Date().getTime();
+  else ajax_url = ajax_url + "&ts=" + new Date().getTime();
+  var xmlhttp = getXmlHttpRequest();
+  xmlhttp.open("get", ajax_url, true);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        //var el = document.getElementById(div_id);
+        //if(el) el.innerHTML = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+
+}
+
+
+
+function ajax_url_value(ajax_url, txt_id) {
+
+  if (InStr(ajax_url, "?") == 0) ajax_url = ajax_url + "?ts=" + new Date().getTime();
+  else ajax_url = ajax_url + "&ts=" + new Date().getTime();
+  var xmlhttp = getXmlHttpRequest();
+  //특성상, 비동기 아님.
+  xmlhttp.open("get", ajax_url, false);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        var el = document.getElementById(txt_id);
+        el.value = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+
+}
+
+
+function ajax_url_return(ajax_url) {
+
+  if (InStr(ajax_url, "?") == 0) ajax_url = ajax_url + "?ts=" + new Date().getTime();
+  else ajax_url = ajax_url + "&ts=" + new Date().getTime();
+  var xmlhttp = getXmlHttpRequest();
+  var rValue = "";
+  //특성상, 비동기 아님.
+  //console.log(ajax_url);
+  xmlhttp.open("get", ajax_url, false);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        rValue = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+  //console.log(rValue);
+  return rValue;
+
+}
+
+
+function ajax_url_return_noTS(ajax_url) {
+
+  var xmlhttp = getXmlHttpRequest();
+  var rValue = "";
+  //특성상, 비동기 아님.
+
+  //console.log(ajax_url);
+  xmlhttp.open("get", ajax_url, false);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        rValue = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+  //console.log(rValue);
+  return rValue;
+
+}
+
+//보이는 영역의 text 만 추출.
+function getVisibleText(element) {
+  window.getSelection().removeAllRanges();
+
+  let range = document.createRange();
+  range.selectNode(element);
+  window.getSelection().addRange(range);
+
+  let visibleText = window.getSelection().toString().trim();
+  window.getSelection().removeAllRanges();
+
+  return visibleText;
+}
+
+//ajax_url_return 와는 또다른 접근방법.
+function ajax_url_return2(ajax_url) {
+
+  ajax_url = "/_mis/file_get_contents_new.php?" + ajax_url;
+  var xmlhttp = getXmlHttpRequest();
+  var rValue = "";
+  //특성상, 비동기 아님.
+
+  //console.log(ajax_url);
+  xmlhttp.open("get", ajax_url, false);
+
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4) {
+
+      if (xmlhttp.status == 200) {
+        rValue = unescape(xmlhttp.responseText);
+      }
+    }
+  }
+
+  xmlhttp.send(null);
+  //console.log(rValue);
+  return rValue;
+
+}
+
+//자동업데이트 체크 및 진행.
+function speedmis_update() {
+
+  //웹업데이트는 항상 체크&진행. 안내문구는 gadmin 에게만.
+
+  file_url = 'https://www.speedmis.com/_mis';
+  if (document.getElementById('MS_MJ_MY').value == 'MY') web_url = 'https://speedmismy.mycafe24.com/_mis';
+  else web_url = file_url;
+
+  if (document.getElementById("RealPid").value == 'speedmis001043') {
+    //엔진 업데이트
+    version_my = ajax_url_return2('/_mis/speedmis_file_version.txt');
+    url = file_url + '/speedmis_file_version.txt';
+
+    version_speedmis = ajax_url_return2(url);
+    if (version_my != version_speedmis && document.getElementById('MisSession_UserID').value == 'gadmin') {
+      toastr.warning("<a href='https://www.speedmis.com/_mis/index.php?gubun=1040&idx=46' target=_blank>수정된 엔진버전이 감지되었습니다. 엔진업데이트를 진행해야 좋습니다. 도움말 바로가기</a>", "", { progressBar: true, timeOut: 10000, closeButton: false, positionClass: "toast-bottom-right" });
+    }
+  } else {
+
+    if (ajax_url_return2('/_mis_addLogic/updateVersion/autoUpdate.txt') == 'Y') {
+      if (ajax_url_return2(web_url + '_addLogic/updateVersion/updateVersion_last.txt') * 1 > ajax_url_return2('/_mis_addLogic/updateVersion/updateVersion_last.txt') * 1) {
+        autoUpdate_url = 'index.php?RealPid=speedmis001043&openUpdate=Y';
+        ifr_id = "ifr_" + Math.floor(Math.random() * 10000000000000000);
+        $('body').append('<iframe id="' + ifr_id + '" style="display:none;"></iframe>');
+        $('iframe#' + ifr_id)[0].src = autoUpdate_url;
+        if (document.getElementById('MisSession_UserID').value == 'gadmin') toastr.success("자동업데이트 설정에 의해 업데이트가 시작되었습니다.", "", { progressBar: true, timeOut: 5000, closeButton: false, positionClass: "toast-bottom-right" });
+      }
+
+      //엔진 업데이트
+      if (document.getElementById("MisSession_UserID").value == 'gadmin') {
+        version_my = ajax_url_return2('/_mis/speedmis_file_version.txt');
+        version_speedmis = ajax_url_return2(file_url + '/speedmis_file_version.txt');
+        if (version_my != version_speedmis) {
+          toastr.warning("<a href='https://www.speedmis.com/_mis/index.php?gubun=1040&idx=46' target=_blank>수정된 엔진버전이 감지되었습니다. 엔진업데이트를 진행해야 좋습니다. 도움말 바로가기</a>", "", { progressBar: true, timeOut: 10000, closeButton: false, positionClass: "toast-bottom-right" });
+        }
+      }
+
+    } else if (document.getElementById("MisSession_UserID").value == 'gadmin') {
+      if (ajax_url_return2(web_url + '_addLogic/updateVersion/updateVersion_last.txt') * 1 > ajax_url_return2('/_mis_addLogic/updateVersion/updateVersion_last.txt') * 1) {
+        toastr.warning("", "<a href='index.php?RealPid=speedmis001043&isMenuIn=auto'>gadmin 님, 자동업데이트 설정을 하시려면 여기를 클릭해주세요.</a>", { progressBar: true, timeOut: 10000, closeButton: false, positionClass: "toast-bottom-right" });
+      }
+    }
+  }
+
+}
+
+function shortUrl2(url) {
+  var t1 = ajax_url_return_noTS("shortURL.asp?" + shortUrl_replace(url));
+  return t1;
+}
+
+function shortUrl_replace(url) {
+  return replaceAll(replaceAll(replaceAll(url, "1=1", "@il=il"), "&", "@nd;"), "%", "@per;")
+}
+
+function siteHome() {
+  var url = window.location.href;
+  var arr = url.split("/");
+  var result = arr[0] + "//" + arr[2];
+  return result;
+}
+
+function nowTrans(text, fromLang, toLang) {
+  if (fromLang == toLang) return text;
+  else {
+    var uu = siteHome() + "/_mis/speedmisTrans.php";
+    var t1 = ajax_url_return_noTS(uu + "?from=" + fromLang + "&to=" + toLang + "&text=" + encodeURIComponent(text));
+    //if(InStr(t1, "\"")) t1 = replaceAll(t1, t1.split("\"")[0], "");
+    //t1 = replaceAll(t1,"\\/","/");
+    if (InStr(t1, "Exception:") + InStr(t1, "correct UR") == 0) return t1;
+    else return text;
+  }
+}
+
+
+//ajax app function-------------------------
+
+function devQueryOnOff() {
+  if (getCookie('devQueryOn') == 'Y') {
+    setCookie('devQueryOn', 'N');
+    parent.toastr.success("이제 쿼리문이 더이상 노출되지 않습니다.");
+  } else {
+    setCookie('devQueryOn', 'Y');
+    parent.toastr.success("이제부터 조회/저장 시에 쿼리문을 보실 수 있습니다!");
+  }
+}
+
+
+function InStr(strSearch, charSearchFor) {
+  if (strSearch == null) return -1;
+  const str = String(strSearch);
+  return str.indexOf(charSearchFor) + 1;
+}
+
+
+function Mid(str, start, len) {
+  if (str == null) return 0;
+  if (start < 0 || len < 0) return "";
+
+  const s = String(str);
+  const iLen = s.length;
+  let iEnd;
+
+  if (start + len > iLen) iEnd = iLen;
+  else iEnd = start + len - 1;
+
+  // start is 1-based in original VB-style Mid
+  return s.substring(start - 1, iEnd);
+}
+
+function Left(str, n) {
+  if (n <= 0) return "";
+  const s = String(str);
+  if (n > s.length) return s;
+  return s.substring(0, n);
+}
+
+function Right(str, n) {
+  if (n <= 0) return "";
+  const s = String(str);
+  const len = s.length;
+  if (n > len) return s;
+  return s.substring(len - n, len);
+}
+
+
+function StringAdd(num, str) {
+  // Make sure start and len are within proper bounds
+  if (num == null) return str;
+  var return_str = '';
+  for (var i = 0; i < num; i++) {
+    return_str = return_str + str
+  }
+  return return_str;
+
+}
+
+
+function replaceAll(oldString, searchStr, replaceStr) {
+  if (oldString == null) return false;
+  return String(oldString).split(searchStr).join(replaceStr);
+}
+
+
+
+function Trim(str) {
+  if (str == null) return false;
+  // Modern browsers support .trim(), but original code removed specific unicode spaces too.
+  // We'll use a regex that covers standard whitespace + the specific ones from original code if needed,
+  // but standard .trim() is usually sufficient. 
+  // Custom whitespace check from original: \x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000
+  // Providing a robust regex fallback for safety.
+  return String(str).replace(/^[\s\uFEFF\xA0\u2000-\u200B\u2028\u2029\u3000]+|[\s\uFEFF\xA0\u2000-\u200B\u2028\u2029\u3000]+$/g, '');
+}
+
+
+
+function Len(aa) {
+  if (aa == null) return 0;
+  bb = aa.length;
+  return bb;
+}
+
+function uni_len(aa) {
+  bb = aa.length;
+  for (ii = 1; ii <= aa.length; ii++) {
+    if (Mid(aa, ii, 1) != "") {
+      if (Mid(aa, ii, 1).charCodeAt(0) > 500) bb = bb + 1;
+
+      //alert(aa + ',' + ii + ',' + Mid(aa,ii,1) + ',' + Mid(aa,ii,1).charCodeAt(0));
+
+    }
+  }
+  return bb;
+}
+
+
+function uni_left(aa, bb) {
+  for (ii = 1; ii <= bb; ii++) {
+    if (Mid(aa, ii, 1) != "") {
+      if (Mid(aa, ii, 1).charCodeAt(0) > 500 && ii <= bb) bb = bb - 1;
+    }
+  }
+  return Left(aa, bb);
+}
+
+
+
+const iif = (evl, arg1, arg2) => evl ? arg1 : arg2;
+function formatnum(pVal, pFmt) {
+  return kendo.toString(pVal, pFmt);
+}
+function isNumeric(val) {
+  if (val === null || val === undefined || val === '') return false;
+  return !isNaN(val - 0);
+}
+
+function isImage(p_filename) {
+  if (InStr(";.jpg;.png;.gif;jpeg;.bmp;", ";" + Right(p_filename, 4).toLocaleLowerCase() + ";") > 0) {
+    return true;
+  } else return false;
+}
+
+function isWebPlayFile(p_filename) {
+  if (InStr(";.jpg;.png;.gif;jpeg;.bmp;.pdf;.htm;html;.mp4;.mp3;.txt;.svg;", ";" + Right(p_filename, 4).toLocaleLowerCase() + ";") > 0) {
+    return true;
+  } else return false;
+}
+
+function isDateObject(sDate) {
+  return (null != sDate) && !isNaN(sDate) && ("undefined" !== typeof sDate.getDate);
+}
+
+function isDate(sDate) {
+  if (sDate == "" || sDate == null) return false;
+  if (isDateObject(sDate)) return true;
+
+  var sOrgDate, sPatt;
+  var sYear = "", sMonth = "", sDay = "";
+  var iYear = 0, iMonth = 0, iDay = 0;
+
+  sPatt = /\//g; sDate = sDate.replace(sPatt, "");
+  sPatt = /-/g; sDate = sDate.replace(sPatt, "");
+  sPatt = /\./g; sDate = sDate.replace(sPatt, "");
+
+  if (sDate == "") return false;
+  if (sDate.length != 8) return false;
+  else {
+    sYear = sDate.substring(0, 4);
+    sMonth = sDate.substring(4, 6);
+    sDay = sDate.substring(6, 8);
+  }
+
+  if (isNaN(sYear) || isNaN(sMonth) || isNaN(sDay)) return false;
+
+  iYear = parseInt(sYear, '10');
+  iMonth = parseInt(sMonth, '10');
+  iDay = parseInt(sDay, '10');
+
+  if (iYear < 1) iYear = 0;
+  if (iMonth < 1 || iMonth > 12) iMonth = 0;
+  if (iDay < 1) iDay = 0;
+
+  if (iMonth == 1 || iMonth == 3 || iMonth == 5 || iMonth == 7 || iMonth == 8 ||
+    iMonth == 10 || iMonth == 12) {
+    if (iDay > 31) iDay = 0;
+  } else if (iMonth == 4 || iMonth == 6 || iMonth == 9 || iMonth == 11) {
+    if (iDay > 30) iDay = 0;
+  } else if (iMonth == 2) {
+    if (iYear % 4 != 0 || (iYear % 100 == 0 && iYear % 400 != 0)) {
+      if (iDay > 28) iDay = 0;
+    } else if (iDay > 29) iDay = 0;
+  }
+  if (iYear == 0 || iMonth == 0 || iDay == 0) return false;
+  else return true;
+}
+
+
+function encode_cafe24(ajax_sql) {
+  ajax_sql = replaceAll(ajax_sql, "wget", "_@w_get");
+  return ajax_sql;
+}
+
+function encode_firewall(ajax_sql) {
+
+  ajax_sql = replaceAll(ajax_sql, "00", "_@@@@");
+  ajax_sql = replaceAll(ajax_sql, "'", "_@dda");
+  ajax_sql = replaceAll(ajax_sql, "%", "_@percent");
+  ajax_sql = replaceAll(ajax_sql, ")", "_@karoB");
+  ajax_sql = replaceAll(ajax_sql, "(", "_@karoA");
+  ajax_sql = replaceAll(ajax_sql, "+", "_@plus");
+  ajax_sql = replaceAll(ajax_sql, "&", "_@_nd");
+  ajax_sql = replaceAll(ajax_sql, "#", "_@shap");
+  ajax_sql = replaceAll(ajax_sql, "able", "_@ab");
+  ajax_sql = replaceAll(ajax_sql, "select", "_@se");
+  ajax_sql = replaceAll(ajax_sql, "update", "_@up");
+  ajax_sql = replaceAll(ajax_sql, "script", "_@sc");
+  ajax_sql = replaceAll(ajax_sql, "from", "_@fr");
+  ajax_sql = replaceAll(ajax_sql, "where", "_@wh");
+  ajax_sql = replaceAll(ajax_sql, "and", "_@an");
+  ajax_sql = replaceAll(ajax_sql, "distinct", "_@di");
+  ajax_sql = replaceAll(ajax_sql, ".dbo.", "_@.d");
+  ajax_sql = replaceAll(ajax_sql, "convert", "_@co");
+  ajax_sql = replaceAll(ajax_sql, "varchar", "_@var");
+  ajax_sql = replaceAll(ajax_sql, "join", "_@jo");
+  ajax_sql = replaceAll(ajax_sql, "char", "_@ch");
+  ajax_sql = replaceAll(ajax_sql, "click", "_@cl");
+  ajax_sql = replaceAll(ajax_sql, "inner", "_@in");
+  ajax_sql = replaceAll(ajax_sql, "left", "_@le");
+  ajax_sql = replaceAll(ajax_sql, "outer", "_@ou");
+  ajax_sql = replaceAll(ajax_sql, "like", "_@li");
+  ajax_sql = replaceAll(ajax_sql, "declare", "_@dec");
+  ajax_sql = replaceAll(ajax_sql, "isnull", "_@isn");
+  ajax_sql = replaceAll(ajax_sql, "getdate", "_@get");
+  ajax_sql = replaceAll(ajax_sql, "union", "_@uni");
+
+
+  return ajax_sql;
+}
+
+
+
+function ignoreSpaces(string) {
+  var temp = "";
+  string = '' + string;
+  splitstring = string.split(" ");
+  for (i = 0; i < splitstring.length; i++) {
+    temp += splitstring[i];
+  }
+  return temp;
+}
+
+
+function getElementsByClass(node, searchClass, tag) {
+  var classElements = new Array();
+  var els = node.getElementsByTagName(tag); // use "*" for all elements
+  var elsLen = els.length;
+  var pattern = new RegExp("\\b" + searchClass + "\\b");
+  for (i = 0, j = 0; i < elsLen; i++) {
+    if (pattern.test(els[i].className)) {
+      classElements[j] = els[i];
+      j++;
+    }
+  }
+  return classElements;
+}
+
+
+function monthDiff(d1, d2) {
+  var months;
+  var d1 = new Date(d1);
+  var d2 = new Date(d2);
+  months = (d2.getFullYear() - d1.getFullYear()) * 12;
+  months -= d1.getMonth();
+  months += d2.getMonth();
+  return months <= 0 ? 0 : months;
+}
+
+function DateDiff(date1, date2) {
+  var asdf
+  var dtDate1 = Date.parse(date1);
+  var dtDate2 = Date.parse(date2);
+  return (dtDate2 - dtDate1) / (24 * 60 * 60 * 1000);
+}
+
+function DateAdd(t, v, sDate) {
+  var yy = parseInt(sDate.substr(0, 4), 10);
+  var mm = parseInt(sDate.substr(5, 2), 10);
+  var dd = parseInt(sDate.substr(8), 10);
+
+  if (t == "d") {
+    d = new Date(yy, mm - 1, dd + v);
+  } else if (t == "m") {
+    d = new Date(yy, mm - 1 + v, dd);
+  } else if (t == "y") {
+    d = new Date(yy + v, mm - 1, dd);
+  } else {
+    d = new Date(yy, mm - 1, dd + v);
+  }
+
+  yy = d.getFullYear();
+  mm = d.getMonth() + 1; mm = (mm < 10) ? '0' + mm : mm;
+  dd = d.getDate(); dd = (dd < 10) ? '0' + dd : dd;
+
+  return '' + yy + '-' + mm + '-' + dd;
+}
+
+
+var rgbToHexColor = (function () {
+  var rx = /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i;
+
+  function pad(num) {
+    if (num.length === 1) {
+      num = "0" + num;
+    }
+
+    return num;
+  }
+
+  return function (rgb, uppercase) {
+    var rxArray = rgb.match(rx),
+      hex;
+
+    if (rxArray !== null) {
+      hex = pad(parseInt(rxArray[1], 10).toString(16)) + pad(parseInt(rxArray[2], 10).toString(16)) + pad(parseInt(rxArray[3], 10).toString(16));
+
+      if (uppercase === true) {
+        hex = hex.toUpperCase();
+      }
+
+      return "#" + hex;
+    }
+
+    return;
+  };
+}());
+
+//================= msi_ajsx start =====================
+function sqlReplace(obj_value) {
+  //obj_value = replaceAll(obj_value,"'","'+char(39)+'");
+  obj_value = replaceAll(obj_value, "'", "''");
+  //obj_value = replaceAll(obj_value,"<","'+char(60)+'");
+  //obj_value = replaceAll(obj_value,">","'+char(62)+'");
+  obj_value = replaceAll(obj_value, String.fromCharCode(1), "");
+  return obj_value;
+}
+
+
+function isPhoneNumber(HP_No) {
+  if (HP_No == null) return false;
+  else {
+    var temp1 = replaceAll(replaceAll(HP_No, " ", ""), "-", "");
+    if (!isNumeric(temp1) || uni_len(temp1) < 9 || uni_len(temp1) > 11 || Left(temp1, 1) != "0") return false;
+    else return true;
+  }
+}
+
+function formatPhoneNumber(HP_No) {
+  if (!isPhoneNumber(HP_No)) return HP_No;
+  else {
+    var temp1 = replaceAll(replaceAll(HP_No, " ", ""), "-", "");
+    if (uni_len(temp1) == 9) return Left(temp1, 2) + "-" + Mid(temp1, 3, 3) + "-" + Right(temp1, 4);
+    else if (uni_len(temp1) == 10) return Left(temp1, 3) + "-" + Mid(temp1, 4, 3) + "-" + Right(temp1, 4);
+    else if (uni_len(temp1) == 11) return Left(temp1, 3) + "-" + Mid(temp1, 4, 4) + "-" + Right(temp1, 4);
+  }
+}
+
+
+
+function check_email(val) {
+  if (!val.match(/\S+@\S+\.\S+/)) { // Jaymon's / Squirtle's solution
+    // Do something
+    return false;
+  }
+  if (val.indexOf(' ') != -1 || val.indexOf('..') != -1) {
+    // Do something
+    return false;
+  }
+  return true;
+}
+
+
+
+
+function copyStringToClipboard(string) {
+  if (window.clipboardData) window.clipboardData.setData('Text', string);
+  else {
+    function handler(event) {
+      event.clipboardData.setData('text/plain', string);
+      event.preventDefault();
+      document.removeEventListener('copy', handler, true);
+    }
+
+    document.addEventListener('copy', handler, true);
+    document.execCommand('copy');
+  }
+}
+
+function guestLogin() {
+  var dm = document.domain;
+  if (dm == "www.speedmis.com") {
+    $('input#MisSession_UserID').val('방문고객');
+    $('input#MisSession_UserPW').val('1234');
+    if (getUrlParameter("isStop") == "Y") return false;
+    submit_ok();
+  }
+}

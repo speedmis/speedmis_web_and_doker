@@ -1,0 +1,20 @@
+
+--update sql :
+
+update MisMenuList set isMenuHidden=N'Y' where idx=N'318'; 
+
+SET @cnt := (select COUNT(*) from information_schema.Columns where TABLE_NAME = 'MisMenuList' AND TABLE_SCHEMA='speedmis_db_demo' AND (COLUMN_NAME = 'lastupdate' or COLUMN_NAME = 'lastupdater'));
+set @query = IF(@cnt=2, 'update MisMenuList set lastupdate=current_timestamp(),lastupdater=N''gadmin'' where idx=N''318''',
+'select 111');
+prepare stmt from @query;
+EXECUTE stmt; 
+                
+
+-----------------------------------------------
+
+ insert into MisReadList (RealPid, widx, userid, wdater, 자격) 
+    select N'speedmis000314', N'318', N'gadmin', N'gadmin', N'수정'; 
+
+
+-----------------------------------------------
+        

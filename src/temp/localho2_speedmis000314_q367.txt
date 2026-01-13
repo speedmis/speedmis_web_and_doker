@@ -1,0 +1,67 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList table_m 
+ where 9=9  and table_m.useflag='1'
+and table_m.idx<>1
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.RealPid as "RealPid"
+,table_upRealPid.MenuName as "table_upRealPidQnMenuName"
+,table_m.upRealPid as "upRealPid"
+,table_m.MenuName as "MenuName"
+,table_m.briefTitle as "briefTitle"
+,table_m.g12 as "g12"
+,table_m.AutoGubun as "AutoGubun"
+,table_m.isMenuHidden as "isMenuHidden"
+,table_m.SortG2 as "SortG2"
+,table_m.SortG4 as "SortG4"
+,table_m.SortG6 as "SortG6"
+,table_m.depth as "depth"
+,(select count(*) from MisMenuList m where length(m.AutoGubun)>length(table_m.AutoGubun) and left(m.AutoGubun, length(table_m.AutoGubun))=table_m.AutoGubun and m.useflag=1) as "zhawiAPP"
+,'' as "zgwonhanjeondal"
+,concat(table_SortG2.autogubun,' ',table_SortG2.menuname) as "zsangwimenyubyeolbogi"
+,table_new_gidx.gname as "table_new_gidxQngname"
+,table_m.new_gidx as "new_gidx"
+,table_AuthCode.kname as "table_AuthCodeQnkname"
+,table_m.AuthCode as "AuthCode"
+,table_MenuType.kname as "table_MenuTypeQnkname"
+,table_m.MenuType as "MenuType"
+,table_MisJoinPid.MenuName as "table_MisJoinPidQnMenuName"
+,table_m.MisJoinPid as "MisJoinPid"
+,table_m.AddURL as "AddURL"
+,BIN(table_m.help_update_deny) as "help_update_deny"
+,table_m.help_title as "help_title"
+-- ,nULL as "help_contents"
+,table_m.remark as "remark"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+-- ,nULL as "zsangwidanggyejohoe"
+,table_m.isCoreProgram as "isCoreProgram"
+from MisMenuList table_m
+left outer join MisMenuList table_upRealPid on table_upRealPid.RealPid = table_m.upRealPid
+ and (table_upRealPid.useflag='1' and (table_upRealPid.MisJoinPid='speedmis000753' or table_upRealPid.autogubun='00' or length(table_upRealPid.autogubun)<=4))
+left outer join MisMenuList table_SortG2 on table_SortG2.autogubun=left(table_m.autogubun,2) and table_SortG2.useflag='1'
+left outer join MisGroup_Master table_new_gidx on table_new_gidx.idx = table_m.new_gidx
+left outer join MisCommonTable table_AuthCode on table_AuthCode.kcode = table_m.AuthCode
+ and table_AuthCode.gcode='speedmis000338'
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_m.MenuType
+ and table_MenuType.gcode='speedmis000306'
+left outer join MisMenuList table_MisJoinPid on table_MisJoinPid.RealPid = table_m.MisJoinPid
+ and (table_MisJoinPid.useflag='1' and table_MisJoinPid.menuType='01')
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.idx<>1 order by table_m.AutoGubun,table_new_gidx.gname limit 100) aaa order by AutoGubun,table_new_gidxQngname) bbb where rowNumber between 51 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

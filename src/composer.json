@@ -1,0 +1,8 @@
+{
+    "require": {
+        "firebase/php-jwt": "^6.0",
+        "php": ">=7.1",
+        "minishlink/web-push": "^9.0",
+        "google/cloud-translate": "^2.0"
+    }
+}

@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteBase /surl/
+# 6자리 영문, 숫자로 구성된 URL 패턴을 redirect.php로 전달
+RewriteRule ^([a-zA-Z0-9]{6})$ redirect.php?code=$1 [L]

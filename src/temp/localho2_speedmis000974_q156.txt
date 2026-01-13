@@ -1,0 +1,46 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisComments table_m 
+left outer join MisMenuList_Member table_member on table_member.RealPid = table_m.RealPid and table_member.userid = N'gadmin'
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid = table_m.RealPid
+ and table_RealPid.MenuType='02' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = N'gadmin')
+ where 9=9  and table_m.useflag='1'
+and table_m.RealPid='speedmis000314' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = N'gadmin' and table_member.AuthorityLevel<>9) and table_m.midx = '1032' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.midx as "midx"
+,table_m.refidx as "refidx"
+,case when table_m.idx=table_m.refidx then 'Y' else 'N' end as "zrefidx0"
+,table_RealPid.MenuName as "table_RealPidQnMenuName"
+,table_m.RealPid as "RealPid"
+,table_m.contents as "contents"
+,(select count(*) from MisComments where midx=table_m.midx and refidx=table_m.refidx and idx<>refidx and useflag=1) as "zdapgeulsu"
+,table_m.sel_like as "sel_like"
+,table_m.sel_hate as "sel_hate"
+,(select likeOrHate from MisCommentsLike where commentsIdx=table_m.idx and wdater='gadmin' limit 1) as "zmyLH"
+,table_m.boardattach1 as "boardattach1"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_Station_NewNum.stationname as "table_Station_NewNumQmstationname"
+from MisComments table_m
+left outer join MisMenuList_Member table_member on table_member.RealPid = table_m.RealPid and table_member.userid = N'gadmin'
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid = table_m.RealPid
+ and table_RealPid.MenuType='02' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = N'gadmin')
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+left outer join MisStation table_Station_NewNum on table_wdater.station_newnum= table_Station_NewNum.num
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.RealPid='speedmis000314' and (ifnull(table_RealPid.AuthCode,'')<>'02' or table_member.userid = N'gadmin' and table_member.AuthorityLevel<>9) and table_m.midx = '1032'  order by table_m.refidx,table_m.idx limit 100) aaa order by refidx,idx) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

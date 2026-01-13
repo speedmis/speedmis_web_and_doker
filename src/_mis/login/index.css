@@ -1,0 +1,335 @@
+﻿
+    .text_box {
+        height:30px;
+        width:209px;
+        border:1px solid #aaa; font-size:12pt;  
+        padding-left:10px; 
+        color:#555; 
+        }
+
+        div#navbar-close > img {
+            top:10px!important;
+        }
+
+        hr.green {
+            width: 152px;
+            border: none;
+            height: 2px;
+            /* Set the hr color */
+            color: #38cc91; /* old IE */
+            background-color: #38cc91; /* Modern Browsers */
+            margin: 30px auto;
+        }
+
+        #aboutCounter p {
+            color: #fff;
+            text-align: center;
+        }
+
+        #aboutCounter p.count {
+            font-size: 52px;
+            font-weight: bold;
+        }
+
+        #aboutCounter p.category-name {
+            font-size: 28px;
+        }
+
+        #aboutCounter .counter {
+            background-size: cover;
+            min-height: 300px;
+            padding: 0px;
+        }
+
+
+
+        #aboutClients p {
+            text-align: center;
+            line-height: 1.7;
+        }
+
+
+        #aboutPro.carousel .item {
+            background-size: cover;
+            background-position: center;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+        }
+
+        #aboutPro .carousel-caption {
+            left: 7%;
+            right: 7%;
+            top: 0;
+            padding-top: 100px;
+            text-shadow: none;
+        }
+
+        #aboutPro .carousel-indicators {
+            bottom: 40px;
+        }
+
+
+        #aboutPro h4 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+
+        }
+
+        #aboutPro small {
+            display: block;
+            font-size: 16px;
+            margin-top: 23px;
+            color: #fff;
+        }
+
+        #aboutPro .quote {
+
+            font-size: 18px;
+            line-height: 1.7;
+            text-align: center;
+            color: #fff;
+            margin-top: 50px;
+            margin-bottom: 27px;
+
+        }
+
+        #aboutPro .btn-lg {
+            padding: 10px 25px;
+            font-size: 16px;
+        }
+
+        #aboutSignup {
+            padding: 52px 0 50px;
+        }
+
+        #aboutSignup .condition {
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        #aboutSignup .already {
+            margin-top: 20px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        #aboutSignup .btn-border-blue {
+            border: 2px solid #4a9cf3;
+            width: 290px;
+            padding: 15px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #aboutSignup .signup-btn {
+            text-align: center;
+        }
+
+        .carousel-indicators li {
+            margin: 0 8px;
+        }
+
+        .carousel-indicators .active {
+            margin: 0 8px;
+        }
+
+        /* RESPONSIVE CSS DESKTOP
+        -------------------------------------------------- */
+        @media (min-width: 768px) {
+
+
+            #aboutClients p {
+                font-size: 16px;
+            }
+
+            #aboutPro .quote {
+                font-size: 20px;
+            }
+
+            #aboutSignup p {
+                font-size: 16px;
+            }
+
+            #aboutSignup .btn-border-blue {
+                width: 214px;
+                margin: 0 10px;
+            }
+
+        }
+
+
+
+
+
+    /* 아래를 적용하면 서브용 헤더가 된다(사진없어지고, 얇아지고, 흰색바탕) */
+
+    .navbar-wrapper-trans .navbar {
+        border-bottom: 1px solid #e6e6e6!important;
+        z-index: 10;
+    }
+
+    .navbar-wrapper-trans a {
+        color: #4d4d4d!important;
+    }
+    .navbar-wrapper .navbar {
+        height: 75px!important;
+    }
+    .hero-container {
+        height: 75px;
+    }
+
+    .page-root #mainCarousel.hero01 {
+        background-image: none!important;
+    }
+
+    .hero-container {
+        background-color: #fff!important;
+    }
+
+    .ticker {
+        background-color: initial!important;
+    }
+
+
+
+.hidden {
+    visibility: inherit!important;
+}
+
+.page-root {
+    min-height: auto!important;
+}
+.navbar-wrapper-trans .navbar {
+    background: #fff!important;
+}
+
+
+h1 {
+    font-size: 30px;
+    font-weight: 500;
+    letter-spacing: -0.9px;
+    text-align: center;
+    color: #4d4d4d;
+    margin: 50px auto;
+}
+
+.logo {
+    margin-top:20px;
+    margin-bottom:20px;
+    padding: 0;
+    text-align:center;
+}
+
+span#lblLogo img {
+    max-width: 100%;
+}
+
+
+.checkid
+{
+    min-height: 20px;
+    margin-bottom:0px;
+    margin-left:0px;
+    cursor: pointer;
+    color: #909090;
+    
+}
+
+.checkid label 
+{
+    margin-left:10px;
+    font-weight: 200;
+}
+
+.select_language
+{
+    font-family: "nanum gothic","dotum","gulim","yahei","Sans-serif","SimSun"; 
+    font-size: 13px; 
+    font-weight: 700;
+    border: none;
+    height: 25px; 
+    color:#3e445f;
+    padding-right:2px;
+    padding-left:1px;
+    -webkit-appearance: none;  
+    -moz-appearance: none;     
+    appearance: none; 
+    padding-top:0px;    
+    padding-bottom:0px;
+    background-color:#ffffff;
+}
+
+select::-ms-expand { 
+    display: none;            /* 화살표 없애기 for IE10, 11*/ 
+} 
+
+select, option {
+text-align:right;   
+}
+
+
+
+.language
+{
+    text-align:right;
+    font-size : 14px;
+    color: #000000;
+}
+
+.already {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.footer {
+    margin: 5px 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 100;
+    color: #909090;
+}
+
+.login-form {
+    border: solid 1px #e1e3e2;
+    border-radius: 4px;
+    padding: 30px 20px;
+}
+.fb-wrap {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.btn-fb {
+    font-size: 16px;
+    padding: 16px 0;
+    background-color: #4c66a3;
+    border: 0;
+}
+p.allow {
+    margin-top: 10px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: #909090;
+}
+
+
+@media screen and (max-width: 460px) {
+
+    .wide {
+        display: none;
+    }
+}
+
+
+@media screen and (min-width: 768px) {
+    .hero-container {
+        height: 75px!important;
+    }
+
+}
+
+
+

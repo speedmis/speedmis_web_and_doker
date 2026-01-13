@@ -1,0 +1,68 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList table_m 
+ where 9=9  and table_m.useflag='1'
+and table_m.MenuType = '01' and table_m.RealPid = N'speedmy006028' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.RealPid as "RealPid"
+,table_m.idx as "table_mQmidx"
+,table_m.MenuName as "MenuName"
+,table_m.MenuName as "table_mQmMenuName"
+,table_MenuType.kname as "table_MenuTypeQnkname"
+,table_m.MenuType as "MenuType"
+,table_m.AutoGubun as "AutoGubun"
+,table_m.isMenuHidden as "isMenuHidden"
+,'' as "zmiribogisaiteuwasilsaiteuronanwineunyeongyeok"
+,table_m.g01 as "g01"
+,table_m.g02 as "g02"
+,table_m.g03 as "g03"
+,table_m.g04 as "g04"
+,table_m.g05 as "g05"
+,table_m.g07 as "g07"
+,table_m.g08 as "g08"
+,table_m.g09 as "g09"
+,table_m.g10 as "g10"
+,table_m.g11 as "g11"
+,table_m.g12 as "g12"
+,table_m.g13 as "g13"
+,table_m.g14 as "g14"
+,table_m.dbalias as "dbalias"
+,case when ifnull(table_m.dbalias,'')='' then '기본MYSQL' else table_m.dbalias end as "zDBseobeo"
+,table_m.addLogic as "addLogic"
+,table_m.isUsePrint as "isUsePrint"
+,table_m.isUseForm as "isUseForm"
+,'' as "zinswaeyangsikURL"
+,table_m.addLogic_print as "addLogic_print"
+,'' as "zwepsoseusangse"
+,'' as "zhaedangmenyugwalli"
+,'' as "zgitajeongbo"
+,table_m.AddURL as "AddURL"
+,table_m.remark as "remark"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_m.filelastupdate as "filelastupdate"
+,table_filelastupdater.username as "table_filelastupdaterQnusername"
+,table_m.filelastupdater as "filelastupdater"
+from MisMenuList table_m
+left outer join MisMenuList table_g2 on table_g2.autogubun = left(table_m.autogubun,2)
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_m.MenuType
+ and table_MenuType.gcode='speedmis000306'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+left outer join MisUser table_filelastupdater on table_filelastupdater.UniqueNum = table_m.filelastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.MenuType = '01' and table_m.RealPid = N'speedmy006028'  order by table_m.idx desc limit 100) aaa order by idx desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

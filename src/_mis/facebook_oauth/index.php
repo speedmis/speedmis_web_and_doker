@@ -1,0 +1,1 @@
+﻿<script>location.href='url.php'+location.search;</script>

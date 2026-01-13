@@ -1,0 +1,2122 @@
+
+
+function resize_ifr_split() {
+    if ($('div.chart_option')[0]) {
+        resize_chart_split();
+        return false;
+    }
+    var $gridRight = $('iframe#grid_right');
+    if ($gridRight[0] && (document.getElementById('MenuType').value == '01' || document.getElementById('MenuType').value == '06')) {
+        var $rightPane = $('div#right-pane');
+        p_top0 = $rightPane.offset().top;
+        if (document.getElementById('isMenuIn').value != 'Y') {
+            p_top = 0;
+        } else if (1 == 1 || getCookie('screenMode') == '2' && getCookie('lastSize_right') == '0px' && document.getElementById('isMenuIn').value == 'Y') {
+            p_top = 61;
+        } else {
+            p_top = p_top0;
+        }
+        $gridRight[0].style.top = p_top + 'px';
+        $gridRight[0].style.left = ($rightPane.offset().left) + 'px';
+        w_dd = -1;
+        if (isMainFrame() == false) {
+            w_dd = -2;
+        }
+        $gridRight[0].style.width = ($rightPane.width() + w_dd) + 'px';
+        p_height0 = $rightPane.height();
+        if ((getCookie('screenMode') == '1' || isMobile()) && getCookie('select_device_id') == 'device-lg' && document.getElementById('isMenuIn').value != 'Y') {
+            p_height = p_height0 + p_top0 + 2;
+        } else if (1 == 1 || getCookie('screenMode') == '2' && getCookie('select_device_id') == 'device-lg' && getCookie('lastSize_right') == '0px' && document.getElementById('isMenuIn').value != 'Y') {
+            p_height = p_height0 + 51 + 2;
+        } else {
+            p_height = p_height0;
+        }
+        $gridRight[0].style.height = p_height + 'px';
+    }
+}
+
+function resize_chart_split() {
+    var $chartOption = $('.chart_option');
+    if ($chartOption[0] == undefined || isMainFrame() == false) {
+        return false;
+    }
+    var $rightPane = $('div#right-pane');
+    p_top0 = $rightPane.offset().top;
+    if (1 == 1 || (getCookie('screenMode') == '1' || isMobile()) && getCookie('select_device_id') == 'device-lg') {
+        p_top = 0;
+    } else {
+        p_top = p_top0;
+    }
+    $chartOption[0].style.top = p_top + 'px';
+    $chartOption[0].style.left = ($rightPane.offset().left) + 'px';
+    w_dd = -1;
+    if (isMainFrame() == false) {
+        w_dd = -2;
+    }
+    $chartOption[0].style.width = ($rightPane.width() + w_dd) + 'px';
+    p_height0 = $rightPane.height();
+    if (1 == 1 || (getCookie('screenMode') == '1' || isMobile()) && getCookie('select_device_id') == 'device-lg') {
+        p_height = p_height0 + p_top0 + 2;
+    } else {
+        p_height = p_height0;
+    }
+    $chartOption[0].style.height = p_height + 'px';
+    $chartOption[0].style.position = 'absolute';
+}
+
+var ThemeChooserViewModel = kendo.observable({
+    sassThemes: [
+        { value: "default-v2", name: "Default v2", colors: ["#ff6358", "#eb5b51", "#fff"] },
+        { value: "bootstrap-v4", name: "Bootstrap v4", colors: ["#0275d8", "#67afe9", "#fff"] },
+        { value: "material-v2", name: "Material", colors: ["#3f51b5", "#283593", "#fff"] }
+    ],
+    themes: [
+        //{ value: "black", name: "Black", colors: [ "#0167cc", "#4698e9", "#272727" ]  },
+        { value: "blueopal", name: "Blue Opal", colors: ["#076186", "#7ed3f6", "#94c0d2"] },
+        //{ value: "bootstrap", name: "Bootstrap v3", colors: [ "#3276b1", "#67afe9", "#fff" ]  },
+        { value: "default", name: "Default", colors: ["#ef6f1c", "#e24b17", "#5a4b43"] },
+        //{ value: "flat", name: "Flat", colors: [ "#363940", "#2eb3a6", "#fff" ]  },
+        { value: "highcontrast", name: "High Contrast", colors: ["#b11e9c", "#880275", "#1b141a"] },
+        { value: "metro", name: "Metro", colors: ["#8ebc00", "#787878", "#fff"] },
+        //{ value: "metroblack", name: "Metro Black", colors: [ "#00aba9", "#0e0e0e", "#565656" ]  },
+        { value: "moonlight", name: "Moonlight", colors: ["#ee9f05", "#40444f", "#212a33"] },
+        { value: "fiori", name: "Fiori", colors: ["#007cc0", "#e6f2f9", "#f0f0f0"] },
+        { value: "silver", name: "Silver", colors: ["#298bc8", "#515967", "#eaeaec"] },
+        //{ value: "uniform", name: "Uniform", colors: [ "#666", "#ccc", "#fff" ]  }
+    ],
+
+    selectedTheme: window.kendoTheme,
+    selectedSassTheme: window.kendoTheme,
+    selectedSize: window.kendoCommonFile
+});
+
+function themeName() {
+    if (window.kendoTheme == 'blueopal') themeName0 = 'Blue Opal';
+    else if (window.kendoTheme == 'highcontrast') themeName0 = 'High Contrast';
+    else if (window.kendoTheme == 'moonlight') themeName0 = 'Moonlight';
+    else if (window.kendoTheme == 'default') themeName0 = 'Default';
+    else if (window.kendoTheme == 'metro') themeName0 = 'Metro';
+    else if (window.kendoTheme == 'fiori') themeName0 = 'Fiori';
+    else themeName0 = 'Silver';
+    return themeName0;
+}
+
+function select_device_load() {
+    if (document.getElementById('ActionFlag').value != 'list' || document.getElementById('MenuType').value != '01' && document.getElementById('MenuType').value != '06') {
+        return false;
+    }
+    if ($("#select_device")[0]) {
+        $("#select_device")[0].outerHTML = '';
+    }
+    $('a#btn_down').after(`<div id="select_device">
+        <span id="device-lg">
+            꽉찬
+        </span>
+        <span id="device-md">
+            넓은
+        </span>
+        <span id="device-sm">
+            보통
+        </span>
+        <span id="device-xs">
+            좁은
+        </span>
+    </div>`);
+    select_device_id = getCookie('select_device_id');
+    var docWidth = $(document).width();
+    if (select_device_id == null || getCookie('select_device_on') == null) {
+        setCookie('select_device_on', '1', 1000);
+        if (docWidth >= 1600) {
+            select_device_id = 'device-md';
+        } else {
+            select_device_id = 'device-sm';
+        }
+        setCookie('select_device_id', select_device_id, 1000);
+    }
+
+    if (docWidth <= 599) {
+        $('span#device-xs').hide();
+        $('span#device-md').hide();
+        $('span#device-sm').hide();
+        if (select_device_id == 'device-xs' || select_device_id == 'device-md' || select_device_id == 'device-sm') {
+            select_device_id = 'device-lg';
+        }
+    } else if (docWidth <= 1100) {
+        $('span#device-md').hide();
+        $('span#device-sm').hide();
+        if (select_device_id == 'device-md' || select_device_id == 'device-sm') {
+            select_device_id = 'device-xs';
+        }
+    } else if (docWidth <= 1551) {
+        $('span#device-md').hide();
+        if (select_device_id == 'device-md') {
+            select_device_id = 'device-sm';
+        }
+    }
+
+
+    if (select_device_id != '') {
+        if (select_device_id == 'device-lg') {
+            p_index = 0;
+        } else if (select_device_id == 'device-md') {
+            p_index = 1;
+        } else if (select_device_id == 'device-sm') {
+            p_index = 2;
+        } else {
+            p_index = 3;
+        }
+    } else {
+        lastSize_right = replaceAll(getCookie('lastSize_right'), 'px', '') * 1;
+        if (lastSize_right <= 10) {
+            p_index = 0;
+        } else if (lastSize_right <= 537) {
+            if ($('span#device-md')[0].style.display != 'none') {
+                p_index = 1;
+            } else if ($('span#device-sm')[0].style.display != 'none') {
+                p_index = 2;
+            } else {
+                p_index = 3;
+            }
+        } else if (lastSize_right <= 867) {
+            if ($('span#device-sm')[0].style.display != 'none') {
+                p_index = 2;
+            } else {
+                p_index = 3;
+            }
+        } else {
+            p_index = 3;
+        }
+    }
+    $("#select_device").kendoButtonGroup({
+        select: function (e) {
+            viewTarget = getCookie('viewTarget');
+            if (viewTarget != 'bottom') viewTarget = 'right';
+            if (viewTarget == 'bottom') {
+                obj = $("#vertical").data("kendoSplitter");
+            } else {
+                obj = $("#horizontal").data("kendoSplitter");
+            }
+            var pre_first_w = obj.size(".k-pane:first");
+            if (pre_first_w == '100%') {
+                pre_first_w = $(document).width();
+            }
+            pre_first_w = replaceAll(pre_first_w, 'px', '') * 1;
+            btn_index = e.indices;
+            if (btn_index == 0) {
+                w = $(document).width() - 10;
+                select_device_id = 'device-lg';
+            } else if (btn_index == 1) {
+                w = 1199;
+                select_device_id = 'device-md';
+            } else if (btn_index == 2) {
+                w = 850;
+                select_device_id = 'device-sm';
+            } else if (btn_index == 3) {
+                w = 501;
+                select_device_id = 'device-xs';
+            }
+            setCookie('select_device_id', select_device_id, 1000);
+
+            w = w + 10; //보정값 
+            if ($('div#example-sidebar').position().left >= 0 && btn_index > 0) {
+                if (btn_index == 3 && this.element.children('span#device-sm').is(":visible") == false) {
+                    w = w - 100;
+                } else {
+                    w = w + 200;
+                }
+            }
+
+            if ($('div#example-sidebar').css('position') == 'relative' && (btn_index == 1 || btn_index == 2)) {
+                w = w - 115;
+            }
+            if ($(document).width() >= 800 && w < 600) {
+                w = 600;
+            }
+
+            if (viewTarget == 'bottom') {
+                obj = $("#vertical").data("kendoSplitter");
+                first_w = $(document).width() - w;
+                obj.size(".k-pane:first", first_w + 'px');
+            } else {
+                obj = $("#horizontal").data("kendoSplitter");
+                first_w = $(document).width() - w;
+                if (first_w == pre_first_w && pre_first_w > 0) {
+                    obj.size(".k-pane:first", '100%');
+                } else if (w == pre_first_w && pre_first_w > 0) {
+                    obj.size(".k-pane:first", '0px');
+                } else if (pre_first_w == 0 && btn_index == 0) {
+                    obj.size(".k-pane:first", '100%');
+                } else {
+                    if (first_w > 0 && first_w < 250) {
+                        first_w = 250;
+                    }
+                    obj.size(".k-pane:first", first_w + 'px');
+                }
+            }
+            if ($('div.chart_option')[0]) {
+                $('li#btn_chart_overflow a').click();
+            } else if ($('tr.k-master-row.k-state-selected')[0] == undefined) {
+                btn_down_click();
+            }
+        },
+        index: p_index
+    });
+}
+// jQuery 객체의 prototype 확장: view, modify 모두에서 값을 가져올 수 있도록.
+jQuery.prototype.smartVal = function (value) {
+    if (value === undefined) {
+        // GET
+        if (this.is('input, select, textarea')) {
+            return this.val();
+        } else {
+            return this.text();
+        }
+    } else {
+        // SET
+        if (this.is('input, select, textarea')) {
+            this.val(value);
+        } else {
+            this.text(value);
+        }
+        return this; // chainable
+    }
+};
+function open_design(p_flag) {
+    url = "addLogic_treat.php?RealPid=speedmis000314&question=pid_name&v=" + document.getElementById('logicPid').value;
+    pid_name = ajax_url_return(url);
+    url = location.href.split('?')[0] + '?RealPid=speedmis001333&isAddURL=Y&allFilter=[{"operator":"eq","value":"' + document.getElementById('logicPid').value + ':' + shortUrl_replace(pid_name) + '","field":"toolbar_zpeurogeuraemseontaek"},{"operator":"eq","value":"Y","field":"toolbar_znaeyongnochuryeobu"}]';
+    if (p_flag == 'pre') {
+        url = url + '&addParam=pre';
+    }
+    window.open(url);
+}
+
+function dev_page_view(p_flag) {
+    if (p_flag == undefined) {
+        if (getUrlParameter('pre') == '1') {
+            p_flag = 'pre';
+        } else {
+            p_flag = 'real';
+        }
+    } else {
+
+        //정확히 setTimeout, 0초 가 좋음.
+        setTimeout(function () {
+            if ($('input#ActionFlag').val() == 'list') {
+                url = 'index.php?gubun=' + $('#gubun').val();
+                if (p_flag == 'real') {
+                    go_mis_gubun($('#gubun').val(), url);
+                } else {
+                    go_mis_gubun($('#gubun').val(), url + '&pre=1');
+                }
+            } else {
+                url = status_view_url();
+                if (p_flag == 'real') {
+                    go_mis_gubun($('#gubun').val(), url);
+                } else {
+                    go_mis_gubun($('#gubun').val(), url + '&pre=1');
+                }
+            }
+        });
+
+    }
+    if (event) {
+        if (event.ctrlKey == true) {
+            return false;
+        }
+    }
+    if (p_flag == 'real') {
+        $('#real_detail').css('color', 'yellow');
+        $('#pre_detail').css('color', '#fff');
+        $('#real_php').css('color', 'yellow');
+        $('#pre_php').css('color', '#fff');
+
+        $('#dev_page_view_real').css('color', 'yellow');
+        $('#dev_page_view_real').css('text-decoration', 'underline');
+        $('#dev_page_view_pre').css('text-decoration', '');
+        $('#dev_page_view_real').css('font-size', '11px');
+        $('#dev_page_view_pre').css('color', '#fff');
+        $('#dev_page_view_pre').css('font-size', '10px');
+        $('body').attr('pre', '0');
+    } else {
+        $('#real_detail').css('color', '#fff');
+        $('#pre_detail').css('color', 'yellow');
+        $('#real_php').css('color', '#fff');
+        $('#pre_php').css('color', 'yellow');
+
+        $('#dev_page_view_real').css('color', '#fff');
+        $('#dev_page_view_real').css('font-size', '10px');
+        $('#dev_page_view_pre').css('color', 'yellow');
+        $('#dev_page_view_pre').css('text-decoration', 'underline');
+        $('#dev_page_view_real').css('text-decoration', '');
+        $('#dev_page_view_pre').css('font-size', '11px');
+        $('body').attr('pre', '1');
+    }
+    if ($('#fab')[0]) {
+        if (InStr(';speedmis000266;speedmis000267;speedmis0001076;', ';' + document.getElementById('RealPid').value + ';') > 0) {
+            $('#fab')[0].style.display = 'none';
+        } else {
+            $('#fab')[0].style.display = '';
+        }
+    }
+}
+function dev_source_copyTo_pre() {
+    program_info = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=info&RealPid=' + $('input#RealPid').val()));
+    if (program_info['result'] != 'success') {
+        alert('해당 프로그램 정보를 가져올 수 없습니다.');
+        return false;
+    }
+    if (program_info['real_detail_date'] == '' && program_info['real_detail_date'] == '') {
+        alert('실사용 소스가 없습니다.');
+        return false;
+    }
+    if (program_info['pre_detail_date'] != '' || program_info['pre_detail_date'] != '') {
+        if (!confirm('테스트 소스가 이미 존재합니다. 그래도 실사용 소스를  테스트 소스로 복제하시겠습니까?')) {
+            return false;
+        }
+    }
+    program_copyTo_pre = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=copyTo_pre&RealPid=' + $('input#RealPid').val()));
+    if (program_copyTo_pre['result'] == 'success') {
+        alert('테스트 소스가 정상적으로 생성되었습니다.');
+        location.href = replaceAll(location.href.split('#')[0], '&pre=1', '') + '&pre=1';
+    } else {
+        alert('테스트 소스 생성이 실패되었습니다.');
+    }
+
+}
+
+// 크로스 플랫폼에서 저장 기능을 강제 호출하는 함수
+function toolbar_btn_click(event_id) {
+    // 1. 실제 DOM 요소를 가져옵니다.
+    var saveButtonElement = document.getElementById(event_id);
+
+    // 2. SpeedMIS가 기대하는 완벽한 더미 이벤트 객체를 생성합니다.
+    var e = {
+        // [수정] 이 속성을 추가하여 e.id가 event_id가 되도록 합니다.
+        id: event_id,
+
+        // 표준 접근 (e.target.id)을 대비해 실제 요소를 연결합니다.
+        target: saveButtonElement,
+        currentTarget: saveButtonElement,
+
+        // 기타 필수 속성
+        preventDefault: function () { },
+        stopPropagation: function () { }
+        // SpeedMIS가 다른 속성(e.which 등)을 필요로 한다면 여기에 추가해야 합니다.
+    };
+
+    // 3. 'toolbar_onClick' 함수를 직접 실행
+    if (typeof toolbar_onClick === 'function') {
+        toolbar_onClick(e);
+    } else {
+        console.error("toolbar_onClick 함수를 찾을 수 없습니다.");
+    }
+}
+function dev_source_applyTo_real() {
+    program_info = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=info&RealPid=' + $('input#RealPid').val()));
+    if (program_info['result'] != 'success') {
+        alert('해당 프로그램 정보를 가져올 수 없습니다.');
+        return false;
+    }
+    if (program_info['pre_detail_date'] == '' && program_info['pre_detail_date'] == '') {
+        alert('테스트 소스가 없습니다.');
+        return false;
+    }
+    if (!confirm('정말로 테스트 소스를 실사용 소스에  적용하시겠습니까?')) {
+        return false;
+    }
+    program_applyTo_real = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=applyTo_real&RealPid=' + $('input#RealPid').val()));
+    if (program_applyTo_real['result'] == 'success') {
+        alert('테스트 소스를 실사용 소스에  정상적으로 적용하었습니다.');
+        location.href = replaceAll(location.href.split('#')[0], '&pre=1', '');
+    } else {
+        alert('테스트 소스를 실사용 소스에 적용이 실패되었습니다.');
+    }
+
+}
+
+function dev_source_delete_pre() {
+    program_info = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=info&RealPid=' + $('input#RealPid').val()));
+    if (program_info['result'] != 'success') {
+        alert('해당 프로그램 정보를 가져올 수 없습니다.');
+        return false;
+    }
+    if (program_info['pre_detail_date'] == '' && program_info['pre_detail_date'] == '') {
+        alert('삭제할 테스트 소스가 없습니다.');
+        return false;
+    }
+    if (!confirm('정말로 테스트 소스를 삭제하시겠습니까?')) {
+        return false;
+    }
+    program_delete = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=delete&RealPid=' + $('input#RealPid').val()));
+    if (program_delete['result'] == 'success') {
+        alert('테스트 소스가 정상적으로 삭제되었습니다.');
+        location.href = replaceAll(location.href.split('#')[0], '&pre=1', '');
+    } else {
+        alert('테스트 삭제가 실패되었습니다.');
+    }
+
+}
+function dev_source_open(t1, t2) {
+    if (t1 == 'real' && t2 == 'detail') {
+        url = 'index.php?gubun=266&idx=' + document.getElementById('RealPid').value + '&tabid=speedmis000267';
+        window.open(url);
+    } else if (t1 == 'real' && t2 == 'php') {
+        url = 'index.php?gubun=1076&idx=' + document.getElementById('RealPid').value + '&tabid=virtual_fieldQnpageLoad&ActionFlag=modify';
+        window.open(url);
+    } else if (t1 == 'pre' && t2 == 'detail') {
+        if (event.currentTarget.innerText == '생성하기') {
+            program_copy_result = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=copy&RealPid=' + $('input#RealPid').val()));
+            if (program_copy_result['result'] == 'fail') {
+                alert(program_copy_result['resultMsg']);
+                return false;
+            } else if (program_copy_result['result'] == 'success') {
+                alert(program_copy_result['resultMsg']);
+                location.href = replaceAll(location.href.split('#')[0], '&pre=1', '') + '&pre=1';
+                return false;
+            } else {
+                alert('비정상적인 결과입니다. 관리자에게 문의하세요!');
+                return false;
+            }
+        } else {
+            url = 'index.php?gubun=267&parent_gubun=266&parent_idx=' + document.getElementById('RealPid').value + '&addParam=pre';
+            window.open(url);
+        }
+    } else if (t1 == 'pre' && t2 == 'php') {
+        if (event.currentTarget.innerText == '생성하기') {
+            program_copy_result = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=copy&RealPid=' + $('input#RealPid').val()));
+            if (program_copy_result['result'] == 'fail') {
+                alert(program_copy_result['resultMsg']);
+                return false;
+            } else if (program_copy_result['result'] == 'success') {
+                alert(program_copy_result['resultMsg']);
+                location.href = replaceAll(location.href.split('#')[0], '&pre=1', '') + '&pre=1';
+                return false;
+            } else {
+                alert('비정상적인 결과입니다. 관리자에게 문의하세요!');
+                return false;
+            }
+        } else {
+            url = 'index.php?gubun=1076&idx=' + document.getElementById('RealPid').value + '&tabid=virtual_fieldQnpageLoad&ActionFlag=modify&addParam=pre';
+            window.open(url);
+        }
+    }
+}
+function dev_ctrl_apply(opposite) {
+    var dev_ctrl_on = getCookie('dev_ctrl_on');     //dev_ctrl 출력여부
+    if (opposite == '1') {
+        if (dev_ctrl_on == 'off') {
+            dev_ctrl_on = 'on';
+        } else {
+            dev_ctrl_on = 'off';
+        }
+        setCookie('dev_ctrl_on', dev_ctrl_on, 999);
+    }
+    if (dev_ctrl_on == 'off') {
+        $('table.dev_table').removeClass('on');
+        $('div#dev_ctrl').removeClass('on');
+        $('table.dev_table').addClass('off');
+        $('div#dev_ctrl').addClass('off');
+    } else {
+        $('table.dev_table').removeClass('off');
+        $('div#dev_ctrl').removeClass('off');
+        $('table.dev_table').addClass('on');
+        $('div#dev_ctrl').addClass('on');
+    }
+}
+
+
+function theme_active() {
+    return getObjects(ThemeChooserViewModel['themes'], 'value', window.kendoTheme)[0]['colors'][0];
+}
+function theme_back() {
+    if ($('#kendoTheme_css').attr('kendotheme') == 'silver') {
+        return '#fff';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'blueopal') {
+        return '#fff';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'highcontrast') {
+        return '#674c63';
+    } else {
+        return '#fff';
+    }
+}
+function theme_input() {
+    return getObjects(ThemeChooserViewModel['themes'], 'value', window.kendoTheme)[0]['colors'][2];
+}
+function theme_font() {
+    if ($('#kendoTheme_css').attr('kendotheme') == 'silver') {
+        return '#515967';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'blueopal') {
+        return '#003f59';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'highcontrast') {
+        return '#fff';
+    } else {
+        return '#515967';
+    }
+}
+function theme_headerBack() {
+    return $('.k-header').css('background-color');
+}
+function theme_buttonActive() {
+    return $('.k-button.k-state-active').css('color');
+}
+function theme_selected() {
+    return $('.k-state-selected').css('color');
+}
+function theme_selectedBack() {
+    return $('.k-state-selected').css('background-color');
+}
+function theme_border() {
+    if ($('#kendoTheme_css').attr('kendotheme') == 'silver') {
+        return '#e2e4e7';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'blueopal') {
+        return '#bbdceb';
+    } else if ($('#kendoTheme_css').attr('kendotheme') == 'highcontrast') {
+        return '#674c63';
+    } else {
+        return '#e2e4e7';
+    }
+}
+
+function root_treeview_select(p_gubun) {
+    if ($('a#back-forward.forward-nav')[0]) {
+        var treeView = $("#root-nav").data("kendoTreeView");
+        var dataItem = treeView.dataSource.get(p_gubun);
+        var path = buildPath(dataItem);
+
+        // Promise 반환되었는지 확인
+        var result = treeView.expandPath(path);
+        if (result && typeof result.then === "function") {
+            result.then(function () {
+                var item = treeView.findByUid(dataItem.uid);
+                treeView.select(item);
+                item[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            });
+        } else {
+            // 동기 방식 fallback
+            var item = treeView.findByUid(dataItem.uid);
+            treeView.select(item);
+            item[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
+    }
+}
+
+
+function go_mis_gubun(p_gubun, p_url) {
+
+
+
+    var pathname = '/' + document.getElementById('top_dir').value + '/index.php';
+    if (pathname != location.pathname && location.pathname != '/_mis/index.php') {
+        pathname = location.pathname;
+    }
+    if (event) {
+        if (event.ctrlKey) {
+            if (Left(event.srcElement, 4) == 'http') {
+                return true;
+            }
+            window.open(pathname + '?gubun=' + p_gubun + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', ''));
+            $('div#example-nav').data('kendoTreeView').select($('div#example-nav [firstmenu="Y"]'));
+            return false;
+        }
+    }
+
+    if ($('input#ActionFlag').val() == 'modify' || $('input#ActionFlag').val() == 'write') {
+        if (check_beforeunload() == true) {
+            if (confirm('편집 중인 화면에서 나가시겠습니까? 변경사항이 저장되지 않을 수 있습니다.')) {
+                $('input#temp1').attr('pre_values', '');
+                $(window).off("beforeunload");
+            } else {
+                var exampleNav = $("#example-nav").data("kendoTreeView");
+                var barDataItem = exampleNav.dataSource.get(getUrlParameter('gubun'));
+                if (barDataItem) {
+                    var barElement = exampleNav.findByUid(barDataItem.uid);
+                    exampleNav.select(barElement);
+                    root_treeview_select(getUrlParameter('gubun'));
+                }
+                return false;
+            }
+        }
+    }
+    check_blcoked_frame = false;
+    try {
+        if (getFrameObj("grid_right")) {
+            if (getFrameObj("grid_right")[0]) {
+                check_blcoked_frame = getFrameObj("grid_right")[0].location.href;
+            }
+        }
+    } catch (e) {
+        check_blcoked_frame = true;
+    }
+    //아이프레임이 타사이트일 경우를 대비한 로직.
+    if (check_blcoked_frame == true) {
+
+    } else if ($('iframe#grid_right').width() > 20 && $('iframe#grid_right').height() > 20 && InStr($('iframe#grid_right')[0].src, '_mis/index.') > 0) {
+        if (getFrameObj("grid_right").$('input#ActionFlag').val() == 'modify' || getFrameObj("grid_right").$('input#ActionFlag').val() == 'write') {
+            if (getFrameObj("grid_right").check_beforeunload() == true) {
+                if (confirm('편집 중인 화면에서 나가시겠습니까? 변경사항이 저장되지 않을 수 있습니다.')) {
+                    getFrameObj("grid_right").$('input#temp1').attr('pre_values', '');
+                    $(window).off("beforeunload");
+                } else {
+                    var exampleNav = $("#example-nav").data("kendoTreeView");
+                    var barDataItem = exampleNav.dataSource.get(getUrlParameter('gubun'));
+                    if (barDataItem) {
+                        var barElement = exampleNav.findByUid(barDataItem.uid);
+                        exampleNav.select(barElement);
+                        root_treeview_select(getUrlParameter('gubun'));
+                    }
+                    return false;
+                }
+            }
+        }
+    }
+
+    if (event) {
+        if ($(event.currentTarget).hasClass('TK-Menu-Item-Link')) {
+            myMenuListThis[0] = myMenuListAll[0]['items'][$('a.TK-Menu-Item-Link').index(event.currentTarget)];
+            $('a.TK-Menu-Item-Link').removeClass('TK-Item--Selected');
+            $(event.currentTarget).addClass('TK-Item--Selected');
+            setTimeout(function () {
+                $("#example-nav")[0].outerHTML = '<div id="example-nav"></div>';
+                make_example_nav();
+            });
+        }
+    }
+    if ($('body').attr('main_loading')) {
+        $('body').attr('main_loading', 'YY');
+    } else {
+        $('body').attr('main_loading', 'Y');
+    }
+
+    displayLoading();
+    $('style#left_menu_hide')[0].innerHTML = '';
+    //zzzzzzzzzzzzzz 과제
+    var myUrl = JSON.parse(localStorage.getItem("myUrl_" + $('input#MisSession_UserID').val()));
+    if (myUrl == null) myUrl = {};
+    /*
+    _call_url_ 가 포함되어 있으면 spa 적용하되, 항상 ajax 로 호출
+    call_url 이 포함되면 spa 사용안하고 항상 url 새로 열기
+    logout 이면 localStorage 저장안하고, 로그아웃페이지로.
+    그외에는 localStorage 저장 및 spa.
+    */
+    if (myUrl[p_gubun] == undefined && p_url == undefined) {
+        url = ajax_url_return('index_only_url.php?gubun=' + p_gubun);
+        if (InStr(url, '_call_url_') > 0) {
+            url = replaceAll(url, '_call_url_', '');
+            myUrl[p_gubun] = url;
+        } else if (url != 'logout' && InStr(url, '_call_url_') == 0) {
+            myUrl[p_gubun] = url;
+            localStorage.setItem("myUrl_" + $('input#MisSession_UserID').val(), JSON.stringify(myUrl));
+        }
+    } else {
+        url = myUrl[p_gubun];
+    }
+
+    navClick_YN = 'Y';
+    if (event == undefined) {
+        navClick_YN = 'N';
+    } else {
+        if ($(event.currentTarget).hasClass('TK-Menu-Item-Link') == false && $(event.currentTarget).hasClass('k-treeview') == false) {
+            navClick_YN = 'N';
+        }
+    }
+    if (navClick_YN == 'N' && $("#example-nav").data("kendoTreeView")) {
+        var exampleNav = $("#example-nav").data("kendoTreeView");
+        var barDataItem = exampleNav.dataSource.get(p_gubun);
+        if (barDataItem) {
+            var barElement = exampleNav.findByUid(barDataItem.uid);
+            exampleNav.select(barElement);
+            root_treeview_select(p_gubun);
+        } else {
+            var barDataItem = exampleNav.dataSource.get(p_gubun);
+            if (barDataItem) {
+                var barElement = exampleNav.findByUid(barDataItem.uid);
+                exampleNav.select(barElement);
+                root_treeview_select(p_gubun);
+            } else {
+
+                var exampleNav = $("#example-nav").data("kendoTreeView");
+                selected = exampleNav.select();
+                item = exampleNav.dataItem(selected);
+                if (item) {
+                    if (p_gubun != item['id']) {
+
+                        i1 = myMenuListAll[0]['items'];
+
+                        obj = getObjects(i1, 'id', p_gubun);
+
+                        if (obj.length > 0) {
+                            g2 = Left(obj[0]['gubun'], 2);
+                            i = getObjectsIndex(i1, 'gubun', g2);
+
+                            myMenuListThis[0] = i1[i];
+                            $('a.TK-Menu-Item-Link').removeClass('TK-Item--Selected');
+                            $($('a.TK-Menu-Item-Link')[i]).addClass('TK-Item--Selected');
+                            setTimeout(function () {
+                                $("#example-nav")[0].outerHTML = '<div id="example-nav"></div>';
+                                make_example_nav();
+                            });
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    if (p_url != undefined) {
+        url = p_url;
+    }
+
+    if (url == 'logout') {
+        location.href = "/" + document.getElementById('top_dir').value + "/login/index.php?preaddress=" + location.pathname.split('/index.php')[0] + "/index.php?gubun=" + p_gubun + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', '');
+        return false;
+    } else if (url == 'xxxcall_url') {
+        location.href = pathname + "?gubun=" + p_gubun + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', '');
+        return false;
+    } else if (url == '') {
+        $('body').removeAttr('main_loading');
+        displayLoadingOff();
+        alert('비정상적인 응답입니다. 관리자에게 문의하세요');
+        return false;
+        /*
+        } else if(InStr(url,'ChkOnlySum')>0 && InStr(url,'allFilter')>0) {
+            location.href = "index.php?gubun="+p_gubun+iif(document.getElementById('isMenuIn').value=='Y','&isMenuIn=Y','');
+            return false;
+        */
+    } else if (url.length >= 500) {
+        $('body').removeAttr('main_loading');
+        displayLoadingOff();
+        alert('비정상적인 응답입니다. 관리자에게 문의하세요');
+        return false;
+    }
+
+    if (typeof pageLoad == 'function') {
+        pageLoad = undefined;
+    }
+    if (typeof rowFunction_UserDefine == 'function') {
+        rowFunction_UserDefine = undefined;
+    }
+    if (typeof rowFunctionAfter_UserDefine == 'function') {
+        rowFunctionAfter_UserDefine = undefined;
+    }
+    if (typeof thisLogic_toolbar == 'function') {
+        thisLogic_toolbar = undefined;
+    }
+    if (typeof listLogic_afterLoad_once == 'function') {
+        listLogic_afterLoad_once = undefined;
+    }
+    if (typeof listLogic_afterLoad_continue == 'function') {
+        listLogic_afterLoad_continue = undefined;
+    }
+    if (typeof helpboxLogic_afterSelect == 'function') {
+        helpboxLogic_afterSelect = undefined;
+    }
+    if (typeof viewLogic_afterLoad == 'function') {
+        viewLogic_afterLoad = undefined;
+    }
+    if (typeof viewLogic_afterLoad_continue == 'function') {
+        viewLogic_afterLoad_continue = undefined;
+    }
+    if (typeof viewLogic_afterLoad_viewPrint == 'function') {
+        viewLogic_afterLoad_viewPrint = undefined;
+    }
+    if (typeof read_idx == 'function') {
+        read_idx = undefined;
+    }
+    $("input#grid_dataBound_once_event").removeAttr("first_load");
+    $('span#span_pageLoad style, .k-animation-container').each(function () {
+        this.outerHTML = '';
+    });
+
+    $('body').removeAttr('first_load');
+
+    if (getStringUrlParameter(url, 'ts') == null) {
+        res_pathname = location.pathname;
+    } else if (getStringUrlParameter(url, 'ts').split(location.origin)[1] == undefined) {
+        res_pathname = location.pathname;
+    } else {
+        res_pathname = getStringUrlParameter(url, 'ts').split(location.origin)[1].split('/index.php')[0] + '/index.php';
+    }
+
+    url = replaceAll(url, '&ts=' + getStringUrlParameter(url, 'ts'), '');
+    url = replaceAll(url, 'index_only_url', 'index') + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', '');
+    url = replaceAll(url, '&isMenuIn=Y&isMenuIn=Y', '&isMenuIn=Y');
+
+    if (p_url == undefined) {
+        url = pathname + '?gubun=' + getStringUrlParameter(url.split('?')[1], 'gubun') + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', '');
+    }
+    console.log('history.pushState;url=' + url);
+    $('div#example-nav [firstmenu="Y"]').removeAttr('firstmenu');
+    if ($("#example-nav").data("kendoTreeView")) {
+        $('div#example-nav').data('kendoTreeView').select().attr('firstmenu', 'Y');
+    }
+
+    if (InStr(p_url, '&pre=1') > 0) {
+        url = replaceAll(url, '&pre=1', '') + '&pre=1';
+    }
+    if (isMainFrame() == true) {       //MainFrame 일때만 기록을 남긴다.
+        history.pushState(null, null, url);
+    } else {
+        history.replaceState(null, null, url);
+    }
+
+    url = encodeURI(url.split('?')[1]);
+    if ($('iframe#grid_right')[0]) {
+        $('iframe#grid_right')[0].style.display = 'none';
+        obj_grid_gubun = $('iframe[grid_gubun=' + document.getElementById("gubun").value + ']')[0];
+        if (obj_grid_gubun) {
+            if (check_blcoked_frame == true) {
+                obj_grid_gubun.outerHTML = '';
+            } else if (obj_grid_gubun.id == 'grid_right' && getFrameObj("grid_right").read_idx) {
+                if (getFrameObj("grid_right").getID('ActionFlag').value == 'write') {
+                    obj_grid_gubun.outerHTML = '';
+                }
+            }
+        }
+    }
+
+
+    $('div#main').load('index_main.php?' + url, function (response, status, xhr) {
+        if (status == "success") {
+            qq = $('input#ServerVariables_QUERY_STRING').val();
+            if (InStr(qq, 'https://') > 0) {
+                history.replaceState(null, null, 'https://' + qq.split('https://')[1]);
+            } else if (InStr(qq, 'https://') > 0) {
+                history.replaceState(null, null, 'http://' + qq.split('http://')[1]);
+            } else {
+                history.replaceState(null, null, res_pathname + '?' + qq);
+            }
+            displayLoadingOff();
+        } else {
+            debugger;   //심각.
+        }
+    });
+    return false;
+}
+
+//str_left_menu_hide 를 addLogic 에서도 활용하기 위해 밖으로 뺌.
+var str_left_menu_hide = `
+                    
+                
+                @media only screen and (max-width: 11199px) {
+                    #example-sidebar {
+                        position: absolute;
+                        top: auto;
+                        height: calc(100% - 100px);
+                    }
+                }
+                @media (min-width: 1024px) {
+                    #example-sidebar {
+                        -webkit-transform: perspective;
+                        transform: translateX(-1010px);
+                    }
+                    #example-sidebar.k-rpanel-expanded {
+                        -webkit-transform: translateX(0) translateZ(0);
+                        -ms-transform: translateX(0) translateZ(0);
+                        transform: translateX(0) translateZ(0);
+                    }
+                }
+                
+                `;
+function common_bottom_ready() {
+    if (isApple() == true) {
+        $('body').attr('isApple', 'Y');
+    }
+    if ($('body').is(':visible') == true && typeof local_lang_apply == 'function') {
+        local_lang_apply();
+    }
+    //spa 에 의한 css 문제는 이 정도 밖에 없음.
+    if (isMainFrame() && document.getElementById('ActionFlag').value == 'list') {
+        if ($('link#link_simple')[0]) {
+            $('link#link_simple')[0].outerHTML = '';
+        }
+        if ($('link#link_scheduler')[0]) {
+            $('link#link_scheduler')[0].outerHTML = '';
+        }
+        if ($('link#link_view')[0]) {
+            $('link#link_view')[0].outerHTML = '';
+        }
+    } else if (isMainFrame() && $('body').attr('actioninc') == 'view') {
+        if ($('link#link_simple')[0]) {
+            $('link#link_simple')[0].outerHTML = '';
+        }
+        if ($('link#link_scheduler')[0]) {
+            $('link#link_scheduler')[0].outerHTML = '';
+        }
+        if ($('link#link_list')[0]) {
+            $('link#link_list')[0].outerHTML = '';
+        }
+    } else if (isMainFrame() && document.getElementById('ActionFlag').value == 'simple') {
+        if ($('link#link_view')[0]) {
+            $('link#link_view')[0].outerHTML = '';
+        }
+        if ($('link#link_scheduler')[0]) {
+            $('link#link_scheduler')[0].outerHTML = '';
+        }
+        if ($('link#link_list')[0]) {
+            $('link#link_list')[0].outerHTML = '';
+        }
+    } else if (isMainFrame() && document.getElementById('ActionFlag').value == 'scheduler') {
+        if ($('link#link_simple')[0]) {
+            $('link#link_simple')[0].outerHTML = '';
+        }
+        if ($('link#link_view')[0]) {
+            $('link#link_view')[0].outerHTML = '';
+        }
+        if ($('link#link_list')[0]) {
+            $('link#link_list')[0].outerHTML = '';
+        }
+    }
+    if ($('div.chart_option')[0]) {
+        $('div.chart_option').remove();
+    }
+    setCookie('viewTarget', 'right');
+
+
+    window.onpopstate = function (event) {  //뒤로가기 이벤트를 캐치합니다.
+
+        url = location.href;
+        $('div#main').load('index_main.php?' + url.split('?')[1]);
+        if ($('iframe#grid_right')[0]) {
+            $('iframe#grid_right')[0].style.display = 'none';
+        }
+
+        var exampleNav = $("#example-nav").data("kendoTreeView");
+        var barDataItem = exampleNav.dataSource.get(getUrlParameter('gubun'));
+        if (barDataItem) {
+            var barElement = exampleNav.findByUid(barDataItem.uid);
+            exampleNav.select(barElement);
+            root_treeview_select(getUrlParameter('gubun'));
+        } else {
+
+            var exampleNav = $("#example-nav").data("kendoTreeView");
+            selected = exampleNav.select();
+            item = exampleNav.dataItem(selected);
+            if (item) {
+                if (getUrlParameter('gubun') != item['id']) {
+
+                    i1 = myMenuListAll[0]['items'];
+
+                    obj = getObjects(i1, 'id', getUrlParameter('gubun'));
+
+                    if (obj.length > 0) {
+                        g2 = Left(obj[0]['gubun'], 2);
+                        i = getObjectsIndex(i1, 'gubun', g2);
+
+                        myMenuListThis[0] = i1[i];
+                        $('a.TK-Menu-Item-Link').removeClass('TK-Item--Selected');
+                        $($('a.TK-Menu-Item-Link')[i]).addClass('TK-Item--Selected');
+                        setTimeout(function () {
+                            $("#example-nav")[0].outerHTML = '<div id="example-nav"></div>';
+                            make_example_nav();
+                        });
+                    }
+                }
+            }
+
+        }
+
+    };
+
+
+    if (top.document.getElementById('MisJoinPid') == null) {
+        $("body").attr("topsite", "notmis");
+    } else {
+        $("body").attr("topsite", "mis");
+    }
+
+    //툴바의 overflow 이슈처리
+    /*
+    if($($('div#toolbar > a.k-button')[$('div#toolbar > a.k-button').length-1]).offset()) {
+        btns_width = $($('div#toolbar > a.k-button')[$('div#toolbar > a.k-button').length-1]).offset().left;
+        if($('div#example-search-wrapper').width() > btns_width-200) {
+            $('div#toolbarRound').css('width', 'calc(100vw - 26px)');
+            $('div#example-search-wrapper').css('overflow-x', 'hidden');
+        }
+    
+    }
+    */
+
+
+    if ($(".tc-theme-list.k-content")[0]) {              //해당 요소는 index_lite.php 에서는 에러가 나며, 실행할 필요도 없는 영역임.
+
+
+
+        $(".tc-theme-list.k-content")[0].style.setProperty("display", "inherit", "important");
+        $("body").attr("isMenuIn", iif(document.getElementById("isMenuIn").value == "Y", "Y", "N"));
+        if (isMainFrame()) {
+            if ($('.k-widget.k-tooltip.k-tooltip-closable.k-popup.k-group.k-reset')[0]) {
+                $('.k-widget.k-tooltip.k-tooltip-closable.k-popup.k-group.k-reset')[0].outerHTML = '';
+            }
+            $(".themechooser").kendoTooltip({
+                showOn: "click",
+                autoHide: false,
+                filter: "span.tc-activator.k-content",
+                content: {
+                    url: "user_settings.html"
+                },
+                width: 520,
+                maxWidth: "100%",
+                height: 274,
+                position: "bottom"
+            });
+
+
+            $("body").attr("isMainFrame", "Y");
+
+            if (document.getElementById("isMenuIn").value == "Y") {
+                if ($('li#example-nav_tv_active')[0]) {
+                    $('div#example-nav').data('kendoTreeView').expand($('li#example-nav_tv_active').parent().parent()[0]);
+                    $('div#example-nav').data('kendoTreeView').select().attr('firstmenu', 'Y');
+                }
+            } else {
+                //$("a#btn_leftVibile").css("display", "none");
+                setTimeout(function () {
+                    $("a#btn_menuView")
+                        .on('click', function (e) {
+                            var url = location.href;
+                            location.href = url + "&isMenuIn=Y";
+                        })
+                        .on('touchend', function (e) {
+                            e.preventDefault();
+                            $(this).trigger('click');
+                        });
+                });
+            }
+
+
+
+
+            if (getCookie('left_menu_hide') == '1') {
+                $('style#left_menu_hide')[0].innerHTML = str_left_menu_hide;
+            } else {
+
+            }
+
+            if ($('span.k-in.k-state-selected').length == 0) {
+                //좌측메뉴가 하나도 없는 경우임. 항상 좌측메뉴숨김.
+                $('style#left_menu_hide')[0].innerHTML = str_left_menu_hide;
+                $('a#btn_leftVibile').remove();
+                //$(document).resize();
+                setTimeout(function () {
+                    $('div#toolbar').click();
+                });
+            } else {
+
+                $('xxxa#btn_leftVibile').click(function () {
+
+                    if ($('div#example-sidebar').hasClass('k-rpanel-expanded') == true || $('div#example-sidebar').css('position') == 'relative') {
+                        setCookie('left_menu_hide', '0', 1000);
+                    } else {
+                        setCookie('left_menu_hide', '1', 1000);
+                    }
+
+                    if (getCookie('left_menu_hide') == '1') {
+                        setCookie('left_menu_hide', '0', 1000);
+                        $('style#left_menu_hide')[0].innerHTML = '';
+                    } else {
+                        //좌측메뉴 숨기기;
+                        setCookie('left_menu_hide', '1', 1000);
+                        $('style#left_menu_hide')[0].innerHTML = p_str_left_menu_hide;
+                        setTimeout(function () {
+                            $('div#toolbar').click();
+                        });
+                    }
+                    $(document).resize();
+
+                });
+
+                if (getCookie('left_menu_hide') == '1') {
+                    var bgcolor = $('a#btn_leftVibile').css('background');
+                    var fontcolor = $('a#btn_leftVibile').css('color');
+                    setTimeout(function () {
+                        $('a#btn_leftVibile').css('color', theme_selectedBack());
+                        $('a#btn_leftVibile').css('background', theme_selected());
+                    }, 1000);
+                    setTimeout(function (p_fontcolor, p_bgcolor) {
+                        $('a#btn_leftVibile').css('color', p_fontcolor);
+                        $('a#btn_leftVibile').css('background', p_bgcolor);
+                    }, 3000, fontcolor, bgcolor);
+                }
+
+
+            }
+
+
+
+        } else {
+            $("body").attr("isMainFrame", "N");
+            if ($("a#btn_mMenu")[0]) $("a#btn_mMenu")[0].style.setProperty("display", "none", "important");
+
+            $("div.k-overflow-anchor.k-button").css("right", "0px");
+            $("div#example-search-wrapper").css("padding-left", "8px");
+            //$("div#vertical").css("overflow-y", "auto");
+            if (typeof parent.isMainFrame == "function") {
+                if (!parent.isMainFrame()) {
+                    $("div#exampleWrap").css("height", "540px");
+                }
+            }
+
+        }
+
+
+
+        $("a#btn_tip").kendoTooltip({
+            autoHide: false,
+            content: {
+                url: "index.php?RealPid=speedmis001039"
+            },
+            showOn: "click",
+            width: 1200,
+            height: 700,
+            position: "top"
+        });
+
+
+        $('style#themechooser_style')[0].innerHTML = '';
+
+        setTimeout(function () {
+            if (getUrlParameter('chartKey') != undefined) {
+                if (isMainFrame() == true) {
+                    $('li#btn_chart_overflow a').click();
+                } else {
+                    creatChartArea();
+                }
+            }
+            $('div#left-pane').css('background-color', $('.k-grid-header').css('background-color'));
+            //$('style#themechooser_style')[0].innerHTML = $('textarea#txt_themechooser_style')[0].value;
+            if (isMainFrame()) {
+                if ($('span.k-in.k-state-selected').length == 0) {
+                    //좌측메뉴가 하나도 없는 경우임. 항상 좌측메뉴숨김.
+                    $('a#btn_leftVibile').remove();
+                }
+
+                if ($('div#toolbar').width() > 3900) {
+                    $('div.k-overflow-anchor.k-button, .k-grid-content.k-auto-scrollable').mouseenter(function () {
+                        $('style#themechooser_style')[0].innerHTML = '';
+                        gridHeight();
+                        event.stopPropagation();
+                    });
+
+                    $('div#toolbar').mouseenter(function () {
+                        gridHeight();
+                        if ($('div#toolbar').offset().left <= 20) {
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_left*' + '/left: 299px;', '/' + '*toolbar_left*' + '/left: 0px;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_width*' + '/width: calc(100% - 300px);', '/' + '*toolbar_width*' + '/width: 100%;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_left*' + '/left: 230px;', '/' + '*toolbar_left*' + '/left: 0px;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_width*' + '/width: calc(100% - 231px);', '/' + '*toolbar_width*' + '/width: 100%;');
+                        } else if ($('div#example-sidebar').width() >= 290) {
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_left*' + '/left: 0px;', '/' + '*toolbar_left*' + '/left: 299px;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_width*' + '/width: 100%;', '/' + '*toolbar_width*' + '/width: calc(100% - 300px);');
+                        } else {
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_left*' + '/left: 299px;', '/' + '*toolbar_left*' + '/left: 230px;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_width*' + '/width: calc(100% - 300px);', '/' + '*toolbar_width*' + '/width: calc(100% - 231px);');
+
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_left*' + '/left: 0px;', '/' + '*toolbar_left*' + '/left: 230px;');
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_width*' + '/width: 100%;', '/' + '*toolbar_width*' + '/width: calc(100% - 231px);');
+                        }
+                        if ($('div#toolbar').offset().top <= 20) {
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_top*' + '/top: 61px;', '/' + '*toolbar_top*' + '/top: 0px;');
+                        } else {
+                            $('textarea#txt_themechooser_style')[0].value = replaceAll($('textarea#txt_themechooser_style')[0].value, '/' + '*toolbar_top*' + '/top: 0px;', '/' + '*toolbar_top*' + '/top: 61px;');
+                        }
+                        $('style#themechooser_style')[0].innerHTML = $('textarea#txt_themechooser_style')[0].value;
+                        if ($('div#toolbar').height() <= 40) {
+                            $('style#themechooser_style')[0].innerHTML = '';
+                        }
+                        if ($('div#grid')[0]) {
+                            //console.log(1122);
+                            setTimeout(function () {
+                                gridHeight();
+                            }, 200);
+                        }
+                    });
+
+
+                } else {
+                    $('div#toolbar').mouseenter(function () {
+                        if ($('div#grid')[0]) {
+                            gridHeight();
+                            //console.log(1144);
+                        }
+                    });
+                    $('div[tabnumber]').mouseenter(function () {
+                        parent.gridHeight();
+                    });
+                }
+
+            } else {
+                $('div#toolbar').mouseenter(function () {
+                    parent_gridHeight();
+                });
+                $('div[tabnumber]').mouseenter(function () {
+                    parent_gridHeight();
+                });
+
+            }
+
+
+            //if($('a.zipcode').length>0) {
+            //    preLoadjscssfile("https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js");
+            //}
+            setTimeout(function () {
+                //우편번호 버튼이 있을 때만 daum js 호출.
+                //if($('a.zipcode').length>0) {
+                //    preLoadjscssfile("https://t1.daumcdn.net/postcode/api/core/200421/1587459050284/200421.js");
+                //}
+                if (getCookie('devQueryOn') == 'Y' && $('a#btn_reload')[0]) {
+                    if (getUrlParameter('pre') == '1') {
+                        $('a#btn_reload').css('background', 'black');
+                        $('a#btn_reload')[0].title = '개발자모드 - 테스트 보기 중';
+                    } else {
+                        $('a#btn_reload').css('background', 'blue');
+                        $('a#btn_reload')[0].title = '개발자모드 - 실사용 보기 중';
+                    }
+                    $('a#btn_reload').css('color', 'yellow');
+                }
+            });
+
+            if (this.frameElement) {
+                if (InStr(this.frameElement.id, "ifr_window") > 0) {
+                    $("body").attr("isPopup", "Y");
+                    //$('body[isMenuIn="N"][isPopup="Y"] div.k-content.k-state-active')[0].style.setProperty('height', 'calc(100vh - 113px)', 'important');
+                    obj = parent.$("iframe#" + windowID()).closest("div.k-widget.k-window").find("span.k-window-title");
+                    title = obj.text();
+                    if (InStr(title, document.getElementById("MenuName").value) == 0) obj.text(title + " [" + document.getElementById("MenuName").value + "]");
+                } else {
+                    $("body").attr("isPopup", "N");
+                }
+            } else {
+                $("body").attr("isPopup", "N");
+            }
+            if ($("li#btn_menuRefresh_overflow").length == 1) {
+                $("li#btn_menuRefresh_overflow").click(function () {
+                    document.treatForm.nmCommand.value = "menuRefresh";
+                    document.treatForm.submit();
+                });
+            };
+
+            $('#toolbar .k-overflow-anchor.k-button').css('border', '1px solid ' + theme_border());
+            $('.k-widget.k-tabstrip.k-floatwrap.k-tabstrip-top').css('border', '1px solid ' + theme_border());
+            if (document.getElementById('isMenuIn').value == 'Y') {
+                $('.themechooser').css('border-top', '1px solid ' + theme_border());
+                $('.themechooser').css('border-bottom', '1px solid ' + theme_border());
+            }
+            if (parent.$ && windowID() != '') {
+                if (parent.$('#' + windowID()).attr('tabrealpid') != undefined) {
+                    $('.themechooser')[0].style.setProperty('border', '0', 'important');
+                    //$('#toolbar .k-overflow-anchor.k-button')[0].style.setProperty('top', '-2px', 'important');
+                    //$('#toolbar .k-overflow-anchor.k-button')[0].style.setProperty('right', '-1px', 'important');
+                }
+            }
+            if (typeof parent.isMainFrame == "function") {
+                if (isMainFrame() == false) {
+                    $('.themechooser')[0].style.setProperty('border', '0', 'important');
+                    if (document.getElementById('ActionFlag').value == 'list') {
+                        $('.themechooser').css('border-bottom', '1px solid ' + theme_border());
+                    }
+                }
+            }
+
+            if ($('body[ismenuin="N"][actionflag="view"][parentmenutype="13"] .themechooser')[0]) {
+                $('body[ismenuin="N"][actionflag="view"][parentmenutype="13"] .themechooser')[0].style.setProperty('border-top', '1px solid ' + rgbToHexColor($('.k-overflow-anchor.k-button')[0].style.borderColor), 'important');
+            }
+
+            if (isMainFrame() || isMainFrame() == false && parent.$('input#RealPid').val() != $('input#RealPid').val()) {
+                $("a#btn_help").kendoTooltip({
+                    autoHide: false,
+                    content: {
+                        url: "commandTreat.php?nmCommand=help&nmRealPid=" + iif($("a#btn_help").attr("misjoin") == "Y", document.getElementById("MisJoinPid").value, document.getElementById("RealPid").value)
+                    },
+                    showOn: "click",
+                    width: 1050,
+                    height: 600,
+                    position: "top"
+                });
+            } else if (isMainFrame() == false && parent.$('input#RealPid').val() == $('input#RealPid').val()) {
+                $("a#btn_help").hide();
+            }
+
+
+
+            if ($('div#toolbar span.k-datepicker').length == 0 && $('div#toolbar .schema_type_date,div#toolbar .schema_type_datetime')[0]) {
+                $('div#toolbar .schema_type_date,div#toolbar .schema_type_datetime').kendoDatePicker();
+            }
+
+            $("body").css("visibility", "visible");
+        });
+
+
+        if (typeof resizeContainers == "function") resizeContainers();
+
+
+
+
+        $("a#sidebar-toggle").bind("touchstart", function (e) {
+            $("input.root-nav").focus();
+            $("input.root-nav").blur();
+            return false;;
+        });
+
+
+
+
+        //테마 기억
+        $("div.tc-column li.tc-item").click(function () {
+            var p_kendoTheme = replaceAll(innerTEXT(this), " ", "").toLowerCase();
+            setCookie("kendoTheme", p_kendoTheme, 1000);
+            location.href = location.href.split("#")[0];
+            /*
+            $("span.tc-activator").click();
+            setTimeout( function() {
+                setCookie("kendoTheme", window.kendoTheme, 1000);
+                location.href = location.href.split("#")[0];
+            }, 1000);
+            */
+        });
+
+        //상단 각 항목에 타이틀태그 추가
+        $("#grid thead a.k-link").each(function () {
+            $(this).attr("title", this.innerText);
+        });
+
+        //화면 색상 폰트를 잘보이게 한다.
+        $("li.tc-item > span.tc-name").addClass("k-link");
+
+        $('span.tc-name.k-link:contains("Silver")').attr('id', 'kendoTheme_Silver');
+        if (isMobile() == true) {
+            $('div#toolbar').css('width', 'calc(100vw - 85px)');
+            $("div#example-search-wrapper div#toolbar").css("overflow-x", "auto");
+        }
+        //툴바의 버튼이 다 안나타나는 현상 때문에 리사이즈함.
+        setTimeout(function () {
+            $(window).resize();       //과제: 이걸 주석처리하니 홈에서 공지갈때 잘됨. go_mis_gubun
+        });
+
+        if (InStr(document.referrer, "/login/") > 0 && getCookie('login_welcome') != 'Y') {
+            setCookie('login_welcome', 'Y');
+            toastr.success("", document.getElementById("MisSession_UserName").value + " 님, 로그인을 환영합니다.", { timeOut: 5000, positionClass: "toast-bottom-right" });
+        }
+
+
+
+
+    }
+
+
+
+    setTimeout(function (p_str_left_menu_hide) {
+
+        $('a#btn_leftVibile').unbind('click');
+
+        $('a#btn_leftVibile').click(function () {
+
+            if ($('div#example-sidebar').css('position') == 'absolute') setCookie('left_menu_hide', '1', 1000);
+
+            if (getCookie('left_menu_hide') == '1') {
+                setCookie('left_menu_hide', '0', 1000);
+                $('style#left_menu_hide')[0].innerHTML = '';
+            } else {
+                //좌측메뉴 숨기기;
+                setCookie('left_menu_hide', '1', 1000);
+                $('style#left_menu_hide')[0].innerHTML = p_str_left_menu_hide;
+                setTimeout(function () {
+                    $('div#toolbar').click();
+                });
+            }
+            $(document).resize();
+        });
+    }, 0, str_left_menu_hide);
+
+    /*
+    setTimeout( function(p_str_left_menu_hide) {
+        $('a#btn_leftVibile').unbind('click');
+        
+
+        //아이패드 때문에 .click( function() --> 인식 거의 안됨..... 이렇게 안하고 아래와 같이 함.
+        var clickEvent = (function() {
+            if ('ontouchstart' in document.documentElement === true) {
+              return 'touchstart';
+            } else {
+              return 'click';
+            }
+        })();
+        if($('a#btn_leftVibile')[0]) {
+            $('a#btn_leftVibile')[0].addEventListener(clickEvent,function(){
+            
+                if($('div#example-sidebar').hasClass('k-rpanel-expanded')==true || $('div#example-sidebar').css('position')=='relative') {
+                    setCookie('left_menu_hide','0',1000);
+                } else {
+                    setCookie('left_menu_hide','1',1000);
+                }
+    
+                if(getCookie('left_menu_hide')=='1') {
+                    setCookie('left_menu_hide','0',1000);
+                    $('style#left_menu_hide')[0].innerHTML = '';
+                } else {
+                    //좌측메뉴 숨기기;
+                    setCookie('left_menu_hide','1',1000);
+                    $('style#left_menu_hide')[0].innerHTML = p_str_left_menu_hide;
+                    setTimeout( function() {
+                        $('div#toolbar').click();
+                    });
+                }
+                $(document).resize();
+            });
+        }
+        
+
+
+    },0,str_left_menu_hide);
+    */
+
+
+    //console.log('프로그램 로딩 시 항상 실행;');
+    if (getCookie('devTarget') == '1' && getCookie('dev_ctrl_on') == 'on') {
+        draw_program_info();
+        if (typeof dev_page_view == 'function') {
+            dev_page_view();
+        }
+    }
+    if (typeof dev_ctrl_apply == 'function') {
+        dev_ctrl_apply();
+    }
+
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        kts = getCookie('kendoThemeSystem');
+        if (kts == 'N') {
+            return false;
+        }
+        change_dark_mode('onchange');
+    });
+
+
+    setTimeout(function (p_str_left_menu_hide) {
+        common_bottom_ready_5000(p_str_left_menu_hide);
+    }, 5000, str_left_menu_hide);
+
+
+}
+function change_dark_mode(p_event) {
+
+    if ($('body').attr('topsite') == 'notmis') {
+        return false;
+    }
+    kt = getCookie('kendoTheme');
+    kts = getCookie('kendoThemeSystem');
+    if (kts == 'Y') {
+        if (isSystemDarkMode() == true) {
+            document.documentElement.classList.add('invert-mode');
+            window.kendoTheme = 'highcontrast';
+            document.getElementById('kendoTheme_css').href = '../_mis_kendo/styles/kendo.highcontrast.min.css';
+            $('#kendoTheme_css').attr('kendoTheme', 'highcontrast');
+            document.getElementById('codemirror_theme').href = 'codemirror-5.52.0/theme/3024-night.css';
+            $('body').attr('kendoTheme', 'highcontrast');
+        } else {
+            if (kt == 'highcontrast' || kt == null) {
+                kt = 'silver';
+            }
+            document.documentElement.classList.remove('invert-mode');
+            document.getElementById('kendoTheme_css').href = '../_mis_kendo/styles/kendo.' + kt + '.min.css';
+            $('#kendoTheme_css').attr('kendoTheme', kt);
+            document.getElementById('codemirror_theme').href = 'codemirror-5.52.0/theme/eclipse.css';
+            $('body').attr('kendoTheme', kt);
+        }
+    } else {
+
+        if (kt == 'highcontrast') {
+            document.documentElement.classList.add('invert-mode');
+            document.getElementById('kendoTheme_css').href = '../_mis_kendo/styles/kendo.highcontrast.min.css';
+            $('#kendoTheme_css').attr('kendoTheme', 'highcontrast');
+            document.getElementById('codemirror_theme').href = 'codemirror-5.52.0/theme/3024-night.css';
+        } else {
+            document.documentElement.classList.remove('invert-mode');
+            document.getElementById('kendoTheme_css').href = '../_mis_kendo/styles/kendo.' + kt + '.min.css';
+            $('#kendoTheme_css').attr('kendoTheme', kt);
+            document.getElementById('codemirror_theme').href = 'codemirror-5.52.0/theme/eclipse.css';
+        }
+        window.kendoTheme = kt;
+        $('body').attr('kendoTheme', kt);
+    }
+    if (p_event != 'onchange') {
+        //if(isMainFrame()==true) {
+        Array.from(document.querySelectorAll("iframe")).forEach(iframe => {
+            const rect = iframe.getBoundingClientRect();
+            const isVisible = rect.width > 0 && rect.height > 0;
+
+            try {
+                const url = new URL(window.location.href);
+
+                const isTarget =
+                    isVisible &&
+                    url.pathname.endsWith("index.php") &&
+                    url.searchParams.has("gubun");
+
+                if (isTarget) {
+                    // 함수 실행
+
+                    iframe.contentWindow?.change_dark_mode?.();
+                }
+
+            } catch (e) {
+                // iframe.src가 상대경로이거나 잘못되었을 때 예외 처리
+                console.warn("Invalid iframe src:", iframe.src);
+            }
+        });
+        //}
+    }
+    common_bottom_ready();
+    $('.k-animation-container').remove();   //이상한 쓰레기가 생김.
+}
+function draw_program_info() {
+    program_info = JSON.parse(ajax_url_return('/_mis/program_dev.php?flag=info&RealPid=' + $('input#RealPid').val()));
+
+    real_detail_tag = Left(program_info['real_detail_date'], 10) + '<br>' + Mid(program_info['real_detail_date'], 12, 5) + ' OPEN';
+    $('#real_detail').html('<span title="최종수정일자:' + program_info['real_detail_date'] + '">' + real_detail_tag + '</span>');
+
+    if (program_info['pre_detail_date'] == '') {
+        pre_detail_tag = '생성하기';
+        $('#pre_detail').html(pre_detail_tag);
+    } else {
+        pre_detail_tag = Left(program_info['pre_detail_date'], 10) + '<br>' + Mid(program_info['pre_detail_date'], 12, 5) + ' OPEN';
+        $('#pre_detail').html('<span title="최종수정일자:' + program_info['pre_detail_date'] + '">' + pre_detail_tag + '</span>');
+    }
+
+    real_php_tag = Left(program_info['real_php_date'], 10) + '<br>' + Mid(program_info['real_php_date'], 12, 5) + ' OPEN';
+    $('#real_php').html('<span title="최종수정일자:' + program_info['real_php_date'] + '">' + real_php_tag + '</span>');
+
+
+    if (program_info['pre_php_date'] == '') {
+        pre_php_tag = '생성하기';
+        $('#pre_php').html(pre_php_tag);
+    } else {
+        pre_php_tag = Left(program_info['pre_php_date'], 10) + '<br>' + Mid(program_info['pre_php_date'], 12, 5) + ' OPEN';
+        $('#pre_php').html('<span title="최종수정일자:' + program_info['pre_php_date'] + '">' + pre_php_tag + '</span>');
+    }
+}
+function common_bottom_ready_5000(p_str_left_menu_hide) {
+
+
+    if ($('body').attr('main_loading')) {
+        if ($('body').attr('main_loading') == 'YY') {
+            $('body').attr('main_loading', 'Y')
+        } else {
+            $('body').removeAttr('main_loading');
+        }
+    }
+}
+
+function make_example_nav() {
+    if (isMainFrame() == false) {
+        return false;
+    }
+    $("#example-nav").kendoTreeView({
+        loadOnDemand: false,
+        dataSource: {
+            data: myMenuListThis[0].items
+        },
+    });
+    var exampleNav = $("#example-nav").data("kendoTreeView");
+    var barDataItem = exampleNav.dataSource.get(getUrlParameter('gubun'));
+    if (barDataItem) {
+        var barElement = exampleNav.findByUid(barDataItem.uid);
+        exampleNav.select(barElement);
+        root_treeview_select(getUrlParameter('gubun'));
+    }
+    var briefTitleClass = ['new-widget', 'updated-widget', 'beta-widget', 'pro-widget'];
+
+    /* 현재메뉴의 briefTitle 노출 */
+    var cnt = exampleNav.dataSource._data.length;
+    for (i = 0; i < cnt; i++) {
+        if (exampleNav.dataSource._data[i].briefTitle != "") {
+            barDataItem = exampleNav.dataSource.get(exampleNav.dataSource._data[i].id);
+            if (barDataItem) {
+                barElement = exampleNav.findByUid(barDataItem.uid);
+                if (barDataItem.briefTitle == undefined) {
+                    //기존버전에서는 briefTitle 없어서 에러가 남. 이때 메뉴 새로고침
+                    document.treatForm.nmCommand.value = "menuRefresh";
+                    document.treatForm.submit();
+                    x.stop; //멈추려면 이런 에러 코딩.
+                }
+                $(barElement.find('.k-icon')[0]).css('left', '18px');
+                $(barElement.find('.k-in')[0]).before('<span class="' + briefTitleClass[barDataItem.briefTitle.charCodeAt() % 4] + '">' + barDataItem.briefTitle + '</span>');
+            }
+        }
+
+        if (exampleNav.dataSource._data[i].items) {
+            var cntQ = exampleNav.dataSource._data[i].items.length;
+
+            for (iQ = 0; iQ < cntQ; iQ++) {
+                if (exampleNav.dataSource._data[i].items[iQ].briefTitle != "") {
+                    barDataItemQ = exampleNav.dataSource.get(exampleNav.dataSource._data[i].items[iQ].id);
+                    if (barDataItemQ) {
+                        barElementQ = exampleNav.findByUid(barDataItemQ.uid);
+                        barElementQ.find('.k-in').before('<span class="' + briefTitleClass[barDataItemQ.briefTitle.charCodeAt() % 4] + '">' + barDataItemQ.briefTitle + '</span>');
+                    }
+
+                }
+            }
+        }
+    }
+
+
+
+    $("#example-nav").on("click", function (e) {
+        nav_click(e);
+    });
+
+
+
+}
+
+
+function s_modify_cancel() {
+    wid = windowID();
+    if (Left(wid, 10) == 'ifr_window') {
+        location.href = parent.$('iframe#' + windowID())[0].src;
+    } else {
+        if ($('body').attr('BodyType') != 'simplelist' && $('body').attr('isAuthW') != 'N') {
+            location.href = replaceAll(replaceAll(status_view_url()
+                , '&idx=' + document.getElementById('idx').value, '&idx=0'), '&ActionFlag=modify', '&ActionFlag=write');
+        } else {
+            location.href = status_view_url();
+        }
+    }
+}
+
+
+//템플릿 사용여부에 체크한 경우에도 아래 함수를 각 AddLogic 에 정의하지 않을 경우, 에러방지를 위해 정의해 놓음.
+function columns_templete(p_dataItem, p_aliasName) {
+    if (p_dataItem == undefined) return '';	//입력일 경우에 해당됨.
+    return p_dataItem[p_aliasName];
+}
+
+function gnb_template_href(p_RealPid, p_widx, p_parent_gubun, p_parent_idx) {
+
+    var url = location.href.split('?')[0] + "?";
+    if (p_parent_idx) url = url + "gubun=" + p_parent_gubun + "&idx=" + p_parent_idx + "&tabid=" + p_RealPid + "&tabrealpid_idx=" + p_widx;
+    else url = url + "RealPid=" + p_RealPid + "&idx=" + p_widx;
+    if (getID("isMenuIn").value == "Y") url = url + "&isMenuIn=Y";
+
+    url = url + "&fromGnb=Y";
+    return url;
+}
+function parentRefresh() {
+    if (isMainFrame() == false) {
+        if (parent.$('div#grid')[0]) {
+            parent.$('div#grid').data('kendoGrid').dataSource.read();
+        } else if (typeof read_idx == 'function') {
+            read_idx();
+        }
+    }
+}
+function gnbDelete(p_flag, p_idx, p_RealPid, p_widx) {
+    if (p_flag == "read") {
+        if (!confirm("정말로 읽은알림 삭제를 하시겠습니까?")) return false;
+    } else if (p_flag == "all") {
+        if (!confirm("정말로 모두삭제를 하시겠습니까?")) return false;
+    }
+    ajax_url_touch("gnbDelete.php?flag=" + p_flag + "&idx=" + p_idx + "&RealPid=" + p_RealPid + "&widx=" + p_widx);
+    setTimeout(function () { gnbPrint(); });
+}
+
+function gnbRead(p_idx, p_RealPid, p_widx) {
+    ajax_url_touch("gnbRead.php?idx=" + p_idx + "&RealPid=" + p_RealPid + "&widx=" + p_widx);
+}
+
+function pushAlim() {
+    if ($('#gnb')[0].style.display == "none") {
+        gnbPrint();
+        $('#gnb')[0].style.display = "block";
+        $('button.TK-Nav-Overlay.TK-Nav-Overlay--Active').click();
+    } else $('#gnb')[0].style.display = "none";
+}
+
+
+function devQueryOn() {
+    setCookie('devQueryOn', 'Y');
+    location.href = location.href;
+}
+function devQueryOff() {
+    setCookie('devQueryOn', 'N');
+    location.href = location.href;
+}
+function get_now_values() {
+    now_values = '';
+    $('.form-group.round_tab [data-bind]').each(function (index, item) {
+        if ($(this).closest('div.form-group')) {
+            if ($(item).attr('type') == 'checkbox') now_values = now_values + this.checked + ';'
+            now_values = now_values + this.value + ';'
+        }
+    });
+    return now_values;
+}
+function set_now_values() {
+    $('input#temp1').attr('now_values', get_now_values());
+    $('input#temp1').attr('now_time', today19());
+}
+function get_pre_values() {
+    if ($('input#temp1').attr('pre_values') == undefined) {
+        $('input#temp1').attr('pre_values', $('input#temp1').attr('now_values'));
+        $('input#temp1').attr('pre_time', today19());
+    }
+    return $('input#temp1').attr('pre_values');
+}
+
+function gnbPrint() {
+
+    if ($("#listView").length == 0) return false;
+    var dataSource1 = new kendo.data.DataSource({
+        type: "odata",
+        transport: {
+            read: {
+                url: "list_json.php?flag=read&RealPid=speedmis000981&recently=Y",
+                //url: "https://demos.telerik.com/kendo-ui/service/Products",
+                dataType: "jsonp"
+            }
+        },
+        schema: {
+            data: function (data) {
+                cnt = 0;
+                data.d.results.forEach(function (a) {
+                    if (a.zjohoeyeobu == "안읽음") ++cnt;
+                });
+                $('span.TK-Counter').text(cnt);
+                if (cnt > 0) {
+                    $('span.TK-Counter').attr('class', 'TK-Counter TK-Counter--SC TK-Counter--Visible');
+                } else {
+                    $('span.TK-Counter').attr('class', 'TK-Counter TK-Counter--SC TK-Counter--Visible TK-Counter--Empty');
+                }
+                return data.d.results;
+            }
+        },
+        pageSize: 1000
+    });
+
+    $("#listView").html('');
+    $("#listView").kendoListView({
+        dataSource: dataSource1,
+        height: 350,
+        scrollable: "endless",
+        template: kendo.template($("#gnb_template").html())
+    });
+}
+
+function expandCollapse(e) {
+    if ($(e.item).is(".k-state-active")) {
+        var that = this;
+        window.setTimeout(function () { that.collapse(e.item); }, 0);
+    }
+    var tree = $("#panelbar-left").data("kendoPanelBar");
+    var dItem = tree.dataItem($(e.item));
+    if (!dItem.hasChildren) {
+        //location.href = "index.php?gubun="+dItem.id;
+        if (dItem.MenuType == "00") {
+            if ($(event.target).closest('li').find('ul').length == 0) {
+                //location.href = "index.php?gubun="+dItem.id+"&isMenuIn=Y";
+            } else if ($(event.target).hasClass('k-i-expand') == false) {
+                sel_obj = $(event.target).closest('li');
+                if (sel_obj.attr('aria-expanded') == 'true') $('div#example-nav').data('kendoTreeView').collapse(sel_obj[0]);
+                else $('div#example-nav').data('kendoTreeView').expand(sel_obj[0]);
+            }
+        } else if (dItem.MenuType == "11") {
+            location.href = dItem.AddURL;
+        } else if (dItem.MenuType == "12") {
+            window.open(dItem.AddURL);
+        } else if (dItem.MenuType == "13") {
+            location.href = location.href.split('?')[0] + "?gubun=" + dItem.id + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', '');
+        } else if (event.ctrlKey) {
+            window.open(location.href.split('?')[0] + "?gubun=" + dItem.id + iif(document.getElementById('isMenuIn').value == 'Y', '&isMenuIn=Y', ''));
+            $('div#example-nav').data('kendoTreeView').select($('div#example-nav [firstmenu="Y"]'));
+        } else if (event.shiftKey) {
+            parent_popup_jquery(location.href.split('?')[0] + "?gubun=" + dItem.id, dItem.text);
+            $('div#example-nav').data('kendoTreeView').select($('div#example-nav [firstmenu="Y"]'));
+        } else {
+            //location.href = "index.php?gubun="+dItem.id+iif(document.getElementById('isMenuIn').value=='Y','&isMenuIn=Y','');
+            go_mis_gubun(dItem.id);
+
+        }
+    }
+}
+
+
+//변경값이 있으면 true 리턴.
+function check_beforeunload() {
+
+    if (isMainFrame() == false || document.getElementById('ActionFlag').value != 'write' && document.getElementById('ActionFlag').value != 'modify') {
+        beforeunload_ignore();
+        return false;
+    }
+    nv = get_now_values();
+    pv = get_pre_values();
+
+    if (nv == undefined) nv = '';
+    if (pv == undefined) pv = '';
+
+    nv = replaceAll(nv, 'undefined;', '');
+    nv = replaceAll(nv, 'undefined', '');
+    nv = replaceAll(nv, 'contains', '');
+    nv = replaceAll(nv, ';', '');
+
+    pv = replaceAll(pv, 'undefined;', '');
+    pv = replaceAll(pv, 'undefined', '');
+    pv = replaceAll(pv, 'contains', '');
+    pv = replaceAll(pv, ';', '');
+
+    if (nv == pv || pv == '' || nv == '') {
+        return false;
+    } else {
+        if ($('input#temp1').attr('now_time')) {
+            const time1 = new Date($('input#temp1').attr('now_time'));
+            const time2 = new Date();
+            const diffInSeconds = Math.floor((time2 - time1) / 1000);
+            if (diffInSeconds >= 10) {
+                // 10초 이상 차이가 나면 true 리턴(편집존중한다는 뜻)
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
+function beforeunload_ignore() {
+    $('input#temp1').attr('pre_values', get_now_values());
+}
+
+function kendoDate_toString(p_date, p_format) {
+    //if(new Date(p_date).getFullYear()*1<2010) debugger;
+    if (p_date == "" || p_date == undefined || p_date == null || p_date == "Invalid Date") return "";
+    if (p_date.yyyymmddhhmm19() == "1970-01-01 09:00:00") return "";
+    return kendo.toString(new Date(p_date), p_format);
+}
+function columns_format(p_dataItem, p_aliasName) {
+    if (document.getElementById('ActionFlag').value == 'list') {
+        if (getObjects(p_columns_1D, 'field', p_aliasName)[0] == undefined) {
+            return false;
+        } else if (getObjects(p_columns_1D, 'field', p_aliasName)[0].columns_format) {
+            //return eval(replaceAll(replaceAll(replaceAll(getObjects(p_columns_1D, 'field', p_aliasName)[0].columns_format,'*'+p_aliasName+',', '*'+p_dataItem[p_aliasName]+','),'#=',''),')#',')'));
+            return eval(replaceAll(replaceAll(replaceAll(replaceAll(getObjects(p_columns_1D, 'field', p_aliasName)[0].columns_format, '*' + p_aliasName + ',', '*' + p_dataItem[p_aliasName] + ','), '(' + p_aliasName + ')', '(' + p_dataItem[p_aliasName] + ')'), '#=', ''), ')#', ')'));
+        } else if (p_dataItem) {
+            return p_dataItem[p_aliasName];
+        } else {
+            return false;
+        }
+    } else {
+        if ($('div#' + p_aliasName + '[data-format]').attr('data-format') != undefined && $('div#' + p_aliasName + '[data-format]').attr('data-format') != '') {
+            return kendo.toString(p_dataItem[p_aliasName], $('div#' + p_aliasName + '[data-format]').attr('data-format'));
+        } else if (p_dataItem) {
+            return p_dataItem[p_aliasName];
+        } else {
+            return false;
+        }
+    }
+}
+
+function parent_gridHeight() {
+    if (isMainFrame() == false && parent.$('style#themechooser_style')[0]) {
+        parent.parent_gridHeight();
+    } else {
+        $('style#themechooser_style')[0].innerHTML = '';
+        gridHeight();
+    }
+}
+
+
+
+function gridHeight() {
+    //speedmis 가 아닌 parent 환경일 경우 스크롤없는 그리드를 반영한다. 상단 iframe 에 의한 스크롤에다가 또 스크롤이면 스트레스.
+    if (typeof parent.gridHeight == 'undefined') return false;
+
+    if ($("style#list_css")[0]) {
+
+        if ($(".k-grid-content.k-auto-scrollable").length > 0) {
+
+
+            setTimeout(function () {
+                setTimeout(function () {
+                    dd = -60;
+                    if ($('div#grid').data('kendoGrid')) {
+                        if ($('div#grid').data('kendoGrid').dataSource._total * 1 <= $('div#grid').data('kendoGrid').dataSource._pageSize) {
+                            if (p_columns[0]['field'] == 'rowNumber') {
+                                dd = dd + 39;
+                                $('div.k-pager-wrap.k-grid-pager').css('display', 'none');
+                            } else {
+                                dd = dd + 0;
+                                $('div.k-pager-wrap.k-grid-pager').css('display', 'flex');
+                            }
+                        } else {
+                            dd = dd + 0;
+                            $('div.k-pager-wrap.k-grid-pager').css('display', 'flex');
+                        }
+                    }
+                    if (isMainFrame() == true) {
+                        //dd = dd - 3;
+                        if (document.getElementById('isMenuIn').value == 'Y') dd = dd - 60; else dd = dd + 0.41;
+                        if (getUrlParameter('ChkOnlySum')) dd = dd - 14;
+                        if (document.getElementById('isMenuIn').value == 'Y' && $("body").attr("screenName") == "fullScreen") dd = dd - 9;
+                        if (document.getElementById('isMenuIn').value == 'Y' && $('nav#js-tlrk-nav').is(':visible') == false) dd = dd + 68;
+                        if ($("body").attr("screenName") == "fullScreen") {
+                            dd = dd + 0;
+                        }
+
+                    } else {
+                        if ($("body").attr("screenName") == "fullScreen") {
+
+                            if ($('input#ActionFlag').val() == 'list') {
+                                dd = dd + 0;  //+5
+                            } else {
+                                dd = dd - 0;
+                            }
+                        } else if (parent.$("body").attr("screenName") == "fullScreen") {
+
+                            if ($('input#ActionFlag').val() == 'list') {
+                                dd = dd - 30;
+                            } else {
+                                dd = dd - 0;
+                            }
+                        } else if ($('input#ActionFlag').val() == 'list') {
+                            dd = dd;
+                        } else {
+                            //dd = dd + 2;
+                        }
+
+                    }
+                    if (document.getElementById('pageSizes').value == '999999') {
+                        dd = dd + 39;
+                    }
+
+                    //심사숙고 로직.
+                    //hh = iif(window.screen.height==$(window).height() || isMobile()==false, $(window).height() + 18, window.screen.height + iif(window.screen.height - $(window).height() <= 200, -150, -443)) - $('div.themechooser').height() - $('div.k-grid-header').height()
+                    //- $('div.k-toolbar.k-grid-toolbar:visible').height()  - $('div.k-grouping-header:visible').height() + dd;
+                    hh = $('html').height() + 19 - $('div.themechooser').height() - $('div.k-grid-header').height()
+                        - ($('div.k-toolbar.k-grid-toolbar:visible').height() || 0) - ($('div.k-grouping-header:visible').height() || 0) + dd;
+
+                    if (isMainFrame() == true && getUrlParameter('ChkOnlySum')) {
+                        hh = hh + 14;
+                    } else if (getUrlParameter('ChkOnlySum')) {
+                        hh = hh + 7;
+                    } else if (getUrlParameter('helpbox')) {
+                        hh = hh + 7;
+                    }
+
+                    /* ipad test 이상 */
+
+                    if (isApple() == true) {
+                        //hh = hh - 7;
+                    }
+                    if (parent.isMainFrame() == false && top.$('body').attr('isMenuIn') == 'N') {
+                        if (document.getElementById('ActionFlag').value == 'list') {
+                            hh = hh - 50;
+                        } else {
+                            hh = hh - 45;
+                        }
+                    }
+                    if (parent.isMainFrame() == false && top.$('body').attr('isMenuIn') == 'Y') {
+
+                        if (parent.$('body').attr('screenname') == 'fullScreen') {
+                            hh = hh - 5;
+                        }
+                    }
+                    /*
+                    alert($('#main').height());
+                    alert($('#exampleWrap').height());
+                    alert($('#example').height());
+                    alert($('div.k-content.k-state-active').height());
+                    */
+                    //toastr.success("----111--$(window).height()", $(window).height(), {progressBar: true, timeOut: 5000});    //1478(비정상)
+                    //toastr.success("------window.screen.height", window.screen.height, {progressBar: true, timeOut: 5000});   //1280
+                    //toastr.success("------111", $(window).height() + 18, {progressBar: true, timeOut: 5000});
+                    //toastr.success("------222", window.screen.height + iif(window.screen.height==$(window).height(), 18, -150), {progressBar: true, timeOut: 5000});
+                    $("style#list_css")[0].innerHTML = `
+        body div#grid div.k-grid-content.k-auto-scrollable {
+            height: `+ hh + `px!important;
+        }
+        body div#grid div.k-grid-content.k-auto-scrollable:hover {
+            height: `+ hh + `px!important;
+        }
+                        `;
+
+                    //console.log("hh="+hh+"px; 높이조정완료");
+
+
+                    if (isMainFrame() == false && $('div#grid')[0]) {
+                        console.log("본문에 넣어지는 iframe 여부 확인 직전");
+                        if (parent.$('div[tabnumber="1"] iframe#' + frameElement.id)[0]) {     //본문에 넣어지는 iframe 의 높이조정
+                            hh = $('div#grid tbody').height() + 77;
+                            $('.k-scrollbar.k-scrollbar-vertical').height(hh);
+                            $('body[isMainFrame="N"] #exampleWrap')[0].style.setProperty("height", hh + 'px', "important");
+                            parent.$('div[tabnumber="1"] iframe#' + frameElement.id).height(hh);
+                            parent.$('div[tabnumber="1"] div#round_' + frameElement.id).css('max-height', hh + 'px');
+                            console.log("본문에 넣어지는 iframe hh=" + hh + "px; 높이조정완료");
+                        }
+                    }
+
+
+
+                    //console.log('.themechooser height='+$('body[ismenuin="Y"] .themechooser').height());
+                    setTimeout(function () {
+                        resize_ifr_split();
+                        setTimeout(function () {
+                            resize_ifr_split();
+                            setTimeout(function () {
+                                resize_ifr_split();
+                                //alert($('body div#grid div.k-grid-content.k-auto-scrollable').parent().parent().parent().parent().parent().parent().offset().top);  //여기서 변화없음.
+                                //alert($('body div#grid div.k-grid-content.k-auto-scrollable').parent().parent().parent().parent().parent().parent().offset().top);
+                            }, 100);
+                        }, 100);
+                    }, 100);
+                });
+            });
+
+        }
+    }
+    //console.log("높이조정완료");
+}
+
+
+function openTip() {
+    url = location.href.split('?')[0] + "?RealPid=speedmis001040&isSplitter=Y";
+    //if($('span.k-in:contains("웹소스관리(업무용MIS)")').length==0) url = url + '&allFilter=[{"operator":"eq","value":"사용Tip","field":"toolbar_flag"}]&isDev=N';
+    parent_popup_jquery(url, "사용팁 & 개발팁 Page", "1200px", "700px");
+}
+
+// sets "hidden" field on items matching query
+function filter(dataSource, query) {
+    var hasVisibleChildren = false;
+    var data = dataSource instanceof kendo.data.HierarchicalDataSource && dataSource.data();
+
+    for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var text = item.text.toLowerCase();
+        var itemVisible =
+            query === true // parent already matches
+            || query === "" // query is empty
+            || text.indexOf(query) >= 0; // item text matches query
+
+        var anyVisibleChildren = filter(item.children, itemVisible || query); // pass true if parent matches
+
+        hasVisibleChildren = hasVisibleChildren || anyVisibleChildren || itemVisible;
+
+        item.hidden = !itemVisible && !anyVisibleChildren;
+    }
+
+    if (data) {
+        // re-apply filter on children
+        dataSource.filter({ field: "hidden", operator: "neq", value: true });
+    }
+
+    return hasVisibleChildren;
+}
+
+// buildPath 함수 정의: dataItem에서 부모 경로를 따라 올라가면서 id 배열 생성
+function buildPath(dataItem) {
+    var path = [];
+    while (dataItem) {
+        path.unshift(dataItem.id);  // 부모부터 앞에 쌓음
+        dataItem = dataItem.parent();  // Kendo TreeView의 계층 구조 활용
+    }
+    return path;
+}

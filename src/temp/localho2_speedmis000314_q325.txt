@@ -1,0 +1,4 @@
+
+-- update sql :
+
+ update MisMenuList set upRealPid='speedmis001048',MenuName='경력증명서',briefTitle='',isMenuHidden='N',SortG2=1,SortG4=6,SortG6=1,new_gidx=52,AuthCode='02',MenuType='01',MisJoinPid='',AddURL='',remark='',isCoreProgram='N',help_update_deny=0,help_title='입력은 SpeedMIS 로, 출력은 엑셀폼에서 정의된 HTML 을 이용합니다.',help_contents='<p>입력 또는 출력에 대한 양식을 HTML 템플릿으로 대체할 수 있습니다.</p><p>특히, 엑셀에서 양식을 정의하고 항목이름을 {성명} 과 같이 표현하면 해당 항목의 데이터로 대체되어 매우 편리하고 쉽게 출력양식을 구성할 수 있습니다.</p><p>아래와 같은 방식의 양식파일로 디자인하며, 디자인된 파일의 HTML 을 해당프로그램의 메뉴관리에 저장하여 적용합니다.</p><p>&nbsp;</p><div class="editorUpload"><p><a target="_blank" href="/uploadFiles/editorImageDir/MisMenuList/1055/경력증명서.xlsx">경력증명서.xlsx</a></p><p>&nbsp;</p><p><a href="https://www.speedmis.com/_mis/index.php?gubun=266&amp;idx=edu001036 " target="_blank">이 프로그램의 웹소스열기</a></p><p>&nbsp;</p></div>',lastupdate=CURRENT_TIMESTAMP,lastupdater='gadmin' where idx='1055';

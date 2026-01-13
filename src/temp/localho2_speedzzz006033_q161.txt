@@ -1,0 +1,39 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from edu_증명서 table_m 
+where 9=9  and table_m.useflag='1'
+
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.문서번호 as "munseobeonho"
+,table_m.양식명 as "yangsingmyeong"
+,table_m.언어 as "eoneo"
+,table_m.대상자ID as "daesangjaID"
+,table_m.대체성명 as "daecheseongmyeong"
+,table_m.대체생년월일 as "daechesaengnyeonworil"
+,table_m.기간 as "gigan"
+,table_m.내용 as "naeyong"
+,table_m.출력일자 as "chullyeogilja"
+,table_m.과정 as "gwajeong"
+,table_m.시작학년 as "sijakhangnyeon"
+,table_m.useflag as "useflag"
+,table_m.HIT as "HIT"
+,table_m.IP as "IP"
+,table_m.remark as "remark"
+-- ,nULL as "wdate"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_m.lastupdater as "lastupdater"
+,table_m.comment_count as "comment_count"
+from edu_증명서 table_m
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ order by table_m.idx desc limit 50) aaa order by idx desc) bbb where rowNumber between 1 and 50
+
+--app Sql :
+
+-----------------------------------------------
+    

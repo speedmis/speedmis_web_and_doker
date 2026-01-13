@@ -1,0 +1,55 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisGroup_Detail table_m 
+ where 9=9  and table_m.useflag='1'
+ and table_m.gidx = '97' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.gidx as "gidx"
+,'' as "z_buseojogeonseontaek_"
+,table_SetNewStation.StationName as "table_SetNewStationQnStationName"
+,table_m.SetNewStation as "SetNewStation"
+-- ,nULL as "z_jikchaekjogeonseontaek_"
+,table_SetPosition.kname as "table_SetPositionQnkname"
+,table_m.SetPosition as "SetPosition"
+,WhereCode2.kname as "WhereCode2Qnkname"
+,table_m.WhereCode2 as "WhereCode2"
+-- ,nULL as "z_sawonjijeongseontaek_"
+,table_SetUserid.username as "table_SetUseridQnusername"
+,table_m.SetUserid as "SetUserid"
+-- ,nULL as "z_gwalligwonhan_"
+,table_isAdminS.kname as "table_isAdminSQnkname"
+,table_m.isAdminS as "isAdminS"
+-- ,nULL as "z_wiui_segaji_jogeone_matneun_inwoneuro_geurubi_ja"
+,table_m.remark as "remark"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_m.protection as "read_only_condition"
+from MisGroup_Detail table_m
+left outer join MisStation table_SetNewStation on table_SetNewStation.Num = table_m.SetNewStation
+ and table_SetNewStation.useflag=1
+left outer join MisCommonTable table_SetPosition on table_SetPosition.kcode = table_m.SetPosition
+ and table_SetPosition.gcode='speedmis000188'
+left outer join MisCommonTable WhereCode2 on WhereCode2.kcode = table_m.WhereCode2
+ and WhereCode2.gcode='speedmis000297'
+left outer join MisUser table_SetUserid on table_SetUserid.UniqueNum = table_m.SetUserid
+ and table_SetUserid.delchk<>'D'
+left outer join MisCommonTable table_isAdminS on table_isAdminS.kcode = table_m.isAdminS
+ and table_isAdminS.gcode='speedmis000745'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ and table_m.gidx = '97'  order by table_m.SetUserid limit 100) aaa order by SetUserid) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

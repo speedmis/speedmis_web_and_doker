@@ -1,0 +1,55 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from edu_N_ghsa_new table_m 
+ where 9=9  and table_m.useflag='1'
+
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.gh_num as "gh_num"
+,table_m.gh_id as "gh_id"
+,table_m.gh0 as "gh0"
+-- ,nULL as "zyeongmunseongmyeong"
+-- ,nULL as "zsaengnyeonworil"
+,table_m.gh1 as "gh1"
+,table_m.gh2 as "gh2"
+,table_gh3.kname as "table_gh3Qnkname"
+,table_m.gh3 as "gh3"
+,table_m.gh5 as "gh5"
+,table_m.gh4 as "gh4"
+,'' as "zjohoe"
+,'' as "zjakseong"
+-- ,nULL as "zjechuryeobu"
+,table_m.ex3 as "ex3"
+,table_m.ex2 as "ex2"
+,date_format(table_m.ex5,'%Y-%m-%d') as "ex5"
+,table_m.ic3 as "ic3"
+,table_m.va1 as "va1"
+-- ,nULL as "zhakseupgyehoekpyo"
+,table_m.va3 as "va3"
+,table_m.va4 as "va4"
+-- ,nULL as "zgajokdaepyoID"
+-- ,nULL as "ex1"
+-- ,nULL as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+from edu_N_ghsa_new table_m
+left outer join MisUser table_uniqueNum on table_uniqueNum.uniqueNum=table_m.gh_id
+left outer join MisCommonTable table_gh3 on table_gh3.kcode = table_m.gh3
+ and (table_gh3.gcode='edu001062')
+left outer join MisUser table_gh_id on table_gh_id.uniquenum=table_m.gh_id
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ order by table_m.gh1 desc,table_m.gh2 desc limit 100) aaa order by gh1 desc,gh2 desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

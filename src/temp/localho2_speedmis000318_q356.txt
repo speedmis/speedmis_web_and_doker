@@ -1,0 +1,4 @@
+
+-- update sql :
+
+ update MisBoardArticle set b_ref=4,RealPid='speedmis000318',title='ddd',contents='ddddd',boardattach1='',boardattach1_midx=null,lastupdate=CURRENT_TIMESTAMP,lastupdater='gadmin' where idx='4';

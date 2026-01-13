@@ -1,0 +1,35 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisReadList table_m 
+left outer join MisUser table_user on table_user.uniquenum=table_m.userid
+ where 9=9  and 123=123 and table_m.RealPid=N'speedmis000266' 
+and table_user.delchk<>'D' and table_m.widx = 'speedmis001307' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.widx as "widx"
+,concat(table_user.UserName,' | ',table_Station_NewNum2.stationname,case when ifnull(table_Station_NewNum4.stationname,'')='' then '' else concat(' > ',table_Station_NewNum4.stationname) end,case when length(table_Station_NewNum.AutoGubun)>=6 then concat(' > ',table_Station_NewNum.stationname) else '' end,' > ',table_positionNum.kname) as "zseongmyeong"
+,table_m.userid as "userid"
+,table_RealPid.MenuName as "table_RealPidQnMenuName"
+,table_m.RealPid as "RealPid"
+,table_m.자격 as "jagyeok"
+-- ,nULL as "zpusisayongyeobu"
+,date_format(table_m.readDate,'%Y-%m-%d %H:%i:%s') as "readDate"
+,table_m.처리결과 as "cheorigyeolgwa"
+from MisReadList table_m
+left outer join MisUser table_user on table_user.uniquenum=table_m.userid
+left outer join MisStation table_Station_NewNum on table_Station_NewNum.Num = table_user.Station_newnum 
+left outer join MisStation table_Station_NewNum2 on table_Station_NewNum2.autogubun = left(table_Station_NewNum.autogubun,2) left outer join MisStation table_Station_NewNum4 on table_Station_NewNum4.autogubun = left(table_Station_NewNum.autogubun,4) and length(table_Station_NewNum.autogubun)>=4
+left outer join MisCommonTable table_positionNum on table_positionNum.kcode = table_user.positionNum and table_positionNum.gcode='speedmis000188'
+left outer join MisCompanyMgt table_소속거래처idx on table_소속거래처idx.idx = table_user.소속거래처idx and table_소속거래처idx.useflag=1
+left outer join MisMenuList table_RealPid on table_RealPid.RealPid=table_m.RealPid
+, (select @RANKT := 0) XX where 9=9  and 123=123 and table_m.RealPid=N'speedmis000266' 
+and table_user.delchk<>'D' and table_m.widx = 'speedmis001307'  order by table_m.idx limit 100) aaa order by idx) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

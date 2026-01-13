@@ -1,0 +1,96 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisUser table_m 
+ where 9=9  and 123=123 
+and table_m.delchk<>'D' and table_m.UniqueNum='gadmin' and table_m.UniqueNum = N'gadmin' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.num as "num"
+,table_m.UniqueNum as "UniqueNum"
+,'[암호화]' as "passwdDecrypt"
+,table_m.UserName as "UserName"
+,table_m.EngName as "EngName"
+,case when ifnull(table_m.google_name,'')<>'' and left(table_m.UniqueNum,1)='g' then 'Google 인증' when ifnull(table_m.google_name,'')<>'' and left(table_m.UniqueNum,1)='f' then 'Facebook 인증' else '자체등록' end as "zgaibyuhyeong"
+,table_m.email as "email"
+,'' as "zallimsangtae"
+,table_m.receive_YN as "receive_YN"
+,table_m.telegram_chat_id as "telegram_chat_id"
+,table_m.allPush_YN as "allPush_YN"
+,table_Station_NewNum.stationname as "table_Station_NewNumQnstationname"
+,table_m.Station_NewNum as "Station_NewNum"
+,table_positionNum.kname as "table_positionNumQnkname"
+,table_m.positionNum as "positionNum"
+,table_m.UsrPhone as "UsrPhone"
+,table_m.HandPhone as "HandPhone"
+,table_m.IntraPhone as "IntraPhone"
+,'' as "zseongbyeol"
+,table_m.ZipCode as "ZipCode"
+,table_m.UsrAddress as "UsrAddress"
+,table_m.LastAddress as "LastAddress"
+,table_m.LastCollege as "LastCollege"
+,table_m.CollegeSubject as "CollegeSubject"
+,table_m.bankname as "bankname"
+,table_m.bankbooknum as "bankbooknum"
+,table_m.bankinsertman as "bankinsertman"
+,table_m.ibsa_date as "ibsa_date"
+,table_delchk.kname as "table_delchkQnkname"
+,table_m.delchk as "delchk"
+,table_myLanguageCode.LanguageName as "table_myLanguageCodeQnLanguageName"
+,table_m.myLanguageCode as "myLanguageCode"
+,table_m.birth_date as "birth_date"
+,table_sun_moon.kname as "table_sun_moonQnkname"
+,table_m.sun_moon as "sun_moon"
+,table_Married.kname as "table_MarriedQnkname"
+,table_m.Married as "Married"
+,table_m.Hobby as "Hobby"
+,table_m.Talent as "Talent"
+,table_m.army as "army"
+,table_m.grade as "grade"
+,table_m.service as "service"
+,table_m.period as "period"
+,table_House.kname as "table_HouseQnkname"
+,table_m.House as "House"
+,table_Hurdle.kname as "table_HurdleQnkname"
+,table_m.Hurdle as "Hurdle"
+,table_Bohun.kname as "table_BohunQnkname"
+,table_m.Bohun as "Bohun"
+,table_m.attach1 as "attach1"
+,table_m.remark as "remark"
+,table_m.hit as "hit"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,table_m.passwdChangeDate as "passwdChangeDate"
+from MisUser table_m
+left outer join MisStation table_Station_NewNum on table_Station_NewNum.Num = table_m.Station_NewNum
+left outer join MisCommonTable table_positionNum on table_positionNum.kcode = table_m.positionNum
+ and table_positionNum.gcode='speedmis000188'
+left outer join MisCommonTable table_delchk on table_delchk.kcode = table_m.delchk
+ and table_delchk.gcode='speedmis000203'
+left outer join MisGlobal_Language table_myLanguageCode on table_myLanguageCode.LanguageCode = table_m.myLanguageCode
+ and table_myLanguageCode.isSupport='Y'
+left outer join MisCommonTable table_sun_moon on table_sun_moon.kcode = table_m.sun_moon
+ and table_sun_moon.gcode='speedmis000209'
+left outer join MisCommonTable table_Married on table_Married.kcode = table_m.Married
+ and table_Married.gcode='speedmis000413'
+left outer join MisCommonTable table_House on table_House.kcode = table_m.House
+ and table_House.gcode='speedmis000402'
+left outer join MisCommonTable table_Hurdle on table_Hurdle.kcode = table_m.Hurdle
+ and table_Hurdle.gcode='speedmis000408'
+left outer join MisCommonTable table_Bohun on table_Bohun.kcode = table_m.Bohun
+ and table_Bohun.gcode='speedmis000408'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and 123=123 
+and table_m.delchk<>'D' and table_m.UniqueNum='gadmin' and table_m.UniqueNum = N'gadmin'  order by table_m.num desc limit 5) aaa order by num desc) bbb where rowNumber between 1 and 5
+
+--app Sql :
+
+-----------------------------------------------
+    

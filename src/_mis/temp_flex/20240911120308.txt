@@ -1,0 +1,9 @@
+
+
+POST :
+{"saveList":"{\"midx\"@colon;\"322\",\"refidx\"@colon;\"\",\"RealPid\"@colon;\"speedmis000752\",\"contents\"@colon;\"..........\",\"virtual_fieldQnmisPildokMem\"@colon;\"\"}","initList":"{\"midx\"@colon;\"322\",\"refidx\"@colon;\"\",\"RealPid\"@colon;\"speedmis000752\",\"contents\"@colon;\"\"}","saveUploadList":"{}","saveTextdecrypt1List":"{}","saveTextdecrypt2List":"{}","viewList":"{\"idx\"@colon;\"\",\"midx\"@colon;\"322\",\"refidx\"@colon;\"\",\"zrefidx0\"@colon;\"\",\"table_RealPidQnMenuName\"@colon;\"\",\"RealPid\"@colon;\"speedmis000752\",\"contents\"@colon;\"..........\",\"zdapgeulsu\"@colon;\"\",\"sel_like\"@colon;\"\",\"sel_hate\"@colon;\"\",\"zmyLH\"@colon;\"\",\"boardattach1\"@colon;\"\",\"table_Station_NewNumQmstationname\"@colon;\"\",\"virtual_fieldQnmisPildokMem\"@colon;\"\",\"wdate\"@colon;\"\",\"table_wdaterQnusername\"@colon;\"\",\"wdater\"@colon;\"\",\"lastupdate\"@colon;\"\",\"table_lastupdaterQnusername\"@colon;\"\",\"lastupdater\"@colon;\"\"}","key_aliasName":"idx","key_value":"0","ActionFlag":"write","click_id":"btn_save","app":"","RealPid":"speedmis000974","parent_idx":"322","MisJoinPid":""}
+
+
+GET :
+{"tempDir":"gadmin_1726023779","addParam":"","parent_gubun":"752","parent_idx":"322"}
+

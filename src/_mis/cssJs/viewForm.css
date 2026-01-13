@@ -1,0 +1,96 @@
+﻿
+
+form#frm div#viewPrintDiv select[data-role] {
+    position: inherit!important;
+    width: calc(100% - 7px);
+    height: 100%;
+    padding: 5px 2px;
+    background-color: #ddf;
+    display: inherit!important;
+}
+
+div#viewPrintDiv input[type="text"] {
+    width: calc(100% - 16px);
+    padding: 5px 8px;
+    border: 0;
+    background-color: #ddf;
+    min-height: 17px;
+}
+
+div#viewPrintDiv input[type="text"] {
+    max-width: calc(100% - 20px);
+}
+
+div#viewPrintDiv .k-picker-wrap {
+    border: 0;
+}
+
+div#viewPrintDiv span.k-widget.k-datepicker.k-valid > * {
+    height: 100%;
+    border: 0;
+}
+div#viewPrintDiv input[data-role="datepicker"] {
+    height: 100%;
+}
+div#viewPrintDiv td > span.k-widget {
+    background: transparent;
+}
+
+div#viewPrintDiv textarea {
+    left: 0px;
+    border: 0;
+    padding: 4px;
+    background-color: #ddf;
+    display: block;
+    overflow-y: auto;
+}
+
+.viewPrintDiv span.k-icon.k-i-k-icon.k-i-plus, .viewPrintDiv span.k-icon.k-i-k-icon.k-i-minus {
+    font-size: 20px;
+	float: left;
+    position: relative;
+    top: 1px!important;
+    background: transparent;
+    left: 0px;
+    margin: 0;
+}
+
+.viewPrintDiv a#btn_detailAdd, .viewPrintDiv a#btn_detailDelete {
+    padding-right: 7px!important;
+    padding-left: 0px;
+}
+
+.viewPrintDiv a.k-button {
+    display: inline-block!important;
+}
+
+.viewPrintDiv span.k-icon {
+    display: inline-block!important;
+}
+.viewPrintDiv td:not([align="center"]):not([align="right"]) > select,
+.viewPrintDiv td:not([align="center"]):not([align="right"]) input[type="text"] {
+    margin-left: -2px;
+}
+
+td > span.k-widget.k-datepicker.k-valid {
+    width: 100%;
+    background: transparent;
+}
+
+tr[firstline] > td:first-child {
+    position: relative;
+}
+tr[firstline] > td:first-child input[type="checkbox"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    display: block!important;
+}
+
+input[type=checkbox], input[type=radio] {
+    margin: 0;
+    top: -1px;
+    border: 1px!important;
+}

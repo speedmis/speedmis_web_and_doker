@@ -1,0 +1,350 @@
+﻿
+    var onToggles = 'off';
+    function onToggle(e) {
+        //console.log('onToggle 입구'+$("body").attr("screenName"));
+        setTimeout( function() {
+            onToggles = 'off';
+        },100);
+        if(onToggles=='on') {
+            setTimeout( function() {
+                console.log($("body").attr("screenName"));
+            },100);
+            return false;
+        }
+        //console.log('onToggle 진행'+$("body").attr("screenName"));
+        onToggles = 'on';
+        if(e.id=="btn_mMenu") {
+            mobile_line();
+            if(e.checked) {
+                $("div#panelbar-left").css("display", "block");
+            } else {
+                $("div#panelbar-left").css("display", "none");
+            }
+            
+            $(window).resize();
+        }
+
+        if(e.id=="btn_mConfig") {
+            $("span.tc-activator.k-content").click();
+        }
+
+
+
+        if(e.id=="btn_fullScreen") {
+
+            toggleFullScreen(e.checked);
+            if(!e.checked) {
+                $('a#btn_fullScreen').removeClass('k-toolbar-first-visible');
+                $('a#btn_fullScreen').removeClass('k-state-active');
+                $('a#btn_fullScreen').attr('aria-pressed','false');
+
+                $("body").attr("screenName","normalScreen");
+                $("nav#js-tlrk-nav").css("display", "block");
+                setTimeout( function() {
+                    if(typeof top.window_resize=='function') {
+                        top.window_resize();
+                    }
+                },100);
+                setTimeout( function() {
+                    if(typeof top.window_resize=='function') {
+                        top.window_resize();
+                    }
+                },400);
+            } else {
+                $('a#btn_fullScreen').addClass('k-toolbar-first-visible');
+                $('a#btn_fullScreen').addClass('k-state-active');
+                $('a#btn_fullScreen').attr('aria-pressed','true');
+
+                $("body").attr("screenName","fullScreen");
+                $("nav#js-tlrk-nav").css("display", "none");
+            }
+            
+        }
+
+        if(e.id=="btn_recently") {
+            if(e.checked) {
+$("#grid").data("kendoGrid").dataSource.transport.options.read.data.recently = "Y";
+            } else {
+$("#grid").data("kendoGrid").dataSource.transport.options.read.data.recently = "";
+            }
+            $("#grid").data("kendoGrid").dataSource.read();
+            $("a#btn_recently").blur();
+        }
+
+        if(e.id=="btn_view") {
+            setCookie('modify_YN','N');
+            if($("#grid tbody tr.k-state-selected").length==0) $($("#grid tbody tr")[0]).click();
+            $($($("#grid tbody tr.k-state-selected")[0]).find('td[comment="Y"]')[0]).click();
+        }
+        if(e.id=="btn_modify") {
+            setCookie('modify_YN','Y');
+            if($("#grid tbody tr.k-state-selected").length==0) $($("#grid tbody tr")[0]).click();
+            $($($("#grid tbody tr.k-state-selected")[0]).find('td[comment="Y"]')[0]).click();
+        }
+
+
+    }
+
+
+
+
+    
+    function rowFunction(p_this) {
+        
+        if(typeof rowFunction_UserDefine == "function") {
+            rowFunction_UserDefine(p_this);
+        }
+    }
+
+
+
+
+    function saveCheckbox(p_this) {
+        if(p_this.checked) p_this.value = "Y";
+        else  p_this.value = "N";
+    
+        p_idx = p_this.id.split("__idx")[1];
+        p_aliasName = p_this.id.split("__idx")[0];
+    
+        var url = "info.php?flag=textUpdate&RealPid="+document.getElementById("RealPid").value+"&MisJoinPid="+document.getElementById("MisJoinPid").value;
+        
+        if(getColumnProperty_aliasName(p_aliasName, "Grid_Schema_Type")=="boolean") {
+            var paramJson = { keyAlias: key_aliasName, keyValue: p_idx, thisValue: iif(p_this.value=="Y",1,0), oldText: iif(p_this.value=="Y","0","1"), thisAlias: p_aliasName};
+        } else {
+            var paramJson = { keyAlias: key_aliasName, keyValue: p_idx, thisValue: p_this.value, oldText: iif(p_this.value=="Y","N","Y"), thisAlias: p_aliasName};
+        }
+        $.post(url, paramJson, 
+            function( result ) {
+                dirtyClear();
+
+                toastr.success(getTitle_aliasName(result.thisAlias) + ": " + result.thisValue + "<br>로 저장이 완료되었습니다.", "", {progressBar: true, timeOut: 5000, positionClass: "toast-bottom-right"});
+
+            }
+        ).done(function() {
+            //alert( "second success" );
+        })
+        .fail(function() {
+            //alert( "error" );
+        })
+        .always(function() {
+            //alert( "finished" );
+        });
+    
+    
+        //p_idx, p_aliasName, p_this.value);
+    }
+    
+
+
+
+    function toolbar_onClick(e) {
+        var grid = $("#grid").data("kendoGrid");
+        
+        if(e.id=="btn_leftVibile") {
+            $("a#sidebar-toggle").click();
+        } else if(e.id=="btn_urlCopy") {
+            
+            url = location.href;
+
+            copyStringToClipboard(url);
+            if(typeof parent.toastr=="object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+            toastr_obj.success("현재 상태의 URL 주소가 복사되었습니다.", "처리결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+            
+        } else if(e.id=="btn_alim") {
+            setTimeout( function() { pushAlim(); });
+        } else if(e.id=="btn_excel") {
+            grid.saveAsExcel();
+        } else if(e.id=="btn_pdf") {
+            grid.saveAsPDF();
+        } else if(e.id=="btn_reopen") {
+            location.href = location.href.split("#")[0];
+        } else if(e.id=="btn_goHome") {
+            parent.location.href = "index.php";
+        } else if(e.id=="btn_editHelp") {
+            var url = 'index.php?RealPid=speedmis001067&ActionFlag=modify&tabid=help_title&idx='+document.getElementById("gubun").value;
+            parent_popup_jquery(url);
+        } else if(e.id=="btn_devQueryOn") {
+            devQueryOn();
+        } else if(e.id=="btn_devQueryOff") {
+            devQueryOff();
+        } else if(e.id=="btn_webSourceOpen") {
+            url = "index.php?RealPid=speedmis000989&idx="+document.getElementById("RealPid").value+"&tabname="+encodeURI("서버로직");
+            window.open(url);
+        } else if(e.id=="btn_addMenu") {
+			var gubun = $('div#example-nav').data('kendoTreeView').dataItem($('div#example-nav span.k-state-selected.k-in')).id;
+			var pname = $('div#example-nav').data('kendoTreeView').dataItem($('div#example-nav span.k-state-selected.k-in')).text;
+            url = 'index.php?RealPid=speedmis001170&idx='+gubun+'&ActionFlag=write';
+            parent_popup_jquery(url, pname + ' 에 대한 ', 850, 600);
+        } else if(e.id=="btn_newopen") {
+            if(document.getElementById("MenuType").value=="13") {
+                window.open(document.getElementById("AddURL").value);
+            } else {
+                window.open(replaceAll(replaceAll(location.href.split("#")[0], "&isMenuIn=Y", ""), "?isMenuIn=Y&", "?"));
+            }
+        } else if(e.id=="btn_listprint") {
+            printGrid();
+        } else if(e.id=="btn_opinion") {
+            sendMsg_opinion();
+        } else if(e.id=="btn_logout") {
+            if(confirm(document.getElementById("MisSession_UserName").value + " 님, 로그아웃을 하시겠습니까?")) location.href = "logout.php";
+        } else if(e.id=="btn_menuName") {
+            if(document.getElementById("MenuType").value=="13") {
+                $("div#main")[0].innerHTML = "<iframe src='"+document.getElementById("AddURL").value+"' js='simple_top.js' frameborder='0' width='100%' height='100%'></iframe>";
+            } 
+        } else if(e.id=="btn_reload") {
+            fun_btn_reload();
+        } else if(e.id=="btn_backup") {
+            $("#grid").data("kendoGrid").dataSource.transport.options.read.data.backup = "Y";
+            grid.dataSource.read();
+            $("#grid").data("kendoGrid").dataSource.transport.options.read.data.backup = "";
+        } else if(e.id=="btn_backupList") {
+            var url = 'index.php?RealPid=speedmis000982&allFilter=[{"operator":"contains","value":"'+document.getElementById("MenuName").value+'","field":"table_RealPidQnMenuName"}';
+            if(document.getElementById("parent_idx").value!="") url = url + ',{"operator":"contains","value":"'+document.getElementById("parent_idx").value+'","field":"parent_idx"}';
+            url = url + ']&isAddURL=Y';
+            parent_popup_jquery(url,'백업내역');
+        } else if(e.id=="btn_backupBye") {
+            location.href = "index.php?gubun="+document.getElementById("gubun").value
+            +iif(document.getElementById("parent_gubun").value!="","&parent_gubun="+document.getElementById("parent_gubun").value,"")
+            +iif(document.getElementById("parent_idx").value!="","&parent_idx="+document.getElementById("parent_idx").value,"")
+            +iif(document.getElementById("isMenuIn").value=="Y","&isMenuIn=Y","");
+        } else if(e.id=="btn_write") {
+            location.href = "index.php?gubun="+document.getElementById("gubun").value+"&idx=0&ActionFlag=write"
+            +iif(document.getElementById("parent_gubun").value!="","&parent_gubun="+document.getElementById("parent_gubun").value,"")
+            +iif(document.getElementById("parent_idx").value!="","&parent_idx="+document.getElementById("parent_idx").value,"")
+            +iif(document.getElementById("isMenuIn").value=="Y","&isMenuIn=Y","")
+            +"&isAddURL=Y";
+        } else if(e.id=="btn_delete") {
+            var deleteList = $("#grid").data("kendoGrid").selectedKeyNames();
+            if(getFieldAttr(document.getElementById("key_aliasName").value, "format")=="{0:yyyy-MM-dd}") {
+                for(i=0;i<deleteList.length;i++) {
+                    deleteList[i] = date10(deleteList[i]);
+                }
+            }
+            if(deleteList.length==0) {
+                toastr.warning("삭제할 내역이 없습니다.", "체크결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                return false;
+            }
+            var idxName = getTitle_aliasName(key_aliasName);
+            if(!confirm(idxName + " : " + JSON.stringify(deleteList) + " 를 삭제하시겠습니까?")) return false;
+
+            $.ajax({
+                method: "POST",
+                url: "save.php",
+                data: { deleteList : JSON.stringify(deleteList), key_aliasName : key_aliasName
+                    ,ActionFlag : "delete", RealPid : document.getElementById("RealPid").value, MisJoinPid : document.getElementById("MisJoinPid").value }
+            })
+            .done(function( result ) {
+                $("#grid thead input.k-checkbox").click();
+                if($("#grid thead input.k-checkbox")[0].checked) $("#grid thead input.k-checkbox").click();
+                if(typeof parent.toastr=="object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                if(JSON.parse(result).resultCode=='fail') {
+                    toastr_obj.error(JSON.parse(result).resultMessage, "처리결과", {progressBar: true, timeOut: 6000, positionClass: "toast-bottom-right"});
+                } else {
+                    toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                }
+                if(isMainFrame()) {
+                    $("a#btn_reload").click();
+                } else {
+                    $("a#btn_close").click();
+                    if(parent.$("a#btn_reload")[0]) parent.$("a#btn_reload").click();
+                }
+            })
+            .fail(function() {
+                console.log( "save error" );
+            });
+        
+        } else if(e.id=="btn_deleteList") {
+            url = "index.php?gubun="+document.getElementById("gubun").value+"&isDeleteList=Y"+iif(document.getElementById("isMenuIn").value=="Y","&isMenuIn=Y","");
+            if(document.getElementById("parent_gubun").value!="") url = url + "&parent_gubun="+document.getElementById("parent_gubun").value;
+            if(document.getElementById("parent_idx").value!="") url = url + "&parent_idx="+document.getElementById("parent_idx").value;
+
+            location.href = url;
+        } else if(e.id=="btn_normalList") {
+            url = "index.php?gubun="+document.getElementById("gubun").value+iif(document.getElementById("isMenuIn").value=="Y","&isMenuIn=Y","");
+            if(document.getElementById("parent_gubun").value!="") url = url + "&parent_gubun="+document.getElementById("parent_gubun").value;
+            if(document.getElementById("parent_idx").value!="") url = url + "&parent_idx="+document.getElementById("parent_idx").value;
+
+            location.href = url;
+        } else if(e.id=="btn_restore") {
+            
+            var deleteList = $("#grid").data("kendoGrid").selectedKeyNames();
+            if(deleteList.length==0) {
+                toastr.warning("복원할 내역이 없습니다.", "체크결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                return false;
+            }
+            var idxName = getTitle_aliasName(key_aliasName);
+            if(!confirm(idxName + " : " + JSON.stringify(deleteList) + " 를 복원하시겠습니까?")) return false;
+
+            $.ajax({
+                method: "POST",
+                url: "save.php",
+                data: { deleteList : JSON.stringify(deleteList), key_aliasName : key_aliasName
+                    ,ActionFlag : "restore", RealPid : document.getElementById("RealPid").value, MisJoinPid : document.getElementById("MisJoinPid").value }
+            })
+            .done(function( result ) {
+                
+                $("#grid thead input.k-checkbox").click();
+                if($("#grid thead input.k-checkbox")[0].checked) $("#grid thead input.k-checkbox").click();
+                if(typeof parent.toastr=="object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                if(JSON.parse(result).resultCode=='fail') {
+                    toastr_obj.error(JSON.parse(result).resultMessage, "처리결과", {progressBar: true, timeOut: 6000, positionClass: "toast-bottom-right"});
+                } else {
+                    toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                }
+                if(isMainFrame()) {
+                    $("a#btn_reload").click();
+                } else {
+                    $("a#btn_close").click();
+                    if(parent.$("a#btn_reload")[0]) parent.$("a#btn_reload").click();
+                }
+            })
+            .fail(function() {
+                console.log( "save error" );
+            });
+        
+        } else if(e.id=="btn_kill") {
+            var deleteList = $("#grid").data("kendoGrid").selectedKeyNames();
+            if(deleteList.length==0) {
+                toastr.warning("완전삭제할 내역이 없습니다.", "체크결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                return false;
+            }
+            var idxName = getTitle_aliasName(key_aliasName);
+            if(!confirm(idxName + " : " + JSON.stringify(deleteList) + " 를 완전삭제하시겠습니까?")) return false;
+
+            $.ajax({
+                method: "POST",
+                url: "save.php",
+                data: { deleteList : JSON.stringify(deleteList), key_aliasName : key_aliasName
+                    ,ActionFlag : "kill", RealPid : document.getElementById("RealPid").value, MisJoinPid : document.getElementById("MisJoinPid").value }
+            })
+            .done(function( result ) {
+                $("#grid thead input.k-checkbox").click();
+                if($("#grid thead input.k-checkbox")[0].checked) $("#grid thead input.k-checkbox").click();
+                if(typeof parent.toastr=="object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                if(JSON.parse(result).resultCode=='fail') {
+                    toastr_obj.error(JSON.parse(result).resultMessage, "처리결과", {progressBar: true, timeOut: 6000, positionClass: "toast-bottom-right"});
+                } else {
+                    toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", {timeOut: 2000, positionClass: "toast-bottom-right"});
+                }
+                if(isMainFrame()) {
+                    $("a#btn_reload").click();
+                } else {
+                    $("a#btn_close").click();
+                    if(parent.$("a#btn_reload")[0]) parent.$("a#btn_reload").click();
+                }
+            })
+            .fail(function() {
+                console.log( "save error" );
+            });
+        
+        }
+
+
+
+
+        
+    }
+
+
+
+

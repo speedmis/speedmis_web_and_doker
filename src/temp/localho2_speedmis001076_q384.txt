@@ -1,0 +1,59 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList table_m 
+ where 9=9  and table_m.useflag='1'
+and table_m.MenuType = '01' and table_m.RealPid = N'speedzzz006033' 
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.RealPid as "RealPid"
+,table_m.idx as "table_mQmidx"
+,case when table_m.addLogic<>'' then 'Y' else 'N' end as "zsoseuyumu"
+,table_m.MenuName as "MenuName"
+,table_m.addLogic as "addLogic"
+,'' as "virtual_fieldQninfo"
+,'' as "virtual_fieldQnmisMenuList0_change"
+,'' as "virtual_fieldQnmisMenuList_change"
+,'' as "virtual_fieldQnhelpbox_change"
+,'' as "virtual_fieldQnpageLoad"
+,'' as "virtual_fieldQnlist_json_init"
+,'' as "virtual_fieldQnlist_query"
+,'' as "virtual_fieldQnlist_json_load"
+,'' as "virtual_fieldQnview_templete"
+,'' as "virtual_fieldQnchange_pildok_member"
+,'' as "virtual_fieldQnsave_updateReady"
+,'' as "virtual_fieldQnsave_updateBefore"
+,'' as "virtual_fieldQnsave_updateQueryBefore"
+,'' as "virtual_fieldQnsave_updateAfter"
+,'' as "virtual_fieldQnsave_writeBefore"
+,'' as "virtual_fieldQnsave_writeQueryBefore"
+,'' as "virtual_fieldQnsave_writeAfter"
+,'' as "virtual_fieldQnsave_pushList"
+,'' as "virtual_fieldQnsave_deleteBefore"
+,'' as "virtual_fieldQnsave_deleteAfter"
+,'' as "virtual_fieldQntextUpdate_sql"
+,'' as "virtual_fieldQnlist_json_updateBefore"
+,'' as "virtual_fieldQncommandTreat_briefInsertBefore"
+,'' as "virtual_fieldQnaddLogic_treat"
+,'' as "virtual_fieldQnscheduler_pageLoad"
+,'' as "virtual_fieldQnscheduler_treatTop"
+,'' as "virtual_fieldQnjsonUrl_index"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+,date_format(table_m.lastupdate,'%Y-%m-%d %H:%i:%s') as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+from MisMenuList table_m
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.MenuType = '01' and table_m.RealPid = N'speedzzz006033'  order by table_m.idx desc limit 100) aaa order by idx desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

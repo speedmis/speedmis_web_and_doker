@@ -1,0 +1,30 @@
+﻿a.TK-TLRK-Logo {
+    background-image: url(/uploadFiles/_HomeImages/mainlogo.png?1573555656122);
+    width: 255px;
+    height: 54px;
+    left: -18px;
+    top: -13px;
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom;
+}
+
+span#lblLogo img {
+    width: 328px;
+    height: auto;
+}
+
+@media screen and (max-width: 1199px) {
+
+    a.k-button-icontext > span.k-icon {
+        display: none;
+    }
+    a.TK-TLRK-Logo {
+        width: 166px;
+        height: 55px;
+        top: -22px;
+        background-size: 163px;
+        left: -8px;
+    }
+}

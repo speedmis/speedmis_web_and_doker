@@ -1,0 +1,40 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisUser table_m 
+ where 9=9  and 123=123 
+and table_m.delchk<>'D' and ((datediff(table_m.toisa_date,DATE_FORMAT(NOW(), '%Y-%m-%d'))<=0) or lTrim(ifnull(table_m.toisa_date,''))='') and ifnull(table_m.isRest,'')<>'Y' and table_m.uniqueNum<>'gadmin' and table_m.uniqueNum<>'admin' and table_m.positionNum<98
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.num as "num"
+,table_m.UniqueNum as "UniqueNum"
+,table_m.UserName as "UserName"
+,concat(table_Station_NewNum2.stationname,case when ifnull(table_Station_NewNum4.stationname,'')='' then '' else concat(' > ',table_Station_NewNum4.stationname) end,case when length(table_Station_NewNum.AutoGubun)>=6 then concat(' > ',table_Station_NewNum.stationname) else '' end) as "zsosokjojik"
+,table_m.Station_newnum as "Station_newnum"
+,table_positionNum.kname as "table_positionNumQnkname"
+,table_m.positionNum as "positionNum"
+,table_m.UsrPhone as "UsrPhone"
+,table_m.HandPhone as "HandPhone"
+,table_m.IntraPhone as "IntraPhone"
+,table_m.email as "email"
+,table_m.증명사진 as "jeungmyeongsajin"
+,table_소속거래처idx.거래처명 as "table_sosokgeoraecheoidxQngeoraecheomyeong"
+,table_Station_NewNum.AutoGubun as "table_Station_NewNumQnAutoGubun"
+,concat(table_m.positionNum,9-table_m.sortnum,table_m.UniqueNum) as "zjikchaeksabeonjeongnyeol"
+,table_Station_NewNum.stationname as "table_Station_NewNumQmstationname"
+from MisUser table_m
+left outer join MisStation table_Station_NewNum on table_Station_NewNum.Num = table_m.Station_newnum
+left outer join MisStation table_Station_NewNum2 on table_Station_NewNum2.autogubun = left(table_Station_NewNum.autogubun,2)
+left outer join MisStation table_Station_NewNum4 on table_Station_NewNum4.autogubun = left(table_Station_NewNum.autogubun,4) and length(table_Station_NewNum.autogubun)>=4
+left outer join MisCommonTable table_positionNum on table_positionNum.kcode = table_m.positionNum
+ and table_positionNum.gcode='speedmis000188'
+left outer join MisCompanyMgt table_소속거래처idx on table_소속거래처idx.idx = table_m.소속거래처idx and table_소속거래처idx.useflag=1
+, (select @RANKT := 0) XX where 9=9  and 123=123 
+and table_m.delchk<>'D' and ((datediff(table_m.toisa_date,DATE_FORMAT(NOW(), '%Y-%m-%d'))<=0) or lTrim(ifnull(table_m.toisa_date,''))='') and ifnull(table_m.isRest,'')<>'Y' and table_m.uniqueNum<>'gadmin' and table_m.uniqueNum<>'admin' and table_m.positionNum<98 order by table_Station_NewNum.AutoGubun,concat(table_m.positionNum,9-table_m.sortnum,table_m.UniqueNum) limit 5) aaa order by table_Station_NewNumQnAutoGubun,zjikchaeksabeonjeongnyeol) bbb where rowNumber between 1 and 5
+
+--app Sql :
+
+-----------------------------------------------
+    

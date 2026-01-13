@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optimization Test</title>
+    <!-- Mock dependencies -->
+    <script>
+        const $ = () => ({ 
+            data: () => {}, 
+            find: () => ({ css: () => {} }),
+            resize: () => {},
+            is: () => false,
+            _data: () => ({})
+        });
+        $._data = () => ({});
+        const kendo = { toString: (v, f) => v, ui: { progress: () => {} } };
+        window.kendo = kendo;
+    </script>
+    <script src="java_conv.js"></script>
+</head>
+<body>
+    <h1>Testing Optimization...</h1>
+    <div id="results"></div>
+    <script>
+        const results = document.getElementById('results');
+        const log = (msg, color='black') => {
+            const div = document.createElement('div');
+            div.style.color = color;
+            div.innerText = msg;
+            results.appendChild(div);
+            // console.log(msg);
+        };
+
+        let passed = 0;
+        let failed = 0;
+
+        const assert = (desc, actual, expected) => {
+            if (actual === expected) {
+                log(`[PASS] ${desc}: ${actual}`, 'green');
+                passed++;
+            } else {
+                log(`[FAIL] ${desc}: Expected "${expected}" but got "${actual}"`, 'red');
+                failed++;
+            }
+        };
+
+        try {
+            // Test InStr
+            assert('InStr("hello", "l")', InStr("hello", "l"), 3);
+            assert('InStr("hello", "z")', InStr("hello", "z"), 0);
+            assert('InStr(null, "z")', InStr(null, "z"), -1); // Optimized behavior check
+
+            // Test Left
+            assert('Left("hello", 2)', Left("hello", 2), "he");
+            assert('Left("hello", 10)', Left("hello", 10), "hello");
+            assert('Left("hello", 0)', Left("hello", 0), "");
+
+            // Test Right
+            assert('Right("hello", 2)', Right("hello", 2), "lo");
+            assert('Right("hello", 10)', Right("hello", 10), "hello");
+            assert('Right("hello", 0)', Right("hello", 0), "");
+
+            // Test Mid
+            assert('Mid("hello", 2, 2)', Mid("hello", 2, 2), "el"); // 1-based start: 2="e"
+            assert('Mid("hello", 1, 1)', Mid("hello", 1, 1), "h");
+            assert('Mid("hello", 6, 1)', Mid("hello", 6, 1), "");
+
+            // Test replaceAll
+            assert('replaceAll("hello world", "l", "X")', replaceAll("hello world", "l", "X"), "heXXo worXd");
+
+            // Test isNumeric
+            assert('isNumeric("123")', isNumeric("123"), true);
+            assert('isNumeric("12.3")', isNumeric("12.3"), true);
+            assert('isNumeric("abc")', isNumeric("abc"), false);
+            assert('isNumeric("")', isNumeric(""), false);
+            assert('isNumeric(null)', isNumeric(null), false);
+
+            // Test iif
+            assert('iif(true, "A", "B")', iif(true, "A", "B"), "A");
+            assert('iif(false, "A", "B")', iif(false, "A", "B"), "B");
+            
+            // Test getReadableByte (Quick check)
+            assert('getReadableByte 1000', getReadableByte(1000), "1000 B");
+            assert('getReadableByte 1024', getReadableByte(1024), "1 KB");
+
+        } catch (e) {
+            log(`ERROR: ${e.message}`, 'red');
+            failed++;
+        }
+
+        log(`\nDONE. Passed: ${passed}, Failed: ${failed}`, failed === 0 ? 'blue' : 'red');
+        if (failed === 0) {
+            document.body.style.backgroundColor = '#e6fffa'; // Hint for success
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Northwind - 영업상세2 - 그리드기반의 맞춤형 웹빌더 DEMO</title>
+    <link href='//fonts.googleapis.com/css?family=Roboto+Slab:400,700' rel='stylesheet'>
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+
+    <link rel="stylesheet" href="../_mis_kendo/examples/content/integration/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../_mis_kendo/styles/kendo.common.min.css" />
+    <script src="../_mis_kendo/js/jquery.min.js"></script>
+    <script src="../_mis_kendo/js/kendo.all.min.js"></script>
+
+
+
+    
+<link rel='stylesheet' href='toast/toastr.min.css'/>
+<link href="css/examples.css" rel="stylesheet" />
+<link rel="stylesheet" href="codemirror-5.52.0/lib/codemirror.css">
+<link href="cssJs/common_top.css?zxsa20220725.223132" rel="stylesheet"/>
+
+
+<script src="../_mis_kendo/js/jszip.min.js"></script>
+<script src="../_mis_kendo/js/kendo.timezones.min.js"></script>
+<script src="../_mis_kendo/speedmis_js/theme-chooser.js"></script>
+<script src="downloadJS/download2.js"></script>
+<script src="codemirror-5.52.0/lib/codemirror.js"></script>
+<script src="codemirror-5.52.0/addon/edit/matchbrackets.js"></script>
+<script src="codemirror-5.52.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="codemirror-5.52.0/mode/xml/xml.js"></script>
+<script src="codemirror-5.52.0/mode/javascript/javascript.js"></script>
+<script src="codemirror-5.52.0/mode/css/css.js"></script>
+<script src="codemirror-5.52.0/mode/clike/clike.js"></script>
+<script src="codemirror-5.52.0/mode/php/php.js"></script>
+<script id="id_js" name="name_js" src="java_conv.js?20220725.223132"></script>
+<script src='toast/toastr.min.js'></script>
+
+
+
+    <script src="cssJs/view_top.js?20220725.223132"></script>
+    <link href="cssJs/view_top.css?20220725.223132" rel="stylesheet"/>
+	<style id="list_css">
+
+#blog {
+  padding-bottom: 110px;
+  .tit_section {
+    padding: 120px 0 30px;
+    font-size: 41px;
+    text-align: center;
+    letter-spacing: -0.03em;
+  }
+  .desc_section {
+    padding-bottom: 90px;
+    font-size: 20px;
+    color: #767676;
+    text-align: center;
+  }
+}
+
+#blog .table tr[data-disable="true"] {
+  td {
+    color: #cacaca !important;
+  }
+  td.tit {
+    cursor: default;
+    &::after {
+      content: " ※ 현재 열람이 불가합니다.";
+      display: inline-block;
+      font-size: 0.8em;
+      color: #ff0032 !important;
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  }
+  &:hover td.tit::after {
+    opacity: 1;
+    transform: translateX(10px);
+    transition: 0.4s #{$G-easeHover};
+  }
+}
+    </style>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   
+
+    <body>
+        <article>
+          <hr>
+      
+          <h1 class="name">이름이 표시될 곳</h1>
+          <p class="region">지역이 표시될 곳</p>
+          <p class="phone">전화번호가 표시될 곳</p>
+      
+          <hr>
+      
+          <h1 class="name">이름이 표시될 곳</h1>
+          <p class="region">지역이 표시될 곳</p>
+          <p class="phone">전화번호가 표시될 곳</p>
+      
+          <hr>
+      
+          <h1 class="name">이름이 표시될 곳</h1>
+          <p class="region">지역이 표시될 곳</p>
+          <p class="phone">전화번호가 표시될 곳</p>
+      
+          <hr>
+      
+          <h1 class="name">이름이 표시될 곳</h1>
+          <p class="region">지역이 표시될 곳</p>
+          <p class="phone">전화번호가 표시될 곳</p>
+      
+          <hr>
+        </article>
+
+<script>
+            // https://spreadsheets.google.com/tq?key=1J-BujYJivMxrmb8j-v_9X7MzMIvEzLGam7Gio2jzPlg&pub=1
+//let myKey = "1J-BujYJivMxrmb8j-v_9X7MzMIvEzLGam7Gio2jzPlg"; // 스프레드시트 KEY
+let myKey = "1PbOKz2JGK93EX7BN1f-2T41DT5JiQ9nrSCHtHzD1U6g"; // 스프레드시트 KEY
+window.addEventListener('DOMContentLoaded', main);
+
+async function main(){
+	const TARGET={
+		name : document.getElementsByClassName('name'),
+		region : document.getElementsByClassName('region'),
+		phone : document.getElementsByClassName('phone')
+	};
+	const SOURCE = 'https://spreadsheets.google.com/tq?key=1J-BujYJivMxrmb8j-v_9X7MzMIvEzLGam7Gio2jzPlg&pub=1';
+	const COLUMNS = ['이름', '지역', '전화번호'];
+	
+	const DATA = await separateRowFromJson(SOURCE, COLUMNS);
+
+	for(let i=0; i<DATA.length; i++){
+		TARGET['name'][i].textContent = DATA[i]['이름'];
+		TARGET['region'][i].textContent = DATA[i]['지역'];
+		TARGET['phone'][i].textContent = DATA[i]['전화번호'];
+	}
+}
+
+async function separateRowFromJson(SOURCE, COLUMNS){
+	const FETCHED_SOURCE = await fetch(SOURCE);
+  	let temp = await FETCHED_SOURCE.json();
+ 	temp = temp['feed']['entry'];
+
+	let _DATA = [];
+	for(var i=0; i<Object.keys(temp).length; i++){
+		_DATA[i]={};
+		for(var k=0; k<Object.keys(COLUMNS).length; k++){;
+			_DATA[i][COLUMNS[k]] = temp[i]['gsx$'+COLUMNS[k]]['$t'];
+		}
+	}
+	
+	return _DATA;
+}
+</script>
+
+
+</body>
+</html>
+
+

@@ -1,0 +1,39 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList table_m 
+ where 9=9  and table_m.useflag='1'
+and table_m.MenuName not like '%jwb' and ifnull(table_m.MenuName,'') like N'%└부품코드관리%'
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_ag2.MenuName as "table_ag2QnMenuName"
+,table_ag4.MenuName as "table_ag4QnMenuName"
+,table_m.MenuName as "MenuName"
+,table_m.AutoGubun as "AutoGubun"
+,table_m.g12 as "g12"
+,table_m.isMenuHidden as "isMenuHidden"
+,table_new_gidx.gname as "table_new_gidxQngname"
+,table_m.new_gidx as "new_gidx"
+,table_AuthCode.kname as "table_AuthCodeQnkname"
+,table_m.AuthCode as "AuthCode"
+,table_MenuType.kname as "table_MenuTypeQnkname"
+,table_m.MenuType as "MenuType"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+from MisMenuList table_m
+left outer join MisMenuList table_ag2 on table_ag2.autogubun=left(table_m.autogubun,2)
+left outer join MisMenuList table_ag4 on table_ag4.autogubun=left(table_m.autogubun,4)
+left outer join MisGroup_Master table_new_gidx on table_new_gidx.idx = table_m.new_gidx
+left outer join MisCommonTable table_AuthCode on table_AuthCode.kcode = table_m.AuthCode
+ and table_AuthCode.gcode='speedmis000338'
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_m.MenuType
+ and table_MenuType.gcode='speedmis000306'
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.MenuName not like '%jwb' and ifnull(table_m.MenuName,'') like N'%└부품코드관리%' order by table_m.AutoGubun,table_new_gidx.gname limit 100) aaa order by AutoGubun,table_new_gidxQngname) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

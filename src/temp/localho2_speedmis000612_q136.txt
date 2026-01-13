@@ -1,0 +1,23 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select 1 as fff
+
+--select sql :
+select MenuName from (select distinct 1 as nnn, table_m.MenuName as "MenuName" from MisMenuList table_m 
+left outer join MisMenuList table_ag2 on table_ag2.autogubun=left(table_m.autogubun,2)
+left outer join MisMenuList table_ag4 on table_ag4.autogubun=left(table_m.autogubun,4)
+left outer join MisGroup_Master table_new_gidx on table_new_gidx.idx = table_m.new_gidx
+left outer join MisCommonTable table_AuthCode on table_AuthCode.kcode = table_m.AuthCode
+ and table_AuthCode.gcode='speedmis000338'
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_m.MenuType
+ and table_MenuType.gcode='speedmis000306'
+where 9=9  and table_m.useflag='1'
+and table_m.MenuName not like '%jwb' and ifnull(table_m.MenuName,'') like N'%└부품코드관리%') aaa order by nnn, MenuName limit 31
+
+--app Sql :
+
+-----------------------------------------------
+    

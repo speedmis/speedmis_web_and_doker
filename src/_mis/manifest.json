@@ -1,0 +1,17 @@
+{    
+    "name": "SpeedMIS",
+    "short_name": "SpeedMIS",
+    "icons": [
+        {
+            "src": "../uploadFiles/_HomeImages/pushlogo.png",
+            "sizes": "1000x1000",
+            "type": "image/png"
+    }
+  ],
+    "start_url": "/_mis/",
+    "scope": "/_mis/",
+    "display": "standalone",
+    "theme_color": "#ffffff",
+    "backgraound_color": "#ffffff",
+    "orientation": "portrait"
+}

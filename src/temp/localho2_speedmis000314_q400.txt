@@ -1,0 +1,67 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisMenuList table_m 
+ where 9=9  and table_m.useflag='1'
+and table_m.idx<>1
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select  count(table_m.idx) as "idx"
+, count(case when ifnull(table_m.RealPid,'')='' then null else '1' end) as "RealPid"
+, count(case when ifnull(table_upRealPid.MenuName,'')='' then null else '1' end) as "table_upRealPidQnMenuName"
+, '' as "upRealPid"
+, count(case when ifnull(table_m.MenuName,'')='' then null else '1' end) as "MenuName"
+, count(case when ifnull(table_m.briefTitle,'')='' then null else '1' end) as "briefTitle"
+, count(case when ifnull(table_m.g12,'')='' then null else '1' end) as "g12"
+, table_m.AutoGubun as "AutoGubun"
+, count(case when ifnull(table_m.isMenuHidden,'')='' then null else '1' end) as "isMenuHidden"
+, sum(table_m.SortG2) as "SortG2"
+, sum(table_m.SortG4) as "SortG4"
+, sum(table_m.SortG6) as "SortG6"
+, '' as "depth"
+, '' as "zhawiAPP"
+, count(case when ifnull('','')='' then null else '1' end) as "zgwonhanjeondal"
+, count(case when ifnull(concat(table_SortG2.autogubun,' ',table_SortG2.menuname),'')='' then null else '1' end) as "zsangwimenyubyeolbogi"
+, table_new_gidx.gname as "table_new_gidxQngname"
+, '' as "new_gidx"
+, count(case when ifnull(table_AuthCode.kname,'')='' then null else '1' end) as "table_AuthCodeQnkname"
+, '' as "AuthCode"
+, count(case when ifnull(table_MenuType.kname,'')='' then null else '1' end) as "table_MenuTypeQnkname"
+, '' as "MenuType"
+, count(case when ifnull(table_MisJoinPid.MenuName,'')='' then null else '1' end) as "table_MisJoinPidQnMenuName"
+, '' as "MisJoinPid"
+, count(case when ifnull(table_m.AddURL,'')='' then null else '1' end) as "AddURL"
+, '' as "help_update_deny"
+, '' as "help_title"
+, '' as "help_contents"
+, count(case when ifnull(table_m.remark,'')='' then null else '1' end) as "remark"
+, count(case when ifnull(date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s'),'')='' then null else '1' end) as "wdate"
+, count(case when ifnull(table_wdater.username,'')='' then null else '1' end) as "table_wdaterQnusername"
+, '' as "wdater"
+, '' as "lastupdate"
+, '' as "table_lastupdaterQnusername"
+, '' as "lastupdater"
+, '' as "zsangwidanggyejohoe"
+, '' as "isCoreProgram"
+from MisMenuList table_m
+left outer join MisMenuList table_upRealPid on table_upRealPid.RealPid = table_m.upRealPid
+ and (table_upRealPid.useflag='1' and (table_upRealPid.MisJoinPid='speedmis000753' or table_upRealPid.autogubun='00' or length(table_upRealPid.autogubun)<=4))
+left outer join MisMenuList table_SortG2 on table_SortG2.autogubun=left(table_m.autogubun,2) and table_SortG2.useflag='1'
+left outer join MisGroup_Master table_new_gidx on table_new_gidx.idx = table_m.new_gidx
+left outer join MisCommonTable table_AuthCode on table_AuthCode.kcode = table_m.AuthCode
+ and table_AuthCode.gcode='speedmis000338'
+left outer join MisCommonTable table_MenuType on table_MenuType.kcode = table_m.MenuType
+ and table_MenuType.gcode='speedmis000306'
+left outer join MisMenuList table_MisJoinPid on table_MisJoinPid.RealPid = table_m.MisJoinPid
+ and (table_MisJoinPid.useflag='1' and table_MisJoinPid.menuType='01')
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_lastupdater.UniqueNum = table_m.lastupdater
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+and table_m.idx<>1 group by table_m.AutoGubun,table_new_gidx.gname order by table_m.AutoGubun,table_new_gidx.gname limit 1000000) aaa order by AutoGubun,table_new_gidxQngname) bbb where rowNumber between 1 and 1000000
+
+--app Sql :
+
+-----------------------------------------------
+    

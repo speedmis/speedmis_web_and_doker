@@ -1,0 +1,20 @@
+
+--dbalias : 1st
+
+
+--count sql :
+ select count(*)
+    from MisUser table_m   
+    left outer join MisStation table_Station_NewNum on table_Station_NewNum.Num = table_m.Station_NewNum    and table_Station_NewNum.useflag='1'   
+    where table_m.delchk<>'D' 
+
+--select sql :
+ select concat(table_m.UserName,'/',table_m.UniqueNum) as 'zgwallihaljigwonseongmyeongID'
+    from MisUser table_m   
+    left outer join MisStation table_Station_NewNum on table_Station_NewNum.Num = table_m.Station_NewNum    and table_Station_NewNum.useflag='1'   
+    where table_m.delchk<>'D'  order by 1; 
+
+--app Sql :
+
+-----------------------------------------------
+    

@@ -1,0 +1,21 @@
+{
+    "require": {
+        "catfan/medoo": "^1.6",
+        "nette/database": "^2.4",
+        "repat/laravel-medoo": "^1.0",
+        "vimeo/vimeo-api": "2.0",
+        "tymon/jwt-auth": "^0.5.12",
+        "firebase/php-jwt": "^5.0",
+        "brozot/laravel-fcm": "^1.2",
+        "mockery/mockery": "^1.2",
+        "phpunit/phpunit": "^8.4",
+        "satooshi/php-coveralls": "^2.1",
+        "coreproc/laravel-notification-channel-fcm": "^1.5",
+        "edwinhoksberg/php-fcm": "^1.0",
+        "baudev/fcm-xmpp": "^1.1",
+        "pluritech/fcm-php": "^2.0",
+        "autoxloo/fcm": "*",
+        "maatwebsite/excel": "~2.1.0",
+        "mike42/escpos-php": "^3.0"
+    }
+}

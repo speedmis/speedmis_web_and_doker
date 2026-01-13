@@ -1,0 +1,4618 @@
+/*
+kendo.pdf.defineFont({
+    "DejaVu Sans": "https://cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf",
+    "DejaVu Sans|Bold": "https://cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf",
+    "DejaVu Sans|Bold|Italic": "https://cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf",
+    "DejaVu Sans|Italic": "https://cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf",
+    "WebComponentsIcons": "https://cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf"
+});
+*/
+
+function getTitle_aliasName(p_aliasName) {
+    var $obj = $('div#round_' + p_aliasName + ' label');
+    if ($obj[0]) return $obj[0].innerText;
+    else return '';
+}
+
+function onSuccess_customuploadFiles(e) {
+    ext = e.files[0].name.split(".")[e.files[0].name.split(".").length - 1].toLocaleLowerCase();
+    if (e.response[0].result == "fail") {
+        alert(e.response[0].msg);
+    } else {
+        if (InStr(";jpg;jpeg;png;bmp;pcx;gif;", ext) > 0) {
+            document.getElementById('temp1').value = '<div class="editorUpload"><img src="/temp/' + document.getElementById('tempDir').value + '/' + e.sender.element.closest('ul').attr('aria-controls') + '_editorImage/' + e.response[0].file + '"/></div>';
+        } else {
+            document.getElementById('temp1').value = '<div class="editorUpload"><a target="_blank" href="/temp/' + document.getElementById('tempDir').value + '/' + e.sender.element.closest('ul').attr('aria-controls') + '_editorImage/' + e.response[0].file + '">' + e.files[0].name + '</a></div>';
+        }
+        e.sender.element.closest("li").next().find("span.k-i-customuploadexec").click();
+    }
+}
+function getFrameObj_tabname(p_tabname) {
+    if ($('div[data-role="tabstrip"] div[tabnumber=' + $('li.k-item[tabname="' + p_tabname + '"]').attr('tabnumber') + ']').find('iframe')[0])
+        return getFrameObj($('div[data-role="tabstrip"] div[tabnumber=' + $('li.k-item[tabname="' + p_tabname + '"]').attr('tabnumber') + ']').find('iframe')[0].id);
+    else return "";
+}
+
+function lineDown_alias(p_alias) {
+    var $obj = $('div#round_' + p_alias);
+    if ($obj[0]) {
+        if ($obj.prev().hasClass('br') == false) {
+            $obj.before('<div class="br"></div>');
+        }
+    }
+}
+
+function tab_pdf_into_viewer() {
+    if (document.getElementById('ActionFlag').value != 'view') return false;
+    $('div[tabnumber][role="tabpanel"]').slice(0, [$('li[tabid]').index($('li[tabid="viewPrint"]'))]).find('a').each(function () {
+        var p_this = this;
+        var $p_this = $(p_this);
+        if (Right($p_this.attr('href'), 4) == '.pdf') {
+            //각 탭에 첨부가 한개씩 일때만 뷰어 가동
+            var $tab = $p_this.closest('div[tabnumber][role="tabpanel"]');
+            if ($tab.find('a').length == 1) {
+
+                $.when(
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.min.js"),
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.worker.entry.min.js"),
+                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.worker.min.js")
+                )
+                    .done(function () {
+                        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.worker.min.js';
+                    }).then(function () {
+
+                        $tab.children().css('display', 'none');
+                        $tab.css('padding', 0);
+                        //$(p_this).closest('div[tabnumber]').css('max-width','900px');
+
+                        var url = $p_this.attr('href');
+                        if (InStr(url, 'https://www.speedmis.com') > 0 && location.hostname != 'www.speedmis.com') {
+                            //타도메인에서의 pdf viewer 로딩실패방지.
+                            url = 'speedmis_mirror.php?' + url;
+                        }
+
+                        $tab.kendoPDFViewer({
+                            pdfjsProcessing: {
+                                file: url
+                            },
+                            render: function (e) {
+                                setTimeout(function (p_e) {
+                                    if ($tab.data('kendoPDFViewer')._events.render[0]) {
+                                        //$('a[data-command="EnableSelectionCommand"]').click();
+                                        p_e.sender.toolbar.zoom.combobox.value("actual");
+                                        p_e.sender.toolbar.zoom.combobox.trigger("change");
+                                        $('div#exampleWrap').css('overflow', 'hidden');
+                                        $tab.data('kendoPDFViewer')._events.render[0] = null;
+                                    }
+                                }, 0, e);
+                            },
+                            width: "calc(100% - 10px)",
+                            height: "calc(100% - 92px)"
+                        });
+                    })
+            }
+        }
+    });
+}
+
+
+function detailAdd(jj) {
+
+    if (document.getElementById("ActionFlag").value == "write") {
+        alert("먼저 입력완료 후에 진행하세요!");
+        return false;
+    }
+    var addTr = "";
+    $('tr[keyvalue="' + $('tr[firstline]').last().attr('keyvalue') + '"]').each(function () {
+        addTr = addTr + this.outerHTML;
+    });
+    addTr = replaceAll(addTr, "<tr ", "<tr newline ");
+    $('tr[keyvalue]').last().after(addTr);
+
+
+    var detail_frame = getFrameObj("ifr_treat" + jj);
+    var detail_key = detail_frame.document.getElementById("key_aliasName").value;
+    var detail_masterKey = detail_frame.document.getElementById("thisAlias_parent_idx").value;
+    var detail_parent_idx = detail_frame.document.getElementById("parent_idx").value;
+    var saveList = {};
+    saveList[detail_masterKey] = detail_parent_idx;
+
+    //아래는 한 줄 추가에 대한 입력처리임
+    $('tr[newline]').each(function () {
+        detail_obj = $(this).find('input, textarea, select');
+        detail_obj.each(function () {
+            if ($(this).attr("default") != undefined) this.value = $(this).attr("default");
+            if (this.id && this.id != "") saveList[replaceAll(this.id, "udd_", "")] = this.value;
+            console.log(this.value);
+        });
+    });
+
+    var click_id = '';
+    if (event) {
+        if (event.target.tagName == 'LI' || event.target.tagName == 'SPAN') {
+            click_id = $(event.target).closest('div[id]')[0].id;
+        } else {
+            click_id = event.target.id;
+        }
+    }
+    $.ajax({
+        method: "POST",
+        url: "save.php?tempDir=" + detail_frame.document.getElementById("tempDir").value
+            + iif(detail_frame.document.getElementById("parent_gubun").value != "", "&parent_gubun=" + detail_frame.document.getElementById("parent_gubun").value, "")
+            + iif(detail_parent_idx != "", "&parent_idx=" + detail_parent_idx, ""),
+        data: {
+            saveList: replaceAll(JSON.stringify(saveList), ':', '@colon;')
+            , saveUploadList: JSON.stringify({})
+            , saveTextdecrypt1List: JSON.stringify({})
+            , saveTextdecrypt2List: JSON.stringify({})
+            , viewList: JSON.stringify({}), key_aliasName: detail_key, key_value: "0"
+            , ActionFlag: "write"
+            , click_id: click_id
+            , RealPid: detail_frame.document.getElementById("RealPid").value
+            , parent_idx: detail_frame.document.getElementById("parent_idx").value
+            , MisJoinPid: detail_frame.document.getElementById("MisJoinPid").value
+        }
+    })
+        .done(function (result) {
+            if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+            toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+            $('input#temp1').attr('now_values', '');
+
+            //추가라인이 없음==처음부터 한줄도 없을 경우임.
+            if ($('tr[newline]').length == 0) {
+                $('a#btn_reload').click();
+            } else {
+
+                var newIdx = JSON.parse(result).newIdx;
+                $('tr[newline]').each(function () {
+                    $(this).attr("keyvalue", newIdx);
+                    $(this).removeAttr('newline');
+                });
+
+            }
+            detail_obj = $('div#viewPrintDiv tr[keyValue] input, div#viewPrintDiv tr[keyValue] textarea, div#viewPrintDiv tr[keyValue] select');
+            detail_obj.change(function () {
+                $(this).closest('tr').attr('change', 'Y');
+            });
+        })
+        .fail(function () {
+            alert("상세라인추가가 실패되었습니다.");
+        });
+
+
+}
+
+
+
+
+function detailDelete(jj) {
+
+
+    cnt = $('tr[firstline] > td:first-child input[type="checkbox"]:checked').length;
+    if (cnt == 0) {
+        alert("삭제할 내역을 선택하세요!");
+        return false;
+    }
+
+    if (!confirm("상세목록 " + cnt + " 건의 내역을 삭제할까요? 확인을 누르시면 즉시 삭제되어 저장됩니다.")) {
+        return false;
+    }
+
+
+    var deleteList = [];
+
+    $('tr[firstline] > td:first-child input[type="checkbox"]:checked').each(function () {
+        keyvalue = $(this).closest("tr").attr("keyvalue");
+        deleteList.push(keyvalue);
+        $('tr[keyvalue="' + keyvalue + '"]').remove();
+    });
+
+    var detail_frame = getFrameObj("ifr_treat" + jj);
+    var detail_key = detail_frame.document.getElementById("key_aliasName").value;
+    var detail_masterKey = detail_frame.document.getElementById("thisAlias_parent_idx").value;
+    var detail_parent_idx = detail_frame.document.getElementById("parent_idx").value;
+
+    $.ajax({
+        method: "POST",
+        url: "save.php",
+        data: {
+            deleteList: JSON.stringify(deleteList)
+            , key_aliasName: detail_key
+            , ActionFlag: "delete"
+            , RealPid: detail_frame.document.getElementById("RealPid").value
+            , MisJoinPid: detail_frame.document.getElementById("MisJoinPid").value
+        }
+    })
+        .done(function (result) {
+            if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+            toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+        })
+        .fail(function () {
+            alert("상세라인 삭제가 실패되었습니다. 새로고침 후 다시 시도하시거나, 관리자에게 문의하세요!");
+        });
+
+
+}
+
+
+
+function print_viewPrint() {
+
+
+
+    //인쇄탭 처리
+    var tag_viewPrint = '';
+    var td_mod = 0;
+
+    //사용자 양식이 있으면 양식에 의해 인쇄.
+    userDefine_page = false;
+
+    if (document.getElementById('userDefine_page_print')) {
+        if (document.getElementById("userDefine_page_print").value != '') {
+            userDefine_page = true;
+        }
+    }
+    if (userDefine_page) {
+
+        if ($('li[tabnumber]').attr("noTouch") != "Y") {
+
+            index = $('li[tabid="viewPrint"]').attr('tabnumber');
+            $('li[tabnumber]').each(function () {
+                if ($(this).attr("tabnumber") * 1 < index) this.style.display = "none";
+            });
+            setTimeout(function () {
+                console.log('k-state-active  3');
+                //$('body[isMenuIn="Y"] div.k-content.k-state-active').css('height', 'calc(100vh - 138px)');
+                //$('body[isMenuIn="N"] div.k-content.k-state-active').css('height', 'calc(100vh - 72px)');
+            });
+            var active_tabid = $('li[tabid="viewPrint"]').attr('active_tabid');
+            if (active_tabid == undefined) {
+                active_tabid = 'once.viewPrint';
+            }
+            if (active_tabid == 'end') {
+
+            } else if (Left(active_tabid, 5) == 'once.') {
+                $('li[tabid="viewPrint"]').attr('active_tabid', 'end');
+                //parent.resize_ifr_split();
+                $('li[tabid="' + active_tabid.split('once.')[1] + '"]').click();
+                console.log('active_tabid=' + active_tabid);
+            } else {
+                if ($('li[tabid="' + active_tabid + '"]').hasClass('k-state-active') == false) $('li[tabid="' + active_tabid + '"]').click();
+            }
+        }
+        var userDefine_page = document.getElementById('userDefine_page_print').value;
+        userDefine_page = replaceAll(userDefine_page, "{{메뉴명}}", document.getElementById("MenuName").value);
+        userDefine_page = replaceAll(userDefine_page, 'src="' + document.getElementById('RealPid').value, 'src="/_mis_addLogic/' + document.getElementById('RealPid').value);
+        userDefine_page = replaceAll(userDefine_page, 'src="' + document.getElementById('RealPid').value, 'href="/_mis_addLogic/' + document.getElementById('RealPid').value);
+
+
+        if ($('style.print')[0]) {
+            userDefine_page = userDefine_page + $('style.print')[0].outerHTML;
+        }
+
+        if (typeof viewLogic_userDefine_page_change == "function") {
+            userDefine_page = viewLogic_userDefine_page_change(userDefine_page);
+        }
+
+        //아래는 엑셀의 html 저장 시 일부 선이 안나타나는 현상을 해결한다.
+        //userDefine_page = replaceAll(userDefine_page, "-style:initial;", "-style:solid;");
+
+        if (document.getElementById("ActionFlag").value == "view") {
+            //$('div.form-group.round_nocontrol:not(.hide), div.form-group.round_nocontrol_pre:not(.hide), div.form-group.round_upload:not(.hide), div.form-group.round_textarea').each( function() {
+            $('div.form-group.round_nocontrol, div.form-group.round_nocontrol_pre, div.form-group.round_dropdownlist, div.form-group.round_upload, div.form-group.round_textarea').each(function () {
+                $(this).find('label.col-form-label').find('span.hr.hide').remove();
+                replaceKey = "{" + $(this).find('label.col-form-label')[0].innerText + "}";
+                replaceKey = replaceAll(replaceKey, "\n", "");
+
+                if ($(this).find('div.nocontrol div[data-bind]')[0]) {
+                    replaceValue = htmlDecode($(this).find('div.nocontrol div[data-bind]')[0].innerHTML);
+                } else if ($(this).find('div[data-bind]')[0]) {
+                    if (InStr($(this).find('div[data-bind]').attr('data-bind'), 'text:') > 0) {
+                        replaceValue = TextToHtml($(this).find('div[data-bind]')[0].innerText);
+                    } else {
+                        replaceValue = "<pre>" + htmlDecode($(this).find('div[data-bind]')[0].innerHTML) + "</pre>";
+                    }
+                } else if ($(this).find('textarea.k-textbox')[0]) {
+                    replaceValue = TextToHtml($(this).find('textarea.k-textbox')[0].value);
+                } else if ($(this).find('ul.k-upload-files.k-reset')[0]) {
+                    replaceValue = htmlDecode($(this).find('ul.k-upload-files.k-reset')[0].innerHTML);
+                } else if ($(this).find('span[aria-selected="true"]')[0]) {
+                    replaceValue = htmlDecode($(this).find('span[aria-selected="true"]')[0].innerText);
+                } else {
+                    //replaceValue = "T.T";
+                    replaceValue = "";
+                }
+                userDefine_page = replaceAll(userDefine_page, replaceKey, replaceValue);
+            });
+
+            userDefine_page = replaceAll(userDefine_page, '{btn.추가삭제}', '');
+
+        }
+
+        //setInterval...  3개.
+        var myInterval1 = setInterval(function () {
+
+            if (document.getElementById("ActionFlag").value == "view" || $('div[tabnumber] > .form-group option').closest('select').length == $('div[tabnumber] > .form-group select').length) {
+                console.log('인쇄폼 기본 로딩 시작');
+                clearInterval(myInterval1);
+
+                if (document.getElementById("ActionFlag").value != "view") {
+
+                    $('div[tabnumber] > .form-group').each(function () {
+
+                        if ($(this).find('label.col-form-label')[0]) {
+                            $(this).find('label.col-form-label').find('span.hr.hide').remove();
+                            replaceKey = "{" + replaceAll($(this).find('label.col-form-label')[0].innerText, "*", "").split('\n')[0] + "}";
+
+                            if ($(this).find('div.nocontrol div[data-bind]')[0]) {
+                                obj = $(this).find('div.nocontrol div[data-bind]')[0];
+                                replaceValue = "<span id='ud_" + obj.id + "'>" + $(this).find('div.nocontrol div[data-bind]')[0].innerHTML + "</span>";
+                            } else if ($(this).find('input[data-role="datepicker"][data-bind]')[0]) {
+                                obj = $(this).find('input[data-role="datepicker"][data-bind]')[0];
+                                v = obj.value;
+                                im = $(obj.outerHTML);
+                                im.attr("id", "ud_" + obj.id);
+                                im.attr("value", v);
+                                im.attr("placeholder", innerTEXT($(obj).closest('div.form-group').find('label')[0]));
+                                replaceValue = im[0].outerHTML;
+                            } else if ($(this).find('input[data-role="autocomplete"][data-bind]')[0]) {
+                                obj = $(this).find('input[data-role="autocomplete"][data-bind]')[0];
+                                v = obj.value;
+                                im = $(obj.outerHTML);
+                                im.attr("id", "ud_" + obj.id);
+                                im.attr("value", v);
+                                im.attr("placeholder", innerTEXT($(obj).closest('div.form-group').find('label')[0]));
+                                im.attr("title", innerTEXT($(obj).closest('div.form-group').find('label')[0]));
+                                replaceValue = im[0].outerHTML;
+                            } else if ($(this).find('input[type="checkbox"][data-bind]')[0]) {
+                                obj = $(this).find('input[type="checkbox"][data-bind]')[0];
+                                im = $(obj.outerHTML);
+                                im.attr("id", "ud_" + obj.id);
+                                im.attr("title", innerTEXT($(obj).closest('div.form-group').find('label')[0]));
+                                if (obj.checked) im.attr("checked", "checked"); else im.removeAttr("checked");
+                                replaceValue = im[0].outerHTML;
+                            } else if ($(this).find('textarea.k-textbox')[0]) {
+                                obj = $(this).find('textarea.k-textbox')[0];
+                                title = innerTEXT($(obj).closest('div.form-group').find('label')[0]);
+                                replaceValue = "<textarea id='ud_" + obj.id + "' title='" + title + "' class='k-valid'>" + $(this).find('textarea.k-textbox')[0].value + "</textarea>";
+                            } else if ($(this).find('div[data-bind]')[0]) {
+                                obj = $(this).find('div[data-bind]')[0];
+                                replaceValue = "<pre id='ud_" + obj.id + "'>" + $(this).find('div[data-bind]')[0].innerHTML + "</pre>";
+                            } else if ($(this).find('ul.k-upload-files.k-reset')[0]) {
+                                obj = $(this).find('ul.k-upload-files.k-reset')[0];
+                                replaceValue = "<span id='ud_" + obj.id + "'>" + obj.innerHTML + "</span>";
+                            } else if ($(this).find('select[data-role="dropdownlist"]')[0]) {
+                                obj = $(this).find('select[data-role="dropdownlist"]')[0];
+                                v = obj.value;
+                                console.log(v);
+                                im = $(obj.outerHTML);
+                                im.attr("id", "ud_" + obj.id);
+                                im.attr("title", innerTEXT($(obj).closest('div.form-group').find('label')[0]));
+                                replaceValue = im[0].outerHTML;
+                                //if(v=="레토리카") debugger;
+                                //if(obj.id=="ic3") debugger;
+
+                                if (v != '') replaceValue = replaceAll(replaceAll(replaceValue, ' selected="selected"', ''), '<option value="' + v + '"', '<option value="' + v + '" selected="selected"');
+                            } else {
+                                obj = $(this)[0];
+                                replaceValue = "<span id='ud_" + obj.id + "'>T.T</span>";
+                            }
+                            userDefine_page = replaceAll(userDefine_page, replaceKey, replaceValue);
+
+                        }
+                    });
+
+                    if (InStr(userDefine_page, '{추가:') > 0) {
+
+                        if (userDefine_page.split('{추가:').length == 2) {
+                            txt = userDefine_page.split('{추가:')[1].split('}')[0];
+                            btn = '<a id="btn_detailAdd" onclick="detailAdd(0);" title="라인추가 시, 추가된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-plus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', btn);
+                        } else if (userDefine_page.split('{추가:').length == 3) {
+                            txt = userDefine_page.split('{추가:')[1].split('}')[0];
+                            btn = '<a id="btn_detailAdd" onclick="detailAdd(0);" title="라인추가 시, 추가된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-plus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', btn);
+
+                            txt = userDefine_page.split('{추가:')[2].split('}')[0];
+                            btn = '<a id="btn_detailAdd" onclick="detailAdd(1);" title="라인추가 시, 추가된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-plus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', btn);
+                        }
+                    }
+                    if (InStr(userDefine_page, '{삭제:') > 0) {
+
+                        if (userDefine_page.split('{삭제:').length == 2) {
+                            txt = userDefine_page.split('{삭제:')[1].split('}')[0];
+                            btn = '<a id="btn_detailDelete" onclick="detailDelete(0);" title="라인삭제 시, 삭제된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-minus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', btn);
+                        } else if (userDefine_page.split('{삭제:').length == 3) {
+                            txt = userDefine_page.split('{삭제:')[1].split('}')[0];
+                            btn = '<a id="btn_detailDelete" onclick="detailDelete(0);" title="라인삭제 시, 삭제된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-minus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', btn);
+
+                            txt = userDefine_page.split('{삭제:')[2].split('}')[0];
+                            btn = '<a id="btn_detailDelete" onclick="detailDelete(1);" title="라인삭제 시, 삭제된 상태로 즉시 저장됩니다." role="button" href="javascript:;" class="k-button k-button-icontext"><span class="k-icon k-i-k-icon k-i-minus"></span>' + txt + '</a>';
+                            userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', btn);
+                        }
+                    }
+
+                }
+
+                if (InStr(userDefine_page, '{추가:') > 0) {
+
+                    if (userDefine_page.split('{추가:').length == 2) {
+                        txt = userDefine_page.split('{추가:')[1].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', '{linekill}');
+                    } else if (userDefine_page.split('{추가:').length == 3) {
+                        txt = userDefine_page.split('{추가:')[1].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', '{linekill}');
+
+                        txt = userDefine_page.split('{추가:')[2].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{추가:' + txt + '}', '{linekill}');
+                    }
+                }
+                if (InStr(userDefine_page, '{삭제:') > 0) {
+
+                    if (userDefine_page.split('{삭제:').length == 2) {
+                        txt = userDefine_page.split('{삭제:')[1].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', '');
+                    } else if (userDefine_page.split('{삭제:').length == 3) {
+                        txt = userDefine_page.split('{삭제:')[1].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', '');
+
+                        txt = userDefine_page.split('{삭제:')[2].split('}')[0];
+                        userDefine_page = replaceAll(userDefine_page, '{삭제:' + txt + '}', '');
+                    }
+                }
+
+                if ($('table.viewPrint')[0]) {
+                    $('table.viewPrint')[0].outerHTML = '<div class="viewPrint">' + userDefine_page + '</div>';
+                }
+
+                $('div.viewPrint').find('td:contains("{linekill}")').closest('tr').remove();
+
+                $('li[tabid="viewPrint"] span.k-link').css('background-color', '#cce0d6');
+                $('li[tabid="viewPrint"] span.k-link').css('color', '#3e0bf3');
+
+                $('.viewPrintTitle').css('visibility', 'hidden');
+                $('.viewPrintTitle').addClass('noprint');
+
+                $('.viewPrint').css('border', 0);
+                if ($('div#viewPrintDiv table[border="0"]')[0]) {
+                    $('.viewPrintDiv span.k-icon').css('right', 'inherit');
+                    $('.viewPrintDiv span.k-icon').css('top', '20px');
+                    $('.viewPrintDiv span.k-icon.k-i-print').css('left', ($('div#viewPrintDiv table[border="0"]').width() - 39) + 'px');
+                    $('.viewPrintDiv span.k-icon.k-i-pdf').css('left', ($('div#viewPrintDiv table[border="0"]').width() - 87) + 'px');
+
+                    if ($('div.viewPrintDivRound').width() < $('div#viewPrintDiv table[border="0"]').width()) {
+                        $('div.viewPrintDivRound').width($('div#viewPrintDiv table[border="0"]').width() + 22);
+                    }
+
+                }
+
+                //디테일에 대한 인쇄/폼 출력 : 입력일 경우는 해당 안됨.
+                if (document.getElementById("ActionFlag").value == "write") {
+
+                    //현재시점은 write 만이며, modify 때도 실행하기 위해 같은 로직이 다른 부분에서 반복됨 : 시작------
+                    $('div#viewPrintDiv input[data-role="datepicker"]').kendoDatePicker({});
+
+                    obj = $('div#viewPrintDiv input[data-bind], div#viewPrintDiv textarea, div#viewPrintDiv select');
+                    obj.css('border', '0');
+                    obj.closest('td').css('background-color', '#ddf');
+                    //현재시점은 write 만이며, modify 때도 실행하기 위해 같은 로직이 다른 부분에서 반복됨 : 끝 ------
+
+                    displayLoadingOff();
+                    return false;
+                }
+
+
+
+                //시작1 -----------------------------------------------------------------------------------------
+
+                tr_count = $('div.viewPrint').find('td:contains(":시작}")').length;
+                if (tr_count > 0) {
+                    setTimeout(function () {
+                        displayLoading();
+                        $('div#viewPrintDiv span.k-icon').css('display', 'none');
+                    });
+                }
+
+                for (jj = 0; jj < tr_count; jj++) {
+
+
+                    tr0 = $($('div.viewPrint').find('td:contains(":시작}")').closest('tr')[jj]);
+                    tr1 = $($('div.viewPrint').find('td:contains(":끝}")').closest('tr')[jj]);
+                    if ($($('div.viewPrint').find('td:contains(":끝}")')[jj]).attr("rowspan") == "2") {
+                        tr1 = tr1.next();
+                    } else if ($($('div.viewPrint').find('td:contains(":끝}")')[jj]).attr("rowspan") == "3") {
+                        tr1 = tr1.next().next();
+                    }
+
+
+                    var setInterval_string = `
+                    var times2_`+ jj + ` = 0;
+                    var myInterval2_`+ jj + ` = setInterval( function(jj, tr0, tr1) {
+
+                        if(typeof tabname_`+ jj + `=='undefined') tabname_` + jj + ` = Trim(replaceAll($($('div.viewPrint').find('td:contains(":시작}")')[jj]).text().split(':시작}')[0],'{',''));
+						console.log('인쇄폼 iframe 접근시도중 상세리스트탭명:'+tabname_`+ jj + `);
+
+                        //times2_ ... 시간이 약간 지나서 따져야 기존로딩내역을 무시함. 
+                        if(getFrameObj_tabname(tabname_`+ jj + `).length==1 && times2_` + jj + `>4) {
+                            
+                            if(getFrameObj_tabname(tabname_`+ jj + `).$('#grid').length==1) {
+
+                                if(getFrameObj_tabname(tabname_`+ jj + `).$('#grid').data('kendoGrid')) {
+
+                                    
+                                    if(getFrameObj_tabname(tabname_`+ jj + `).$('#grid').data('kendoGrid')._data) {
+                                        console.log('인쇄폼 iframe 상세리스트 접근완료`+ jj + `');
+                                        clearInterval(myInterval2_`+ jj + `);
+                          
+                                        //최대 네줄 반복으로 제한.
+                                        var repeatLine = 0;
+                                        if(tr0.html()==tr1.html()) {
+                                            addTr0 = tr0[0].outerHTML;
+                                            repeatLine = 1;
+                                        } else if(tr0.next().html()==tr1.html()) {
+                                            addTr0 = tr0[0].outerHTML+tr0.next()[0].outerHTML;
+                                            repeatLine = 2;
+                                        } else if(tr0.next().next().html()==tr1.html()) {
+                                            addTr0 = tr0[0].outerHTML+tr0.next()[0].outerHTML+tr0.next().next()[0].outerHTML;
+                                            repeatLine = 3;
+                                        } else if(tr0.next().next().next().html()==tr1.html()) {
+                                            addTr0 = tr0[0].outerHTML+tr0.next()[0].outerHTML+tr0.next().next()[0].outerHTML+tr0.next().next().next()[0].outerHTML;
+                                            repeatLine = 4;
+                                        }
+                                        
+                                        if(repeatLine==0) {
+                                            displayLoadingOff();
+                                            alert("인쇄양식의 상세내역 반복라인 감지에 실패했습니다.");
+                                            $('div.viewPrint').find('td:contains(":시작}")').html('');
+                                            clearInterval(myInterval2_`+ jj + `);
+                                            return false;
+                                        }
+                                        addTr0 = replaceAll(addTr0, "{"+tabname_`+ jj + `+":시작}", "");
+                                        addTr0 = replaceAll(addTr0, "{"+tabname_`+ jj + `+":끝}", "");
+                                        addTr0 = "<tr firstline "+Mid(addTr0, 5,100000);
+                                        
+
+
+                                        d = getFrameObj_tabname(tabname_`+ jj + `).$('#grid').data('kendoGrid')._data;
+                                        c = getFrameObj_tabname(tabname_0).p_columns_1D;
+
+                                        if($('iframe#ifr_treat0').length==0) {
+											console.log(getFrameObj_tabname(tabname_`+ jj + `).location.href + "&idx=0&ActionFlag=write");
+											console.log('iframe 으로 입력페이지 진입시작`+ jj + `');
+											//notab=Y 는 아래의 상황만을 위한 속도개선 파람.
+                                            $('iframe#ifr_treat').after('<iframe id="ifr_treat0" style="display:none;"></iframe>');
+                                            getFrameObj('ifr_treat0').location.href = getFrameObj_tabname(tabname_`+ jj + `).location.href + "&idx=0&ActionFlag=write&notab=Y";
+                                        }
+                                        //$('#ifr_treat').css('display','block');
+                                        //$('#ifr_treat').attr('style','width:100%; height:300px;');
+
+                                        var myInterval3_`+ jj + ` = setInterval( function(jj, tr0, tr1, repeatLine, tabname_` + jj + `, addTr0, c, d) {
+
+                                            if(getFrameObj('ifr_treat0').length>=1) {
+
+                                                //kendo 로딩이 끝난상태.
+                                                //if(getFrameObj("ifr_treat").$('input[role="textbox"]').length>0 && getFrameObj("ifr_treat").$('option').closest('select').length==getFrameObj("ifr_treat").$('select[data-role="dropdownlist"]').length) {
+                                                //if(getFrameObj("ifr_treat").$('input[role="textbox"]').length>0 && getFrameObj("ifr_treat").$('select[data-role="dropdownlist"]').length==getFrameObj("ifr_treat").$('select[data-role="dropdownlist"]').closest('div.round_dropdownlist ').find('span.k-dropdown-wrap span.k-icon.k-i-arrow-60-down').length) {
+                                                //if(getFrameObj("ifr_treat").$('input[role="textbox"]').length>0 || getFrameObj("ifr_treat").$('select[data-role="dropdownlist"]').length>0) {
+                                                if(getFrameObj('ifr_treat0').document.getElementById("loadingEnd")) {
+                                                if(getFrameObj('ifr_treat0').document.getElementById("loadingEnd").value=="Y") {
+                                                    console.log('인쇄폼 iframe 입력페이지 로딩완료`+ jj + `');
+
+                                                    clearInterval(myInterval3_`+ jj + `);
+                        
+                                                    for(i=0;i<d.length;i++) {
+                                                        addTr = addTr0;
+                                                        detail_key = getFrameObj('ifr_treat0').document.getElementById("key_aliasName").value;
+                                                        //console.log('detail_key='+detail_key);
+                                                        addTr = replaceAll(addTr, "<tr ",  "<tr keyValue='"+d[i][detail_key]+"' obj_index='" + jj + "' ");
+                                                        for(j=0;j<c.length;j++) {
+                                                            if(c[j].title) {
+                                                                //console.log('c[j].title='+c[j].title);
+                                                                t = "{"+tabname_`+ jj + `+"."+c[j].title+"}";                                                                
+                                                                if(InStr(addTr, t)>0) {
+                                                                    v = d[i][c[j].field];
+                                                                    if(v==null) v = "";
+                                                                    if(document.getElementById("ActionFlag").value=="view") {
+                                                                        if(c[j].Grid_CtlName=="textarea") {
+                                                                            addTr = replaceAll(addTr, t, TextToHtml(v));
+                                                                        } else {
+																			if(c[j].template!=undefined && InStr(c[j].template,'function(')<=0 && v!='') {
+																				v = Trim(eval(replaceAll(replaceAll(replaceAll(c[j].template,'#=',''),'#',''),c[j].field,v)));
+																			}
+	                                                                        addTr = replaceAll(addTr, t, v);
+																			addTr = replaceAll(addTr, "{"+tabname_`+ jj + `+".No}", d[i]['rowNumber']);
+                                                                        }
+                                                                    } else {
+                                                                        k = c[j].field;
+                                                                        //if(k=='isuQSUs') debugger;
+                                                                        if(c[j].Grid_CtlName=="datepicker") {
+                                                                            v = new Date(v).yyyymmdd10();
+                                                                            im = $(getFrameObj('ifr_treat0').$("input#"+k)[0].outerHTML);
+                                                                            im.attr("id", "udd_"+k);
+                                                                            im.attr("value", v);
+                                                                            im.attr("placeholder",c[j].title);
+																			im.attr("title",$(getFrameObj('ifr_treat0').$('label[for="'+k+'"] > span.alim')).text());
+                                                                            r = im[0].outerHTML;
+                                                                            addTr = replaceAll(addTr, t, r);
+                                                                        } if(c[j].Grid_CtlName=="text" || c[j].Grid_CtlName=="dropdownlist") {
+																			im = $(getFrameObj('ifr_treat0').$("input#"+k)[0].outerHTML);
+                                                                            im.attr("id", "udd_"+k);
+                                                                            im.attr("value", v);
+                                                                            im.css('display','inline-block');
+                                                                            im.attr("placeholder",c[j].title);
+																			im.attr("title",$(getFrameObj('ifr_treat0').$('label[for="'+k+'"] > span.alim')).text());
+																			if($(getFrameObj('ifr_treat0').$("input#"+k)).attr('data-role')=='numerictextbox') {
+																				if($(getFrameObj('ifr_treat0').$("input#"+k)).prev().attr('required')=='required') {
+																					im.attr('required','required');
+																				}
+																			}
+                                                                            r = im[0].outerHTML;
+                                                                            addTr = replaceAll(addTr, t, r);
+                            
+                                                                        } else if(c[j].Grid_CtlName=="textarea") {
+                                                                            im = $(getFrameObj('ifr_treat0').$("textarea#"+k)[0].outerHTML);
+                                                                            im.attr("id", "udd_"+k);
+                                                                            im.removeAttr("style");
+                                                                            im.attr("placeholder",c[j].title);
+																			im.attr("title",$(getFrameObj('ifr_treat0').$('label[for="'+k+'"] > span.alim')).text());
+                                                                            im[0].innerHTML = v;
+                                                                            r = im[0].outerHTML;
+                                                                            addTr = replaceAll(addTr, t, r);
+                                                                        } else if(c[j].editor && Left(k,6)=="table_") {
+                                                                            new_k = Mid(k,7,100).split("Qn")[0].split("Qm")[0];
+                                                                            objd = $(getFrameObjBody('ifr_treat0')).find('#'+new_k);
+                                                                            if(objd.attr("data-role")=="dropdownlist") {
+                                                                                r = replaceAll(replaceAll(objd[0].outerHTML,'id="','id="udd_'),'>'+v+'<',' selected>'+v+'<');
+                                                                                addTr = replaceAll(addTr, t, r);
+                                                                            }
+                                                                        } else if(c[j].Grid_CtlName=="check") {
+                                                                            im = $($(getFrameObjBody('ifr_treat0')).find('#'+k)[0].outerHTML);
+                                                                            im.attr("id", "udd_"+k);
+                                                                            im.attr("title",c[j].title+". "+$(getFrameObj('ifr_treat0').$('label[for="'+k+'"] > span.alim')).text());
+                                                                            if(v=="Y") {
+                                                                                im[0].checked = true;
+                                                                                im.attr("checked", "checked");
+                                                                            }
+                                                                            r = im[0].outerHTML;
+                                                                            addTr = replaceAll(addTr, t, r);
+                                                                        } else if(c[j].Grid_CtlName=="dropdownitem") {
+                                                                            im = $($(getFrameObjBody('ifr_treat0')).find('#'+k)[0].outerHTML);
+                                                                            im.attr("id", "udd_"+k);
+                                                                            im[0].value = v;
+                                                                            im.css("display","inline-block");
+                                                                            im.attr("title",c[j].title + ". " + $(getFrameObj('ifr_treat0').$('label[for="'+k+'"] > span.alim')).text());
+                                                                            im.find('option').removeAttr('selected');
+                                                                            im.find('option[value="'+v+'"]').attr('selected','selected');
+                                                                            r = im[0].outerHTML;
+                                                                            addTr = replaceAll(addTr, t, r);
+                                                                        } else {
+                                                                            if(c[j].template!=undefined && InStr(c[j].template,'function(')<=0 && v!='') {
+																				v = Trim(eval(replaceAll(replaceAll(replaceAll(c[j].template,'#=',''),'#',''),c[j].field,v)));
+																			}
+                                                                            addTr = replaceAll(addTr, t, v);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        tr0.before(addTr);
+                                                    }
+                                                    if(repeatLine>=4) tr0.next().next().next().remove();
+                                                    if(repeatLine>=3) tr0.next().next().remove();
+                                                    if(repeatLine>=2) tr0.next().remove();
+                                                    tr0.remove();
+
+                                                    console.log('인쇄폼 출력완료`+ jj + `');
+
+												   
+
+
+													//사용자 정의에서는 숫자데이터의 강제성이 없으므로 강제성 로직 추가
+													$('input[data-role="numerictextbox"]').change( function() {
+														if(!isNumeric(this.value) && this.value!='') {
+															alert('숫자 형태로만 넣으세요!');
+															this.value = '';
+														}
+													});
+
+
+
+
+													if(typeof viewLogic_afterLoad_viewPrint=="function") {
+														setTimeout( function() {
+															viewLogic_afterLoad_viewPrint();
+														}, 0);
+													} 
+
+													
+													$('div.viewPrint').width($($('div#viewPrintDiv table')[0]).width()+30);
+													$('div#viewPrintDiv').width($($('div#viewPrintDiv table')[0]).width()+30);
+													//if($('div#viewPrintDiv').width()<800 && $('div.viewPrint div[id] > table > colgroup').length>0) {
+														//엑셀html 이면서 폭이 800 이내면 반응형 인식위해 class 추가
+														//$('div.viewPrintDiv').addClass('zoom150');
+													//}
+													
+													if($('div.viewPrint div[id] > table > colgroup').length>0) {
+														//엑셀html 이면 class 추가하여 확대
+														$('div.viewPrintDiv').addClass('zoom150');
+													}
+													$('div#viewPrintDiv').css('left',0);
+												   
+
+													if(jj+1==tr_count) {
+														displayLoadingOff();
+														$('div#viewPrintDiv span.k-icon').css('display','block');
+													}
+                                                    
+													if(document.getElementById("ActionFlag").value=="view") {
+														return false;
+													}
+
+													$('tr[firstline] > td:first-child').each( function() {
+														this.innerHTML = '<input type="checkbox"/>'+this.innerHTML;
+													})
+
+
+													//현재시점은 modify 만이며, write 때도 실행하기 위해 같은 로직이 다른 부분에서 반복됨 : 시작------
+													$('div#viewPrintDiv input[data-role="datepicker"]').kendoDatePicker({});
+
+													
+													obj = $('div#viewPrintDiv input[data-bind], div#viewPrintDiv textarea, div#viewPrintDiv select');
+													obj.css('border', '0');
+													obj.closest('td').css('background-color', '#ddf');
+													//현재시점은 modify 만이며, write 때도 실행하기 위해 같은 로직이 다른 부분에서 반복됨 : 끝 ------
+
+													detail_obj = $('div#viewPrintDiv tr[keyValue] input, div#viewPrintDiv tr[keyValue] textarea, div#viewPrintDiv tr[keyValue] select');
+													detail_obj.change( function() {
+														$(this).closest('tr').attr('change','Y');
+													});
+
+
+													//$('div.viewPrint').width($($('div#viewPrintDiv table')[0]).width()+40);
+													//$('div#viewPrintDiv').width($($('div#viewPrintDiv table')[0]).width()+40);
+													setTimeout( function() {
+														$('div#viewPrintDiv textarea').each( function() {
+															$(this).closest('td').css('padding',0);
+															$(this).width($(this).closest('td').width()-8);
+															$(this).height($(this).closest('td').height()-7);
+														});
+													}, 1000);
+
+
+                                                }
+                                                }
+                                            }
+                                            $('.viewPrint select[data-role="dropdownlist"]').closest('td').css('padding-left',0);
+                                            
+                                            if($("body").attr("pageW_YN")=="N") {
+                                                $('a#btn_detailAdd').closest('tr').css('display','none');
+                                            }
+                
+                                        },100, jj, tr0, tr1, repeatLine, tabname_`+ jj + `, addTr0, c, d);
+                                    }
+                                }
+                            }
+                        }
+                        ++times2_`+ jj + `;
+                    }, 100, jj, tr0, tr1);
+				`;
+
+                    eval(setInterval_string);
+
+
+                }
+
+                if (tr_count == 0) {
+
+
+                    //사용자 정의에서는 숫자데이터의 강제성이 없으므로 강제성 로직 추가
+                    //더 위의 로직과 같으나, 아래는 마스터만 있는 경우임.
+                    $('input[data-role="numerictextbox"]').change(function () {
+                        if (!isNumeric(this.value) && this.value != '') {
+                            alert('숫자 형태로만 넣으세요!');
+                            this.value = '';
+                        }
+                    });
+
+
+                    if (typeof viewLogic_afterLoad_viewPrint == "function") {
+                        setTimeout(function () {
+                            viewLogic_afterLoad_viewPrint();
+                        }, 0);
+                    }
+
+
+
+                    $('div.viewPrint').width($($('div#viewPrintDiv table')[0]).width() + 30);
+                    $('div#viewPrintDiv').width($($('div#viewPrintDiv table')[0]).width() + 30);
+                    //if($('div#viewPrintDiv').width()<800 && $('div.viewPrint div[id] > table > colgroup').length>0) {
+                    //엑셀html 이면서 폭이 800 이내면 반응형 인식위해 class 추가
+                    //$('div.viewPrintDiv').addClass('zoom150');
+                    //}
+                    if ($('div.viewPrint div[id] > table > colgroup').length > 0) {
+                        //엑셀html 이면 class 추가하여 확대
+                        $('div.viewPrintDiv').addClass('zoom150');
+                    }
+                    $('div#viewPrintDiv').css('left', 0);
+
+                    setTimeout(function () {
+                        $('div#viewPrintDiv textarea').each(function () {
+                            $(this).closest('td').css('padding', 0);
+                            $(this).height($(this).closest('td').height() - 7);
+                        });
+                    }, 1000);
+
+                    displayLoadingOff();
+                    $('div#viewPrintDiv span.k-icon').css('display', 'block');
+                }
+                $('div.viewPrint img').css('width', 'auto');
+                $('div.viewPrint img').on('load', function () {
+                    this.style.width = $(this).width() + 'px';
+                });
+            }
+        }, 100);
+
+    } else {
+        $('div.form-group.round_nocontrol:not(.hide), div.form-group.round_upload:not(.hide), div.form-group.round_textarea').each(function () {
+
+            colspan = 1;
+            addTag = '';
+
+            if (td_mod > 1) td_mod = 0;
+
+            if (td_mod == 0) tag_viewPrint = tag_viewPrint + '\n<tr>';
+            if ($(this).hasClass('col-sm-12') || $(this).hasClass('round_textarea')) {
+                if (td_mod == 1) {
+                    tag_viewPrint = tag_viewPrint + '<td class="content" colspan="2"></td></tr>\n<tr>';
+                }
+                if ($(this).hasClass('col-lg-12') || $(this).hasClass('round_textarea')) colspan = 4;
+                else colspan = 3;
+                addTag = ' colspan="' + colspan + '"';
+                td_mod = 1;
+            }
+            if (colspan == 4) tag_viewPrint = tag_viewPrint + '<td class="title" colspan="4">' + $(this).find('label.col-form-label')[0].innerText + '</td></tr>\n<tr>';
+            else tag_viewPrint = tag_viewPrint + '<td class="title">' + $(this).find('label.col-form-label')[0].innerText + '</td>';
+
+            tag_viewPrint = tag_viewPrint + '<td class="content"' + addTag + '><div>';
+            if ($(this).find('div.nocontrol div[data-bind]')[0]) tag_viewPrint = tag_viewPrint + $(this).find('div.nocontrol div[data-bind]')[0].innerHTML;
+            else if ($(this).find('textarea.k-textbox')[0]) tag_viewPrint = tag_viewPrint + TextToHtml($(this).find('textarea.k-textbox')[0].value);
+            else if ($(this).find('ul.k-upload-files.k-reset')[0]) tag_viewPrint = tag_viewPrint + $(this).find('ul.k-upload-files.k-reset')[0].innerHTML;
+            tag_viewPrint = tag_viewPrint + '</div></td>';
+
+            if (td_mod > 0) tag_viewPrint = tag_viewPrint + '</tr>';
+
+            td_mod++;
+        });
+        if (td_mod < 2) tag_viewPrint = tag_viewPrint + '<td class="content" colspan="2"></td></tr>';
+        $('table.viewPrint tbody').html(tag_viewPrint);
+
+        displayLoadingOff();
+    }
+
+}
+
+
+//첨부이미지 없어도 실행됨. 확실한 onload 임.
+function viewImageAfterLoad1() {
+    if ($('textarea#userDefine_page_print')[0]) {
+        $('.k-hstack').hide();
+    }
+    tab_cnt = $('li.k-item[tabid]').length;
+
+    $('li.k-item').css('width', 'auto');
+
+    if ($("#btn_menuName").text() == "") $("#btn_menuName").text(document.getElementById("MenuName").value);
+    $("#btn_menuTitle").text(getTitle_aliasName(document.getElementById("key_aliasName").value).split("\n")[0].split("*")[0] + ":" + document.getElementById("idx").value + " 상세");
+
+    fileObj = $("input.editorFile");
+    for (i = 0; i < fileObj.length; i++) {
+        var field_aliasName = $(fileObj[i]).attr("aliasName");
+        $("#" + fileObj[i].id).kendoUpload({
+            async: {
+                saveUrl: "cell_upload.php?flag=formEditorUpload&RealPid=" + document.getElementById("RealPid").value + "&MisJoinPid=" + document.getElementById("MisJoinPid").value
+                    + "&field=" + field_aliasName + "&idx=" + document.getElementById("idx").value + "&key=" + document.getElementById("key_aliasName").value + "&tempDir=" + document.getElementById("tempDir").value,
+                autoUpload: true
+            },
+            validation: {
+                maxFileSize: 10500000,
+                //allowedExtensions: [".jpg", ".jpeg", ".png", ".bmp", ".gif"]
+            },
+            success: function (e) {
+                // e.files : 업로드된 파일 정보
+                // e.operation : "upload" 또는 "remove"
+                // e.response : 서버에서 반환한 응답 데이터
+                onSuccess_customuploadFiles(e);
+            },
+            showFileList: false,
+        });
+        objValid = $("#" + fileObj[i].id).data().kendoUpload.options.validation;
+        if (objValid.allowedExtensions) $("#" + fileObj[i].id).attr("accept", objValid.allowedExtensions.join());
+    }
+
+
+
+    $('a#btn_write,a#btn_save,a#btn_saveClose,a#btn_saveView,a.k-button.save').click(function () {
+        //$(this).attr('title', '입력완료 버튼은 클릭 후, 5초후에 활성화됩니다.');
+        $(this).addClass('k-state-disabled');
+
+        setTimeout(function () {
+            displayLoading_long();
+        });
+        setTimeout(function (p_this) {
+            //$(p_this).removeAttr('title');
+            $(p_this).removeClass('k-state-disabled');
+        }, 5000, this);
+    },);
+
+    $('li[tabnumber]').click(function () {
+        into_CodeMirror("");
+        if ($(this).attr("tabid") == "viewPrint") {
+
+            setTimeout(function () {
+                //아래의 코딩은 print_viewPrint() 에도 있음.
+                $('div#viewPrintDiv input[data-role="datepicker"]').kendoDatePicker({});
+            });
+
+        };
+    });
+
+
+    //우편번호 팝업
+    if ($('a.k-button.zipcode')[0] && document.getElementById("ActionFlag").value != "view") {
+
+        if ($('div.round_autocomplete.zipcode').next().find('input')[0]) {
+            if ($('div.round_autocomplete.zipcode').next().find('input')[0].readOnly == false) {
+
+                $('div.round_autocomplete.zipcode').each(function () {
+                    $(this).next().find('input')[0].readOnly = true;
+                    $(this).find('input')[0].readOnly = true;
+                });
+
+                $('a.k-button.zipcode').click(function () {
+                    var p_this = this;
+                    new daum.Postcode({
+                        oncomplete: function (data) {
+
+                            jibunObj = $(p_this).closest('div.round_autocomplete.zipcode').next().find('label[grid_columns_title0]')[0];
+                            isJibun = 'N';
+                            if (jibunObj) {
+                                if (InStr(jibunObj.innerText, '지번') > 0) {    //사용자 설정
+                                    isJibun = 'Y';
+                                }
+                            }
+
+                            var addr = ''; // 주소 변수
+                            // 사용자가 선택한 주소 타입에 따라(도로명/지번) 값을 조합합니다.
+                            if (data.userSelectedType === 'R' && isJibun == 'N') { // 도로명 주소를 선택한 경우
+                                addr = data.roadAddress;
+                            } else { // 지번 주소를 선택한 경우(J)
+                                addr = data.jibunAddress;
+                            }
+
+                            // 💡 SpeedMIS 화면의 해당 필드에 값을 입력합니다.
+                            // (사용자님의 PHP/HTML 폼 필드 ID에 맞게 수정해야 합니다!)
+                            $(p_this).parent().find('input')[0].value = data.zonecode;     // 우편번호
+
+
+                            $(p_this).closest('div.round_autocomplete.zipcode').next().find('input')[0].value = addr;
+                            $(p_this).parent().find('input')[0].value = data.zonecode;
+                            if (typeof addLogic_zipcode == "function") {
+                                addLogic_zipcode(data);
+                            }
+                        }
+                    }).open();
+                });
+            }
+        }
+    }
+
+    //helplist
+    $('.txt_helplist').each(function () {
+        $('select#' + this.id.split('helplist_')[1]).change(function (e) {
+
+            if (isJsonString($('#helplist_' + this.id).val())) {
+                items = JSON.parse($('#helplist_' + this.id).val());
+                for (k = 0; k < items.length; k++) {
+                    if (isNumeric(items[k])) {
+                    } else {
+                        items_field = $('label[grid_columns_title="' + items[k].split('.')[0] + '"]').attr('for');
+                        if (this.id != items_field && items_field != undefined) {
+                            if ($('#frm #' + items_field)[0]) {
+                                items_value = getSelectTxt(this).split(' | ')[k];
+                                if ($('#frm #' + items_field).attr('data-role') == 'numerictextbox') {
+                                    $('#frm #' + items_field).data('kendoNumericTextBox').value(items_value);
+                                } else if ($('#frm #' + items_field).attr('data-role') == 'autocomplete') {
+                                    $('#frm #' + items_field).data('kendoAutoComplete').value(items_value);
+                                } else if ($('#frm #' + items_field).attr('data-role') == 'dropdownlist') {
+                                    $('#frm #' + items_field).data('kendoDropDownList').value(items_value);
+                                } else {
+                                    $('#frm #' + items_field)[0].value = items_value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    //내부로직
+    if (typeof viewLogic_afterLoad0 == "function") {
+        setTimeout(function () {
+            viewLogic_afterLoad0();
+        }, 0);
+    }
+
+
+
+    if (typeof viewLogic_afterLoad == "function" && $('body').attr('first_load') != 'end') {
+        //검증완료: kimgo index.php?gubun=3041 입력 때 화면로그시, if($('select#depG1')[0].value!='') 이게 만족함.
+        //검증완료: kimgo index.php?gubun=3041 부서1 선택있는 내역의 참조입력 때 화면로그시, if($('select#depG1')[0].value!='') 이게 만족함.
+        setTimeout(function () {
+            //setTimeout( function() {
+            viewLogic_afterLoad();
+            //});
+        }, 100);
+    }
+
+    if (document.getElementById('ActionFlag').value != 'view') {
+        $('#div_temp1').attr('now_values', '');
+        setTimeout(function () {
+            set_now_values();
+            $('input#temp1').attr('pre_values', $('input#temp1').attr('now_values'));
+        }, 5000);   //5초후 초기값. 10초 이후에만 따짐으로 적당함.
+    }
+
+
+    //setTimeout( function() {
+
+
+    //내용없는 불필요한 탭을 숨김.
+    if (document.getElementById("ActionFlag").value == "write") {
+        var cnt = $('div[data-role="tabstrip"] div[tabnumber]').length - 1;
+        for (i = 2; i <= cnt; i++) {
+            if ($('div[tabnumber="' + i + '"] > div').length == $('div[tabnumber="' + i + '"] > div.round_nocontrol').length) {
+                $('div[data-role="tabstrip"] li[tabnumber="' + i + '"]').css('display', 'none');
+            }
+        }
+    }
+    //setTimeout( function() {
+    if ($('li[tabid]:visible').length <= 1 && InStr(location.href, 'index.php') > 0) {
+        //이상
+        if (Left(windowID(), 9) == 'ifr_treat') {
+            //parent.$('.k-hstack').hide();
+            console.log('k-state-active  1');
+            //parent.$('body[isMenuIn="N"] div.k-content.k-state-active').css('height','calc(100% - 72px)'); /*** ***/
+            //parent.$('body[isMenuIn="Y"] div.k-content.k-state-active').css('height','calc(100% - 133px)');
+            setTimeout(function () {
+                if (parent.$('ul.k-tabstrip-items.k-reset').css('display') == 'none') {
+                    //parent.$('body[isMenuIn="N"] div.k-content.k-state-active').css('height','calc(100% - 56px)');
+                }
+            });
+        } else {
+            console.log('k-state-active  2 탭숨김에 따른 스타일조정');
+            $('ul.k-tabstrip-items.k-reset').hide();
+            $('div[tabnumber]')[0].style.setProperty('border-top-width', '0px', 'important');
+            $('.k-widget.k-tabstrip.k-tabstrip-top').css('border-top', '0');
+            $('.k-widget.k-tabstrip.k-tabstrip-top').css('padding-top', '0');
+            $('.k-widget.k-tabstrip.k-tabstrip-top').css('padding-bottom', '4px');
+        }
+
+    }
+    //},0);
+
+    if ($('body').attr('first_load') == undefined) {
+
+        //입력시 불필요한 탭숨기기
+        if (document.getElementById('ActionFlag').value == 'write') {
+            $('div[tabnumber]').each(function (index, item) {
+                if ($(this).find('div.form-group.row').length == $(this).find('div.form-group.round_nocontrol').length) {
+                    $('li[tabnumber]')[index].style.setProperty('display', 'none', 'important');
+                }
+            });
+        }
+
+        $('body').attr('first_load', 'end');
+        //큰타이틀만 남은 경우 숨김.
+        setTimeout(function () {
+            setTimeout(function () {
+                var row_obj = $('.form-group.row:visible');
+                var sub_obj = $('.form-group.round_nocontrol.row.subtitle:visible');
+
+                sub_obj.each(function (index, item) {
+                    if (index < sub_obj.length - 1) {
+                        index_now = row_obj.index(sub_obj[index]);
+                        index_next = row_obj.index(sub_obj[index + 1]);
+                        if (index_now + 1 == index_next) {
+                            this.style.display = 'none';
+                            if (InStr($(this).prev().attr('style'), 'border-top') > 0) $(this).prev()[0].style.display = 'none';
+                        }
+                    } else {
+                        if (sub_obj[index] == row_obj[row_obj.length - 1]) {
+                            this.style.display = 'none';
+                            if (InStr($(this).prev().attr('style'), 'border-top') > 0) $(this).prev()[0].style.display = 'none';
+                        }
+                    }
+                });
+            }, 0);
+        }, 0);
+    }
+
+
+
+    $("span.k-tool-icon.k-icon.k-i-customuploadexec").parent().parent().css("display", "none");
+    var obj1 = $("div.round_upload input[type=file]");
+    var obj2 = $("div.round_upload input[type=file][autocomplete]");
+    if (obj1.length == 0) {
+        /*
+        viewLogic_afterLoad_continue 는 setTimeout 100 을 2번 해야함!
+        ... 의 프로그램 추가 시, 생성할 메뉴 또는 프로그램 형태가 공란이면 정상임.
+        */
+
+        setTimeout(function () {
+            setTimeout(function () {
+                print_viewPrint();
+                if (typeof viewLogic_afterLoad_continue == "function") {
+                    viewLogic_afterLoad_continue();
+                }
+            }, 100);
+        }, 100);
+        return false;
+    } else if (obj1.length > obj2.length) {
+        setTimeout(function () {
+            viewImageAfterLoad1();
+        }, 100);
+    } else {
+        setTimeout(function () {
+            viewImageAfterLoad2();
+        }, 100);
+    }
+    setTimeout(function () {
+        setTimeout(function () {
+            print_viewPrint();
+            if (typeof viewLogic_afterLoad_continue == "function") {
+                viewLogic_afterLoad_continue();
+            }
+        }, 100);
+    }, 100);
+
+    //}, 100);  //100
+}
+
+
+function view_helpbox(p_btn, code_alias, event_alias) {
+
+    sel_idx = document.getElementById('idx').value;
+    url = location.href.split('?')[0] + '?gubun=' + document.getElementById('gubun').value + '&sel_idx=' + sel_idx + '&helpbox=' + code_alias + '&winID=' + windowID() + '&pwinID=' + parent.windowID() + '&winActionFlag=' + document.getElementById('ActionFlag').value;
+    key_aliasName_title = $('div#round_' + document.getElementById('key_aliasName').value).find('label')[0].innerText;
+    //field:입력컨트롤의 title 이며 팝업의 field 로 쓰임,   code_alias_title: 코드에 해당하는 title 이므로 항상 | 의 후자임.
+    code_alias_title = replaceAll($('div#round_' + code_alias).find('label')[0].innerText, '*', '').split('|')[1];
+    code_alias_title = Trim(replaceAll(code_alias_title, '*', ''));
+    if (event_alias == '') {
+        field = '';
+    } else {
+        if (code_alias == event_alias) field = code_alias_title;
+        else {
+            field = replaceAll($('div#round_' + code_alias).find('label')[0].innerText, '*', '').split('|')[0];
+            field = Trim(replaceAll(field, '*', ''));
+        }
+        v = $('#' + event_alias + '[data-role]')[0].value;
+        if (v != undefined && v != '') {
+            v = encodeURIComponent(v);
+            url = url + '&allFilter=[{"operator":"contains","value":"' + v + '","field":"' + field + '"}]';
+        }
+    }
+
+    if (document.getElementById('ActionFlag').value == 'write') {
+        parent_popup_jquery(url, code_alias_title + ' 선택창', 1000, 600, true);
+    } else {
+        parent_popup_jquery(url, key_aliasName_title + ':' + sel_idx + ' 에 대한 ' + code_alias_title + ' 선택창', 1000, 600, true);
+    }
+}
+
+function checkUncheckAllNodes(nodes, checked) {
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].set("checked", checked);
+
+        if (nodes[i].hasChildren) {
+            checkUncheckAllNodes(nodes[i].children.view(), checked);
+        }
+    }
+}
+function treeview_chbAllOnChange(p_this) {
+
+    topobj = $(p_this).closest('div.round_dropdowntree');
+    key = replaceAll(topobj[0].id, 'round_', '');
+    obj = $('div#' + key + '[data-role="treeview"]');
+
+    var checkedNodes = [];
+    var treeView = obj.data("kendoTreeView");
+    var isAllChecked = p_this.checked;
+
+    checkUncheckAllNodes(treeView.dataSource.view(), isAllChecked)
+
+    p_this.blur();
+}
+
+
+
+
+function pdf_onclick() {
+    fname = document.getElementById('MenuName').value + '_idx' + document.getElementById('idx').value + '_' + today15() + ".pdf";
+    $('div.viewPrintDivRound span.k-icon').css('display', 'none');
+    $('div.viewPrintDivRound *:visible').each(function () {
+        this.style.setProperty("font-family", "Arial", "important");
+        this.style.setProperty("font-style", "normal", "important");
+    });
+    $('div.viewPrintDivRound')[0].innerHTML = $('div.viewPrintDivRound')[0].innerHTML;
+
+    if ($('div.viewPrint div[id] > table > colgroup').length > 0) {
+        //엑셀html 인쇄
+        zoom = 0.587;
+    } else {
+        //일반 본문인쇄
+        zoom = 0.626;
+    }
+    if (typeof thisPage_options_pdf == 'function') {
+        options_pdf = thisPage_options_pdf();
+    } else {
+        options_pdf = {
+            paperSize: "A4",
+            scale: zoom,
+            landscape: false,
+            margin: { left: "0.2cm", top: "0.9cm", right: "1.0cm", bottom: "0.5cm" }
+        };
+    }
+    setTimeout(function (fname, options_pdf) {
+        getPDF($('div.viewPrintDiv'), fname, options_pdf);
+    }, 0, fname, options_pdf);
+}
+
+function into_CodeMirror(p_refresh) {
+    console.log("into_CodeMirror start " + p_refresh);
+    setTimeout(function () {
+        obj = $('div.k-content[tabnumber] textarea.code');
+
+        if ($('.CodeMirror-vscrollbar').length > 0 && p_refresh == "refresh") {
+            $('.CodeMirror-vscrollbar').remove();
+            $('.CodeMirror-code').remove();
+            $('.CodeMirror-scroll').remove();
+            $('.CodeMirror').remove();
+        }
+
+        if ($('.CodeMirror-vscrollbar').length == 0) {
+
+            for (i = 0; i < obj.length; i++) {
+                var editor = CodeMirror.fromTextArea(obj[i], {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "application/x-httpd-php",
+                    indentUnit: 4,
+                    readOnly: document.getElementById("ActionFlag").value == "view" || $(obj[i]).attr('readonly') == 'readonly',
+                    indentWithTabs: true,
+                    autoRefresh: true,
+                    theme: $('#codemirror_theme').attr('href').split('/theme/')[1].split('.css')[0],
+                });
+                editor.getScrollerElement().style.minWidth = "300px";
+                editor.getScrollerElement().style.minHeight = "100px";
+
+            }
+        }
+
+        if (document.getElementById("ActionFlag").value == "view") $('form#frm textarea').prop('readonly', true);
+
+    }, 0);
+}
+
+function k_file_createClick(p_info_url) {
+
+    $('span.k-file-name-size-wrapper').prepend('<span title="download" class="k-icon k-i-save save"></span>');
+    $('span.k-i-save.save').click(function (e) {
+        var fileName = $(this).next()[0].title;
+        var url = $(this).closest('li.k-file').attr('attachurl');
+        downloadURI(url, fileName);
+    });
+
+    $(".k-file-name:not([style])").click(function (e) {
+
+        var attachurl = $(this).closest('li.k-file').attr('attachurl');
+        var fileName = attachurl.split('/')[attachurl.split('/').length - 1];
+        if (isMobile() || isWebPlayFile(fileName)) {
+            $('input#temp1').attr('now_values', '');
+            if (isWebPlayFile(attachurl)) window.open(attachurl);
+            else location.href = attachurl;
+        } else {
+            var x = new XMLHttpRequest();
+            x.open("GET", attachurl, true);
+            x.responseType = 'blob';
+            x.onload = function (e) { download(x.response, fileName, "application/zip"); }
+            x.send();
+        }
+    });
+    $(".k-file-name:not([style])").css("cursor", "pointer");
+    $(".k-file-extension-wrapper:not([style])").click(function (e) {
+        $(this).parent().find(".k-file-name").click();
+    });
+    $("li.k-file img.image-preview").click(function (e) {
+        $(this).parent().find(".k-file-name").click();
+    });
+    $(".k-file-extension-wrapper:not([style])").css("cursor", "pointer");
+    $("li.k-file img.image-preview").css("cursor", "pointer");
+}
+
+
+function viewImageAfterLoad2() {
+    var obj = $("div.round_upload input[type=file]");
+    forMax = obj.length;
+    for (i = 0; i < forMax; i++) {
+        //objValid = $("#"+$(obj[i]).attr("id")).data().kendoUpload.options.validation;
+        objValid = JSON.parse("{ " + $('#' + obj[i].id).attr("validation") + " }");
+        if (objValid.allowedExtensions) $('#' + obj[i].id).attr("accept", objValid.allowedExtensions.join());
+        $('#' + obj[i].id).data('kendoUpload').options.validation.maxFileSize = objValid.maxFileSize;
+        var attTitle = iif($('#' + obj[i].id).attr("multiple"), "여러개 업로드 가능", "한개 업로드 가능") + ', 파일당 최대 ' + (objValid.maxFileSize / 1024 / 1024) + 'MB';
+        if (objValid.allowedExtensions) attTitle = attTitle + ', 제한 ' + objValid.allowedExtensions.join();
+        $('#' + obj[i].id).attr("title", attTitle);
+    }
+
+    var obj = $("div.round_upload input[type=file][data-files]");	//첨부파일 필드가 3개 이면 3개가 잡힘.
+    forMax = obj.length;
+    for (i = 0; i < forMax; i++) {
+        obj1 = JSON.parse($(obj[i]).attr("data-files"));	//각 필드에 대한 첨부파일 갯수
+        obj2 = $("div#round_" + $(obj[i]).attr("id")).find("span.k-file-group-wrapper");
+        if (obj1.length != obj2.length) {
+            console.log('첨부파일 비정상 발생!');
+            debugger;
+        }
+        forMax2 = obj1.length;
+        for (j = 0; j < forMax2; j++) {
+            if (InStr(".jpg.jpeg.png.gif", obj1[j].extension.toLowerCase()) > 0) {
+                obj2[j].outerHTML = '<img class="image-preview" src="thumbnail.php?' + obj1[j].attachUrl + '?' + Date.now() + '">';
+            }
+            $($(obj[i]).closest('div.k-widget.k-upload').find('li.k-file')[j]).attr('attachUrl', obj1[j].attachUrl);
+        }
+    }
+
+    var info_url = "info.php?RealPid=" + document.getElementById("RealPid").value + "&MisJoinPid=" + document.getElementById("MisJoinPid").value + "&key_aliasName=" + document.getElementById("key_aliasName").value + "&thisAlias={thisAlias}&key_idx=" + document.getElementById("idx").value;
+    k_file_createClick(info_url);
+}
+
+
+
+function tab() {
+    var tabs = "";
+
+    for (var i = 0; i < stringify.level; i++) {
+        tabs += "\t";
+    }
+
+    return tabs;
+}
+
+function stringify(items) {
+    var item,
+        itemString,
+        levelString = "";
+
+    for (var i = 0; i < items.length; i++) {
+        item = items[i];
+
+        if (!item.items) {
+            itemString = kendo.stringify(item);
+        } else {
+            stringify.level++;
+            var subnodes = stringify(item.items);
+            stringify.level--;
+
+            delete item.items;
+
+            itemString = kendo.stringify(item);
+
+            itemString = itemString.substring(0, itemString.length - 1);
+
+            itemString += ",\"items\":[\r\n" + subnodes + tab() + "]}";
+        }
+
+        levelString += tab() + itemString;
+
+        if (i != items.length - 1) {
+            levelString += ",";
+        }
+
+        levelString += "\r\n";
+    }
+
+    return levelString;
+}
+
+
+
+function addPreview(file, wrapper) {
+    var raw = file.rawFile;
+    var reader = new FileReader();
+    if (raw) {
+        reader.onloadend = function () {
+            var preview = $("<img class='image-preview'>").attr("src", this.result);
+            wrapper.find(".k-file[data-uid='" + file.uid + "'] .k-file-extension-wrapper")
+                .replaceWith(preview);
+        };
+
+        reader.readAsDataURL(raw);
+    }
+}
+
+function checkedNodeIds(nodes, checkedNodes) {
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].checked) {
+            checkedNodes.push(nodes[i].value);
+        }
+
+        if (nodes[i].hasChildren) {
+            checkedNodeIds(nodes[i].children.view(), checkedNodes);
+        }
+    }
+}
+
+function toolbar_onClick(e) {
+
+    if (e.id == "btn_leftVibile") {
+        $("a#sidebar-toggle").click();
+    } else if (e.id == "btn_alim") {
+        setTimeout(function () { pushAlim(); });
+    } else if (e.id == "btn_urlCopy") {
+        url = status_view_url();
+        url = encodeURI(url);
+        fetch('./shorten.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ long_url: url })
+        })
+            .then(response => response.text())
+            .then(response => {
+                copyStringToClipboard(response);
+
+                const toastr_obj = typeof parent.toastr === "object" ? parent.toastr : toastr;
+                toastr_obj.success(
+                    "현재 상태의 URL 주소가 복사되었습니다.",
+                    "처리결과",
+                    { timeOut: 2000, positionClass: "toast-bottom-right" }
+                );
+            })
+            .catch(error => {
+                console.error("에러 발생:", error);
+            });
+
+
+    } else if (e.id == "btn_basicFormVisible") {
+        index = $('li[tabid="viewPrint"]').attr('tabnumber');
+        $('li[tabnumber]').each(function () {
+            if ($(this).attr("tabnumber") * 1 < index) {
+                $(this).attr("noTouch", "Y");
+                this.style.display = "inline-block";
+            }
+        });
+        $('li[tabid="viewPrint"]')[0].style.setProperty("display", "inline-block", "important");
+        $('li[tabid="viewPrint"]').parent().css('display', 'inline-flex');
+        $('li[tabid="viewPrint"]').parent().parent().css('display', 'inline-block');
+        $('li[tabnumber="1"]').click();
+    } else if (e.id == "btn_editHelp") {
+        var url = location.href.split('?')[0] + '?RealPid=speedmis001067&ActionFlag=modify&tabid=help_title&idx=' + document.getElementById("gubun").value;
+        parent_popup_jquery(url);
+    } else if (e.id == "btn_reopen") {
+        p_url = status_view_url();
+        p_url = replaceAll(p_url, "&isMenuIn=Y", "");
+        go_mis_gubun(document.getElementById("gubun").value, p_url);
+    } else if (e.id == "btn_backupBye") {
+        p_url = location.href.split("#")[0];
+        p_tabjsonname = getUrlParameter("tabjsonname");
+        p_url = replaceAll(p_url, "&tabjsonname=" + p_tabjsonname, "");
+        $('input#temp1').attr('now_values', '');
+        go_mis_gubun(document.getElementById("gubun").value, p_url);
+    } else if (e.id == "btn_devQueryOn") {
+        devQueryOn();
+    } else if (e.id == "btn_devQueryOff") {
+        devQueryOff();
+    } else if (e.id == "btn_opinion") {
+        sendMsg_opinion();
+    } else if (e.id == "btn_logout") {
+        if (confirm(document.getElementById("MisSession_UserName").value + " 님, 로그아웃을 하시겠습니까?")) {
+            $('input#temp1').attr('now_values', '');
+            location.href = "logout.php";
+        }
+    } else if (e.id == "btn_goHome") {
+        parent.location.href = location.href.split('?')[0];
+    } else if (e.id == "btn_help") {
+        //help_open_page();
+    } else if (e.id == "btn_webSourceOpen") {
+        url = location.href.split('?')[0] + "?RealPid=speedmis000266&idx=" + document.getElementById("logicPid").value + "&tabname=" + encodeURI("상세내역");
+        if (document.getElementById("logicPid").value != document.getElementById("RealPid").value) {
+            if (confirm('Mis Join 으로된 프로그램입니다. \n기본정보를 조회/수정하시려면 [확인](메뉴관리로 이동)을,\n웹소스로 이동하시려면 [취소]를 선택하세요!')) {
+                url = location.href.split('?')[0] + "?RealPid=speedmis000314&idx=" + document.getElementById("gubun").value;
+            }
+        }
+        window.open(url);
+    } else if (e.id == "btn_designer") {
+        url = "addLogic_treat.php?RealPid=speedmis000314&question=pid_name&v=" + document.getElementById('logicPid').value;
+        pid_name = ajax_url_return(url);
+        url = location.href.split('?')[0] + '?RealPid=speedmis001333&isAddURL=Y&allFilter=[{"operator":"eq","value":"' + document.getElementById('logicPid').value + ':' + shortUrl_replace(pid_name) + '","field":"toolbar_zpeurogeuraemseontaek"},{"operator":"eq","value":"Y","field":"toolbar_znaeyongnochuryeobu"}]';
+        window.open(url);
+    } else if (e.id == "btn_addMenu") {
+        if ($('div#example-nav').data('kendoTreeView').dataItem($('div#example-nav span.k-state-selected.k-in'))) {
+            var gubun = $('div#example-nav').data('kendoTreeView').dataItem($('div#example-nav span.k-state-selected.k-in')).id;
+            var pname = $('div#example-nav').data('kendoTreeView').dataItem($('div#example-nav span.k-state-selected.k-in')).text;
+        } else {
+            var gubun = getUrlParameter('gubun');
+            var pname = document.getElementById('MenuName').value;
+        }
+        url = location.href.split('?')[0] + '?RealPid=speedmis001170&idx=' + gubun + '&ActionFlag=write';
+        parent_popup_jquery(url, pname + ' 에 대한 ', 850, 600);
+    } else if (e.id == "btn_newopen") {
+        p_url = status_view_url();
+        p_url = replaceAll(p_url, "&isIframe=Y", "");
+
+        window.open(replaceAll(replaceAll(p_url, "&isMenuIn=Y", ""), "?isMenuIn=Y&", "?"));
+    } else if (e.id == "btn_reload") {
+        if ($('input#ActionFlag')[0].value != 'view') {
+            if (document.getElementById('userDefine_page_print')) {
+                //과제임. 사용자양식에 의한 입력/수정 시, 새로고침을 하면 컨트롤이 깨져서 location 이용함.
+                location.replace(status_view_url());
+            } else if (event) {   //사용자가 직접 클릭했을 때만 묻는다.  view bottome 의 beforeunload 와 같은조건.
+                if (check_beforeunload() == true && $('body').width() * $('body').height() > 0) {
+                    if (event.type == 'click') {
+                        if (!confirm('변경 중인 내용을 무시하고 새로고침 하시겠습니까?')) return false;
+                    }
+                }
+
+            }
+        }
+        read_idx(document.getElementById("idx").value);
+    } else if (e.id == "btn_close") {
+
+        if (!window.frameElement) return false;
+
+        if (check_beforeunload() == true && $('input#ActionFlag')[0].value != 'view') {
+            if (!confirm("편집 중인 창을 닫으시겠습니까?")) return false;
+        }
+
+        if (parent.$("#grid").data("kendoGrid")) parent.$("#grid").data("kendoGrid").dataSource.read();
+
+        if (window.frameElement.id == "grid_bottom") {
+            var splitter = parent.$("#vertical").data("kendoSplitter");
+            var size = splitter.size(".k-pane:first");
+            if (size != "100%") {
+                parent.setCookie('lastSize_bottom', size, 1000);
+                splitter.size(".k-pane:first", "100%");
+            }
+        } else if (window.frameElement.id == "grid_right") {
+            var splitter = parent.$("#horizontal").data("kendoSplitter");
+            var size = splitter.size(".k-pane:first");
+            if (size != "100%") {
+                parent.setCookie('lastSize_right', size, 1000);
+                splitter.size(".k-pane:first", "100%");
+            }
+        } else {
+            //팝업닫기!!!
+            if (parent.$(".k-widget.k-window.k-dialog a.k-dialog-close").length == 1) {
+
+                parent.$("a#btn_reload").click();
+                parent.$(".k-widget.k-window.k-dialog a.k-dialog-close").click();
+                parent.$(".k-widget.k-window.k-dialog a.k-dialog-close").closest('.k-widget.k-window').remove();
+            } else if (window.frameElement.id != '') {
+                parent.$("div#" + replaceAll(window.frameElement.id, "ifr_", "") + "[data-role=window]").data("kendoWindow").close();
+                parent.$("div#" + replaceAll(window.frameElement.id, "ifr_", "") + "[data-role=window]").closest('.k-widget.k-window').remove();
+            } else if ($('body[topsite="notmis"]')[0]) {
+                url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                    + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                    + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                    + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                    + "&isAddURL=Y";
+                go_mis_gubun(document.getElementById("gubun").value, url);
+            }
+        }
+
+    } else if (e.id == "btn_list") {
+        //참조입력 후에는 프레임 안에 갖히는 현상 발생. 이때 목록 누르면 상위프레임 목록이 되도록 닫고, 새로고침!
+        if ($('body[topsite="notmis"]')[0]) {
+            url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                + iif(getUrlParameter('treemenu') == 'Y', '&treemenu=Y', '')
+                + "&isAddURL=Y";
+            go_mis_gubun(document.getElementById("gubun").value, url);
+        } else if (parent.isMainFrame() && !isMainFrame() && parent.document.getElementById("RealPid").value == document.getElementById("RealPid").value && parent.document.getElementById("ActionFlag").value == "list") {
+            if (parent.$("#grid").data("kendoGrid")) parent.$("#grid").data("kendoGrid").dataSource.read();
+            $("a#btn_close").click();
+        } else {
+            url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                + iif(getUrlParameter('treemenu') == 'Y', '&treemenu=Y', '')
+                + iif(isNumeric(getUrlParameter('psize')), "&psize=" + getUrlParameter('psize'), "")
+                + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "") + iif(document.getElementById("isIframe").value == "Y", "&isIframe=Y", "")
+                + "&isAddURL=Y";
+            go_mis_gubun(document.getElementById("gubun").value, url);
+        }
+    } else if (e.id == "btn_view") {
+        url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + document.getElementById("idx").value
+            + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "")
+            + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+            + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+            + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+            + iif(isNumeric(getUrlParameter('psize')), "&psize=" + getUrlParameter('psize'), "")
+            + iif(document.getElementById("isIframe").value == "Y", "&isIframe=Y", "")
+            + "&isAddURL=Y";
+        go_mis_gubun(document.getElementById("gubun").value, url);
+    } else if (e.id == "btn_modify") {
+        url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + document.getElementById("idx").value
+            + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+            + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+            + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+            + "&ActionFlag=modify" + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "") + iif(document.getElementById("isIframe").value == "Y", "&isIframe=Y", "")
+            + "&isAddURL=Y";
+        go_mis_gubun(document.getElementById("gubun").value, url);
+    } else if (e.id == "btn_refWrite") {
+        url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + document.getElementById("idx").value
+            + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+            + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+            + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+            + iif(isNumeric(getUrlParameter('psize')), "&psize=" + getUrlParameter('psize'), "")
+            + "&ActionFlag=write" + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "") + iif(document.getElementById("isIframe").value == "Y", "&isIframe=Y", "")
+            + "&isAddURL=Y";
+        go_mis_gubun(document.getElementById("gubun").value, url);
+    } else if (e.id == "btn_write") {
+        url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=0"
+            + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+            + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+            + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+            + iif(isNumeric(getUrlParameter('psize')), "&psize=" + getUrlParameter('psize'), "")
+            + "&ActionFlag=write" + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "") + iif(document.getElementById("isIframe").value == "Y", "&isIframe=Y", "")
+            + "&isAddURL=Y";
+        go_mis_gubun(document.getElementById("gubun").value, url);
+    } else if (e.id == "btn_delete") {
+
+        //상세내역 삭제 시도 중, 본문삭제를 누르는 실수 방지용 로직.
+        active_tabid = $('li[aria-selected="true"][tabid]').attr('tabid');
+        if (active_tabid == "viewPrint") {
+            cnt = $('tr[firstline] > td:first-child input[type="checkbox"]:checked').length;
+            if (cnt > 0) {
+                alert("상세내역이 선택되어 있으면 본문을 삭제할 수 없습니다. 만약 상세내역 삭제를 원하신다면 하단의 삭제버튼을 이용하세요!");
+                return false;
+            }
+        } else if ($('li[aria-selected="true"][tabid]').attr('tabrealpid') != "" && $('li[aria-selected="true"][tabid]').attr('tabrealpid') != undefined && getFrameObj(active_tabid)) {
+
+            if (getFrameObj(active_tabid).document.getElementById("ActionFlag").value == "list") {
+                var deleteList = getFrameObj(active_tabid).$("#grid").data("kendoGrid").selectedKeyNames();
+                if (getFrameObj(active_tabid).getFieldAttr(getFrameObj(active_tabid).document.getElementById("key_aliasName").value, "format") == "{0:yyyy-MM-dd}") {
+                    for (i = 0; i < deleteList.length; i++) {
+                        deleteList[i] = date10(deleteList[i]);
+                    }
+                }
+                getFrameObj(active_tabid).$('td[keyidx] input.k-checkbox[disabled]:checked').each(function () {
+                    var delete_index = deleteList.indexOf($(this).closest("td").attr("keyidx"));
+                    if (delete_index > -1) deleteList.splice(delete_index, 1);
+                });
+
+                if (deleteList.length > 0 && getFrameObj(active_tabid).$('td[keyidx] input.k-checkbox:visible').length > 0) {
+                    alert("상세내역이 선택되어 있으면 본문을 삭제할 수 없습니다. 만약 상세내역 삭제를 원하신다면 하단의 삭제버튼을 이용하세요!");
+                    return false;
+                }
+            }
+
+        }
+
+        var idxName = Trim($("div#" + document.getElementById("key_aliasName").value + "[data-bind]").parent().parent().find("label").text());
+
+        alert_msg = "본문 " + idxName + " : " + document.getElementById("idx").value + " 를 삭제하시겠습니까?";
+
+        if ($('iframe[real_src]:visible')[0]) alert_msg = "************* 주의 : 본문 페이지 삭제 시도 중 *************\n" + alert_msg + "\n*************************************************************";
+
+        if (!confirm(alert_msg)) return false;
+
+        var deleteList = [];
+        deleteList.push(document.getElementById("idx").value);
+
+
+        var saveList = {};
+
+        //다른쪽의 saveList 로직을 필수항목만 주석처리하고 그대로 가져옴.
+        if (document.getElementById("ActionFlag").value == 'modify') {
+            obj = $('form#frm [data-text-field]:not([id*=ud_]):not([id*=udd_])');
+            forMax = obj.length;
+            for (i = 0; i < forMax; i++) {
+
+                //console.log(obj[i].tagName + ":::" + $(obj[i]).attr("data-role") + ":::");
+                if (document.getElementById('thisAlias_parent_idx').value == obj[i].id && document.getElementById("ActionFlag").value == 'modify') {
+                    //이 경우 무시.
+                } else if (InStr(obj[i].id, 'Qn') > 0 && InStr(obj[i].id, 'virtual_fieldQn') == 0) {
+                    //이 경우 무시.
+                } else if ((obj[i].tagName == "SELECT" || obj[i].tagName == "DIV") && $(obj[i]).attr("Grid_Items") != undefined) {
+                    //아래와 같이 같으면, dropdownitem 임.
+                    if ($(obj[i]).attr("data-role") == undefined) {
+                        saveList[obj[i].id] = $(obj[i]).val();
+                    } else if ($(obj[i]).attr("data-role") == "dropdownlist") {
+                        saveList[obj[i].id] = $(obj[i]).data("kendoDropDownList").value();
+                    } else if ($(obj[i]).attr("data-role") == "treeview") {
+                        var checkedNodes = [], treeView = $(obj[i]).data("kendoTreeView");
+                        checkedNodeIds(treeView.dataSource.view(), checkedNodes);
+                        if (checkedNodes.length > 0) {
+                            vv = ',' + checkedNodes.join(',') + ',';
+                            vv = replaceAll(vv, ',,', ',');
+                            vv = Mid(vv, 2, vv.length - 2);
+                            saveList[obj[i].id] = vv;
+                        } else {
+                            if ($(obj[i]).attr("required") == "required") {
+                                var label_name = $('label[for="' + obj[i].id + '"]').text().split('*')[0];
+                                //alert(label_name + "는 필수항목입니다.");
+                                //return false;
+                            }
+                            saveList[obj[i].id] = '';
+                        }
+                    } else {
+                        saveList[obj[i].id] = $(obj[i]).data("kendoMultiSelect").value().join(",");
+                    }
+                } else if (obj[i].tagName == "DIV") {
+                    saveList[obj[i].id] = obj[i].innerHTML;
+                } else if ($(obj[i]).attr("type") == "checkbox") {
+                    if ($(obj[i]).attr("Grid_Schema_Type") == "boolean") {
+                        saveList[obj[i].id] = iif(obj[i].checked, "1", "0");
+                    } else {
+                        saveList[obj[i].id] = iif(obj[i].checked, "Y", "N");
+                    }
+                } else {
+                    //attr 로 해야 인식이 더 잘됨.
+                    if ($(obj[i]).attr("data-role") == "editor") {
+                        if ($.parseHTML(obj[i].value) == null) saveList[obj[i].id] = "";
+                        else {
+                            htm = '';
+                            cnt_parse = $.parseHTML(obj[i].value).length;
+                            for (m = 0; m < cnt_parse; m++) {
+                                htm = htm + $.parseHTML(obj[i].value)[m].data;
+                            }
+                            $('<div>' + htm + '</div>').find('img').each(function () {
+                                if (InStr($(this).attr('src'), 'data:') > 0) {
+                                    var imgname = 'i' + getRandomArbitrary(100000, 999999) + '.png';
+                                    var fullname = '/temp/' + $('#tempDir')[0].value + '/' + obj[i].id + '_editorImage/' + imgname;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: 'editor_image_save.php?tempDir=' + $('#tempDir')[0].value + '&field=' + obj[i].id + '&imgname=' + imgname,
+                                        dataType: 'text',
+                                        async: false,
+                                        data: {
+                                            base64data: $(this).attr('src')
+                                        }
+                                    });
+                                    htm = replaceAll(htm, $(this).attr('src'), fullname);
+                                }
+                            });
+                            saveList[obj[i].id] = htm;
+                        }
+                    } else if ($(obj[i]).attr("data-role") == "timepicker") {
+                        if ($(obj[i]).data("kendoTimePicker").value() == null) saveList[obj[i].id] = null;
+                        else saveList[obj[i].id] = Right($(obj[i]).data("kendoTimePicker").value().yyyymmddhhmm16(), 5);
+                    } else if ($(obj[i]).attr("data-role") == "datetimepicker") {
+                        if ($(obj[i]).data("kendoDateTimePicker").value() == null) saveList[obj[i].id] = null;
+                        else saveList[obj[i].id] = $(obj[i]).data("kendoDateTimePicker").value().yyyymmddhhmm16();
+                    } else if ($(obj[i]).attr("value") != undefined) {
+                        saveList[obj[i].id] = $(obj[i]).attr("value");
+                    } else {
+                        saveList[obj[i].id] = obj[i].value;
+                    }
+                }
+            }
+        }
+
+
+        $.ajax({
+            method: "POST",
+            dataType: "text",
+            url: "save.php?tempDir=" + document.getElementById("tempDir").value + '&addParam=' + document.getElementById("addParam").value,
+            data: {
+                deleteList: JSON.stringify(deleteList), key_aliasName: document.getElementById("key_aliasName").value
+                , ActionFlag: "delete", RealPid: document.getElementById("RealPid").value, MisJoinPid: document.getElementById("MisJoinPid").value
+                , viewList: replaceAll(JSON.stringify(resultAll.d.results[0]), ':', '@colon;')
+                , saveList: replaceAll(JSON.stringify(saveList), ':', '@colon;')    //삭제 시, 서버로직에서 응용을 위해 viewList 와 saveList 를 함께 보냄. 
+            }
+        })
+            .done(function (result) {
+                if (isJsonString(result)) {
+                    if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                    toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                } else {
+                    alert(result);
+                }
+                if (isMobile() == false) {
+                    toastr.info('delete 쿼리를 보시려면 브라우저의 개발자모드에서 콘솔을 보세요!', '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                    console.log('delete 쿼리: ' + JSON.parse(result).sql);
+                }
+                $('input#temp1').attr('now_values', '');
+                if (isMainFrame() || document.getElementById('BodyType').value == 'only_one_list') {
+                    url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                        + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                        + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                        + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                        + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "");
+
+                    if (document.getElementById("isMenuIn").value == 'S') {
+                        location.href = url;
+                    } else {
+                        go_mis_gubun(document.getElementById("gubun").value, url);
+                    }
+                } else {
+                    $("a#btn_close").click();
+                    if (parent.$("#grid").data("kendoGrid")) parent.$("#grid").data("kendoGrid").dataSource.read();
+                }
+            })
+            .fail(function () {
+                debugger;
+                console.log("save error");
+            });
+
+    }
+
+    if (e.id == "btn_delete") {
+        beforeunload_ignore();
+        if ($('a#btn_list')[0]) {    //list 버튼이 없어도 하위로직에서 해결됨.
+            $('a#btn_list').click();
+        }
+    } else if (e.id == "btn_back") {
+        if (getUrlParameter('parent_idx') != null && getUrlParameter('parent_idx') == getStringUrlParameter(document.referrer, 'parent_idx') || isMainFrame() == true) {
+            history.back();
+        } else if (document.getElementById("idx").value == "0") {
+            $('#btn_close').click();
+        } else {
+            location.replace(replaceAll(location.href, '&ActionFlag=write', ''));
+        }
+    }
+
+
+    if (e.id == "btn_save" || e.id == "btn_saveClose" || e.id == "btn_saveView") {
+
+        //일단 pre_values==now_values 로 해야 함 : 반영이 늦기 때문. 
+        $('input#temp1').attr('pre_values', get_now_values());
+
+        var save_actionFlag = iif(document.getElementById("ActionFlag").value == "write" && document.getElementById("BodyType").value == "save_templist", iif($("#BodyType").attr("add") == "Y", "templist", "templist_end"), document.getElementById("ActionFlag").value);
+
+        if (save_actionFlag == 'templist') {
+            $('input#temp1').attr('pre_values', 'templist'); //임시저장 시에는 이동방지
+        }
+        if (save_actionFlag == 'templist_end') {
+            cnt = $('#grid_list5').data('kendoGrid').dataSource._pristineData.length;
+            if (cnt == 0) {
+                alert('저장할 내역이 없습니다.');
+                setTimeout(function () {
+                    displayLoadingOff();
+                });
+                return false;
+            }
+            if (!confirm("아래에 임시내역 " + cnt + " 건을 저장하시겠습니까?")) {
+                setTimeout(function () {
+                    displayLoadingOff();
+                });
+                return false;
+            }
+        } else {
+            //입력폼값을 기본폼값에 반영 시작
+            $('div#viewPrintDiv [id*=ud_]').each(function () {
+                realId = replaceAll(this.id, "ud_", "");
+                realObj = $('#' + realId)[0];
+                if (this.type == "checkbox") {
+                    realObj.checked = this.checked;
+                } else {
+                    realObj.value = this.value;
+                }
+            });
+            //입력폼값을 기본폼값에 반영 끝
+
+
+            //비밀번호 등이 필수입력의 경우, 수정의 경우는 모름으로 입력일때만 disabled 를 해제시킴(그래야 필수입력이 인식됨)
+            if (document.getElementById("ActionFlag").value == "write") {
+                $('input.isPassSave[type="checkbox"]').each(function () {
+                    if (this.checked == false) $(this).click();
+                });
+            }
+
+            if ($("a#btn_save").attr("no_role") != "Y") {
+                $("input#checkSubmit").click();
+                if ($('input#temp1').attr('delta_sec') == undefined) {
+                    $('input#temp1').attr('delta_sec', 0);
+                }
+                delta_sec = $('input#temp1').attr('delta_sec') * 1 + 1;
+                $('input#temp1').attr('delta_sec', delta_sec);
+                if ($('form#frm')[0].checkValidity() == false && delta_sec % 2 == 1) {
+                    setTimeout(function () {
+                        displayLoadingOff();
+                        setTimeout(function () {
+                            if (kendo.culture().name == "ko-KR") {
+                                alert("필수항목 입력조건에 의해 저장이 되지 않았습니다!");
+                            } else {
+                                alert("The required fields were not saved due to the entry conditions!");
+                            }
+                        }, 500);
+                    });
+                } else {
+                    setTimeout(function () {
+                        displayLoadingOff();
+                    });
+                }
+                if ($('form#frm')[0].checkValidity() == false) {
+                    $('input#temp1').attr('pre_values', 'stop');
+                    return false;
+                }
+            }
+
+            //첨부파일은 별도로 체크해야 함. required 로는 안됨.
+            var attach_required_upload_ok = true;
+            $('input[data-role="upload"][attach_required]').each(function () {
+                if ($(this).closest('div.k-widget.k-upload').find('ul.k-upload-files.k-reset li.k-file.k-file-success').length == 0) {
+                    field_name = $(this).closest('div.round_upload').find('label[for]')[0].innerText.split('*')[0];
+                    if (kendo.culture().name == "ko-KR") {
+                        alert_msg = field_name + ' 항목은 필수업로드 항목입니다.';
+                    } else {
+                        alert_msg = field_name + ' is a required field.';
+                    }
+                    alert(alert_msg);
+                    attach_required_upload_ok = false;
+                    setTimeout('displayLoadingOff();', 100);     // time 을 0 으로 하면 안사라짐.
+                    return false;
+                }
+            });
+            if (attach_required_upload_ok == false) {
+                $('input#temp1').attr('pre_values', 'stop');
+                return false;
+            }
+        }
+
+        var saveList = {}, initList = {};
+        obj = $('form#frm [data-text-field]:not([id*=ud_]):not([id*=udd_])');
+        forMax = obj.length;
+
+
+
+        for (i = 0; i < forMax; i++) {
+            //console.log(obj[i].id);
+            //console.log(obj[i].tagName + ":::" + $(obj[i]).attr("data-role") + ":::");
+            //if(obj[i].id=='addLogic') debugger;
+            if (document.getElementById('thisAlias_parent_idx').value == obj[i].id && document.getElementById("ActionFlag").value == 'modify') {
+                //이 경우 무시.
+            } else if (InStr(obj[i].id, 'Qn') > 0 && InStr(obj[i].id, 'virtual_fieldQn') == 0) {
+                //이 경우 무시.
+            } else if ((obj[i].tagName == "SELECT" || obj[i].tagName == "DIV") && $(obj[i]).attr("Grid_Items") != undefined) {
+                //아래와 같이 같으면, dropdownitem 임.
+                if ($(obj[i]).attr("data-role") == undefined) {
+                    saveList[obj[i].id] = $(obj[i]).val();
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                } else if ($(obj[i]).attr("data-role") == "dropdownlist") {
+                    saveList[obj[i].id] = $(obj[i]).data("kendoDropDownList").value();
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                } else if ($(obj[i]).attr("data-role") == "treeview") {
+                    var checkedNodes = [], treeView = $(obj[i]).data("kendoTreeView");
+                    checkedNodeIds(treeView.dataSource.view(), checkedNodes);
+                    if (checkedNodes.length > 0) {
+                        vv = ',' + checkedNodes.join(',') + ',';
+                        vv = replaceAll(vv, ',,', ',');
+                        vv = Mid(vv, 2, vv.length - 2);
+                        saveList[obj[i].id] = vv;
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    } else {
+                        if ($(obj[i]).attr("required") == "required") {
+                            var label_name = $('label[for="' + obj[i].id + '"]').text().split('*')[0];
+                            alert(label_name + "는 필수항목입니다.");
+                            $('input#temp1').attr('pre_values', 'stop');
+                            return false;
+                        }
+                        saveList[obj[i].id] = '';
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    }
+                } else {
+                    saveList[obj[i].id] = $(obj[i]).data("kendoMultiSelect").value().join(",");
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+                }
+            } else if (obj[i].tagName == "DIV") {
+                saveList[obj[i].id] = obj[i].innerHTML;
+                if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+            } else if ($(obj[i]).attr("type") == "checkbox") {
+                if ($(obj[i]).attr("Grid_Schema_Type") == "boolean") {
+                    saveList[obj[i].id] = iif(obj[i].checked, "1", "0");
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = iif($(obj[i]).attr('initvalue') == 'true', '1', '0');
+                } else {
+                    saveList[obj[i].id] = iif(obj[i].checked, "Y", "N");
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = iif($(obj[i]).attr('initvalue') == 'true', 'Y', 'N');
+                }
+            } else {
+                //attr 로 해야 인식이 더 잘됨.
+                if ($(obj[i]).attr("data-role") == "editor") {
+                    if ($.parseHTML(obj[i].value) == null) {
+                        saveList[obj[i].id] = "";
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+                    } else {
+                        htm = '';
+                        cnt_parse = $.parseHTML(obj[i].value).length;
+                        for (m = 0; m < cnt_parse; m++) {
+                            htm = htm + $.parseHTML(obj[i].value)[m].data;
+                        }
+                        $('<div>' + htm + '</div>').find('img').each(function () {
+                            if (InStr($(this).attr('src'), 'data:') > 0) {
+                                var imgname = 'i' + getRandomArbitrary(100000, 999999) + '.png';
+                                var fullname = '/temp/' + $('#tempDir')[0].value + '/' + obj[i].id + '_editorImage/' + imgname;
+                                $.ajax({
+                                    type: "POST",
+                                    url: 'editor_image_save.php?tempDir=' + $('#tempDir')[0].value + '&field=' + obj[i].id + '&imgname=' + imgname,
+                                    dataType: 'text',
+                                    async: false,
+                                    data: {
+                                        base64data: $(this).attr('src')
+                                    }
+                                });
+                                htm = replaceAll(htm, $(this).attr('src'), fullname);
+                            }
+                        });
+                        saveList[obj[i].id] = encode_cafe24(htm);
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+                    }
+                } else if ($(obj[i]).attr("data-role") == "timepicker") {
+                    if ($(obj[i]).data("kendoTimePicker").value() == null) {
+                        saveList[obj[i].id] = null;
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    } else {
+                        saveList[obj[i].id] = Right($(obj[i]).data("kendoTimePicker").value().yyyymmddhhmm16(), 5);
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    }
+                } else if ($(obj[i]).attr("data-role") == "datetimepicker") {
+                    if ($(obj[i]).data("kendoDateTimePicker").value() == null) {
+                        saveList[obj[i].id] = null;
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    } else {
+                        saveList[obj[i].id] = $(obj[i]).data("kendoDateTimePicker").value().yyyymmddhhmm16();
+                        if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = $(obj[i]).attr('initvalue');
+                    }
+                } else if ($(obj[i]).attr("value") != undefined) {
+                    saveList[obj[i].id] = encode_cafe24($(obj[i]).attr("value"));
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+                } else {
+                    saveList[obj[i].id] = encode_cafe24(obj[i].value);
+                    if ($(obj[i]).attr('initvalue') != undefined) initList[obj[i].id] = encode_cafe24($(obj[i]).attr('initvalue'));
+                }
+            }
+
+
+        }
+
+        //textdecrypt1  list save
+        var saveTextdecrypt1List = {};
+        obj = $('div.textdecrypt1 input[data-role="autocomplete"]');
+        forMax = obj.length;
+        for (i = 0; i < forMax; i++) {
+            saveTextdecrypt1List[obj[i].id] = obj[i].value;
+            delete saveList[obj[i].id];
+        }
+        var saveTextdecrypt2List = {};
+        obj = $("form#frm [data-textdecrypt2-field]");
+        forMax = obj.length;
+        for (i = 0; i < forMax; i++) {
+            saveTextdecrypt2List[obj[i].id] = obj[i].value;
+        }
+
+        //아래는 첨부파일목록
+        var saveUploadList = {};
+        //upload 컨트롤에 변화가 있어야 첨부에 관해 저장함 / maxlength0 는 제외시킴; maxlength 가 공백인 경우임.
+        var obj1 = $('form#frm[upload_change="Y"] div.round_upload.maxlength_plus,body[actionflag="write"] form#frm[upload_change="Y"] div.round_upload.maxlength_minus');
+        forMax = obj1.length;
+        for (i = 0; i < forMax; i++) {
+            keyName = replaceAll(obj1[i].id, "round_", "");
+            saveUploadList[keyName] = "";
+            var obj2 = $(obj1[i]).find("li.k-file.k-file-success span.k-file-name");
+            forMax2 = obj2.length;
+            for (j = 0; j < forMax2; j++) {
+                keyValue = obj2[j].title;
+                if (saveUploadList[keyName] == "") saveUploadList[keyName] = keyValue;
+                else saveUploadList[keyName] = saveUploadList[keyName] + "@AND@" + keyValue;
+            }
+        }
+
+        var viewList = {};
+
+        var obj1 = $("div[id*=round_");
+        forMax = obj1.length;
+        for (i = 0; i < forMax; i++) {
+            keyName = replaceAll(obj1[i].id, "round_", "");
+            if (keyName != '') {
+                //if(keyName=='saeopjang3') debugger;
+                data_role = $('#round_' + keyName + ' #' + keyName).attr('data-role');
+                //if(keyName=='saeopjang2') debugger;
+                if ($(obj1[i]).find("div.timepicker").length == 1) {
+                    v = Right(new Date("2020-01-01 " + v).yyyymmddhhmm16(), 5);
+                } else if ($('#round_' + keyName + ' input#' + keyName).attr("type") == "checkbox") {
+                    if ($('#round_' + keyName + ' input#' + keyName).attr("Grid_Schema_Type") == "boolean") {
+                        v = iif($('#round_' + keyName + ' input#' + keyName)[0].checked, "1", "0");
+                    } else {
+                        v = iif($('#round_' + keyName + ' input#' + keyName)[0].checked, "Y", "N");
+                    }
+                } else if ($('#round_' + keyName + ' input#' + keyName).length > 0) {
+                    v = $('#round_' + keyName + ' input#' + keyName).val();
+                    if ($('#round_' + keyName + ' input#' + keyName).hasClass('round_helpbox2') == true) {
+                        viewList[$('#round_' + keyName + ' input#' + keyName).closest('div').find('input')[0].id] = encode_cafe24($('#round_' + keyName + ' input#' + keyName).closest('div').find('input')[0].value);
+                    }
+                } else if ($('#round_' + keyName + ' textarea#' + keyName).length > 0) {
+                    v = $('#round_' + keyName + ' textarea#' + keyName).val();
+                    if ($('#round_' + keyName + ' textarea#' + keyName).attr('data-role') == 'editor') {
+                        if (v == '' || v == undefined || v == null) v = '';
+                        else v = $.parseHTML(v)[0].data;
+                    }
+                } else if (data_role == 'multiselect') {
+                    //과제 : 아래의 dropdownlist 처럼 한줄추가하기
+                    v = $('select#' + keyName).data('kendoMultiSelect').value().toString();
+                } else if (data_role == 'treeview') {
+                    var checkedNodes = [], treeView = $('div#' + keyName).data("kendoTreeView");
+                    checkedNodeIds(treeView.dataSource.view(), checkedNodes);
+                    if (checkedNodes.length > 0) {
+                        vv = ',' + checkedNodes.join(',') + ',';
+                        vv = replaceAll(vv, ',,', ',');
+                        vv = Mid(vv, 2, vv.length - 2);
+                        v = vv;
+                    } else {
+                        if ($('div#' + keyName).attr("required") == "required") {
+                            var label_name = $('label[for="' + obj[i].id + '"]').text().split('*')[0];
+                            alert(label_name + "는 필수항목입니다.");
+                            $('input#temp1').attr('pre_values', 'stop');
+                            return false;
+                        }
+                        v = '';
+                    }
+                } else if (data_role == 'dropdownlist') {
+                    if ($('select#' + keyName).attr('data-text-field') != 'text') {  //dropdownlist 일 경우임.
+                        viewList[$('select#' + keyName).attr('data-text-field')] = $('select#' + keyName).data('kendoDropDownList').text();
+                        v = $('select#' + keyName).data('kendoDropDownList').value().toString();
+                    } else {    //dropdownitem 일 경우임.
+                        v = $('select#' + keyName).data('kendoDropDownList').value().toString();
+                    }
+                } else if ($('#round_' + keyName + ' div[data-bind]').length > 0) {
+                    if (keyName == $('input#key_aliasName').val() && resultAll['d']['results'][0]) {
+                        v = resultAll['d']['results'][0][keyName];
+                    } else {
+                        v = innerTEXT0($('#round_' + keyName + ' div[data-bind]')[0]);
+                    }
+                } else if ($('#round_' + keyName + ' #' + keyName).length > 0) {
+                    v = $('#round_' + keyName + ' #' + keyName).val();
+                } else {
+                    v = '@@stop';
+                }
+                if ($(obj1[i]).find('[data-format]').attr('data-format') != undefined) {
+                    df = $(obj1[i]).find('[data-format]').attr('data-format');
+                    if (InStr(df, '#') > 0 || isNumeric(df.replace(/\D/g, ''))) {
+                        v = replaceAll(replaceAll(v, '.', '1234567').replace(/\D/g, ''), '1234567', '.');
+                        if (Right(df, 1) == '%') v = v / 100.;
+                    }
+                }
+                if (v != '@@stop') viewList[keyName] = encode_cafe24(v);
+            }
+        }
+
+        //다중키(_-_) 의 write 의 경우, 값이 없으면 아래 로직으로 값을 찾아 viewList 에 넣어야 한다. save.php 에서 viewList 를 해석함.
+        if (key_count >= 2 && viewList[document.getElementById('key_aliasName').value] == '') {
+            v = '';
+            cnt = 0;
+            for (i = 2; cnt < key_count && i < 10; i++) {
+                c = $($("div[id*=round_")[i]).find('[data-role]').length;
+                if (c > 0) {
+                    v = v + iif(v == '', '', '_-_') + $($("div[id*=round_")[i]).find('[data-role]')[c - 1].value;
+                    ++cnt;
+                }
+            }
+            viewList[document.getElementById('key_aliasName').value] = v;
+        }
+        //아래는 saveUploadList 와 거의 비슷하게 가져옴. 
+        var obj1 = $('form#frm div.round_upload.maxlength_plus,body[actionflag="write"] form#frm[upload_change="Y"] div.round_upload.maxlength_minus');
+        forMax = obj1.length;
+        for (i = 0; i < forMax; i++) {
+            keyName = replaceAll(obj1[i].id, "round_", "");
+            viewList[keyName] = "";
+            var obj2 = $(obj1[i]).find("li.k-file.k-file-success span.k-file-name");
+            forMax2 = obj2.length;
+            for (j = 0; j < forMax2; j++) {
+                keyValue = obj2[j].title;
+                if (viewList[keyName] == "") viewList[keyName] = keyValue;
+                else viewList[keyName] = viewList[keyName] + "@AND@" + keyValue;
+            }
+        }
+
+
+        if (typeof viewLogic_before_save == "function") {
+            if (viewLogic_before_save() == false) {
+                $('input#temp1').attr('pre_values', 'stop');
+                return false;
+            }
+        }
+
+        /*
+                if($(obj[i]).attr("data-role")=="editor") {
+                    if($.parseHTML( obj[i].value )==null) saveList[obj[i].id] = "";
+                    else saveList[obj[i].id] = $.parseHTML( obj[i].value )[0].data;
+                } else if($(obj[i]).attr("data-role")=="timepicker") {
+                    if($(obj[i]).data("kendoTimePicker").value()==null) saveList[obj[i].id] = null;
+                    else saveList[obj[i].id] = Right($(obj[i]).data("kendoTimePicker").value().yyyymmddhhmm16(),5);
+                } else if($(obj[i]).attr("data-role")=="datetimepicker") {
+                    if($(obj[i]).data("kendoDateTimePicker").value()==null) saveList[obj[i].id] = null;
+                    else saveList[obj[i].id] = $(obj[i]).data("kendoDateTimePicker").value().yyyymmddhhmm16();
+                } else if($(obj[i]).attr("value")!=undefined) {
+                    saveList[obj[i].id] = $(obj[i]).attr("value");
+                } else {
+                    saveList[obj[i].id] = obj[i].value;
+                }
+        */
+
+        var e_id = e.id;    //실제 클릭한 버튼id 가 아닐 수도 있음.
+        var click_id = '';
+        if (event) {
+            if (event.target.tagName == 'LI' || event.target.tagName == 'SPAN') {
+                click_id = $(event.target).closest('div[id]')[0].id;
+            } else {
+                click_id = event.target.id;
+            }
+        }
+        $.ajax({
+            method: "POST",
+            dataType: "text",
+            url: "save.php?tempDir=" + document.getElementById("tempDir").value + '&addParam=' + document.getElementById("addParam").value
+                + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, ""),
+            data: {
+                saveList: replaceAll(JSON.stringify(saveList), ':', '@colon;')
+                , initList: replaceAll(JSON.stringify(initList), ':', '@colon;')
+                , saveUploadList: JSON.stringify(saveUploadList)
+                , saveTextdecrypt1List: JSON.stringify(saveTextdecrypt1List)
+                , saveTextdecrypt2List: JSON.stringify(saveTextdecrypt2List)
+                , viewList: replaceAll(JSON.stringify(viewList), ':', '@colon;')
+                , key_aliasName: document.getElementById("key_aliasName").value
+                , key_value: document.getElementById("idx").value
+                , ActionFlag: save_actionFlag
+                , click_id: click_id
+                , app: document.getElementById("app").value
+                , csrf_token: document.getElementById("csrf_token").value
+                , RealPid: document.getElementById("RealPid").value
+                , parent_idx: document.getElementById("parent_idx").value
+                , MisJoinPid: document.getElementById("MisJoinPid").value
+            }
+        })
+            .done(function (result) {
+                setTimeout(function () {
+                    $('#BodyType').removeAttr('add');
+                }, 100);
+
+                if (typeof result == "string" && isJsonString(result) == false) {
+                    if (InStr(result, '</script>') > 0) {
+                        stripAndExecuteScript(result);
+                    } else if (result != '') {
+                        if (getCookie('devQueryOn') == 'Y') {
+                            rnd = getRandomArbitrary(101, 400);
+                            result = replaceAll(replaceAll(result, '<!--', ''), '-->', '');
+                            result = $('<div>' + result + '</div>')[0].innerText;
+                            if (result.length <= 500 && InStr(result, '<!--') == 0) {
+                                if (InStr(result, '<') + InStr(result, '/>') == 0) {
+                                    result = TextToHtml(result);
+                                }
+                                toastr.error(result, '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                            } else {
+                                toastr.error('<a id="rnd' + rnd + '" href="javascript:;" onclick="query_error_popup(this);">에러쿼리를 보시려면 여기를 클릭하세요.</a>', '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                                $('a#rnd' + rnd).attr('msg', result);
+                            }
+                        } else {
+                            if (result.length <= 500 && InStr(result, '<!--') == 0) {
+                                if (InStr(result, '<') + InStr(result, '/>') == 0) {
+                                    result = TextToHtml(result);
+                                }
+                                toastr.error(result, '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                            } else {
+                                toastr.error('저장 도중에 에러가 발생했습니다. 관리자에게 문의하세요.', '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                            }
+                        }
+                    }
+                    setTimeout('displayLoadingOff();', 0);
+                    $('input#temp1').attr('pre_values', 'stop');
+                    return false;
+                } else if (JSON.parse(result).resultMessage == undefined) {
+                    toastr.error("저장이 실패되었습니다.", "", { progressBar: true, timeOut: 5000, closeButton: false, positionClass: "toast-bottom-right" });
+                    setTimeout('displayLoadingOff();', 0);
+                    $('input#temp1').attr('pre_values', 'stop');
+                    return false;
+                } else if (JSON.parse(result).resultCode == "fail") {
+                    if (JSON.parse(result).__devQuery_url && getCookie('devQueryOn') == 'Y') {
+                        rnd = getRandomArbitrary(101, 400);
+                        if (typeof top.toastr == "object") {
+                            top.toastr.error('<a id="rnd' + rnd + '" href="javascript:;" onclick="query_error_popup(this,\'' + JSON.parse(result).__devQuery_url + '\');">저장 쿼리를 보시려면 여기를 클릭하세요!</a>', '쿼리실행오류', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                        } else {
+                            toastr.error('<a id="rnd' + rnd + '" href="javascript:;" onclick="query_error_popup(this,\'' + JSON.parse(result).__devQuery_url + '\');">저장 쿼리를 보시려면 여기를 클릭하세요!</a>', '쿼리실행오류', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                        }
+                        $('a#rnd' + rnd).attr('msg', JSON.parse(result).resultMessage);
+                    } else {
+                        if (typeof top.toastr == "object") {
+                            top.toastr.error(JSON.parse(result).resultMessage, "처리결과", { progressBar: true, timeOut: 6000, positionClass: "toast-bottom-right" });
+                        } else {
+                            toastr.error(JSON.parse(result).resultMessage, "처리결과", { progressBar: true, timeOut: 6000, positionClass: "toast-bottom-right" });
+                        }
+                    }
+                    if (JSON.parse(result).afterScript) {
+                        var afterScript = JSON.parse(result).afterScript;
+                        if (afterScript != "") eval(afterScript);
+                    }
+                    setTimeout('displayLoadingOff();', 0);
+                    $('input#temp1').attr('pre_values', 'stop');
+                    return false;
+                }
+                if (JSON.parse(result).__devQuery_url && getCookie('devQueryOn') == 'Y' && isMobile() == false) {
+                    if (typeof top.toastr == "object") {
+                        top.toastr.info('<a href="javascript:;" onclick="query_popup(\'' + JSON.parse(result).__devQuery_url + '\');">저장 쿼리를 보시려면 여기를 클릭하세요!</a>', '', { timeOut: 7000, positionClass: "toast-bottom-right" });
+                    } else {
+                        toastr.info('<a href="javascript:;" onclick="query_popup(\'' + JSON.parse(result).__devQuery_url + '\');">저장 쿼리를 보시려면 여기를 클릭하세요!</a>', '', { timeOut: 7000, positionClass: "toast-bottom-right" });
+                    }
+                }
+
+                /*사용자정의 디테일 내역 저장시작*/
+                if ($('div#viewPrintDiv [id*=udd_]').length > 0) {
+
+                    if ($('iframe#ifr_treat0')[0]) {
+                        var detail_frame = getFrameObj("ifr_treat0");
+                        var detail_key = detail_frame.document.getElementById("key_aliasName").value;
+                        var detail_parent_idx = detail_frame.document.getElementById("parent_idx").value;
+
+                        $('tr[change="Y"][obj_index="0"]').each(function () {
+                            detail_obj = $(this).find('input, textarea, select');
+
+                            var saveList = {}, initList = {};
+
+                            detail_obj.each(function () {
+                                if (this.id && this.id != "") {
+                                    saveList[replaceAll(this.id, "udd_", "")] = this.value;
+                                    if ($(this).attr('initvalue') != undefined) initList[replaceAll(this.id, "udd_", "")] = $(this).attr('initvalue');
+                                }
+                            });
+                            $.ajax({
+                                method: "POST",
+                                url: "save.php?tempDir=" + detail_frame.document.getElementById("tempDir").value
+                                    + iif(detail_frame.document.getElementById("parent_gubun").value != "", "&parent_gubun=" + detail_frame.document.getElementById("parent_gubun").value, "")
+                                    + iif(detail_parent_idx != "", "&parent_idx=" + detail_parent_idx, ""),
+                                data: {
+                                    saveList: replaceAll(JSON.stringify(saveList), ':', '@colon;')
+                                    , initList: replaceAll(JSON.stringify(initList), ':', '@colon;')
+                                    , saveUploadList: JSON.stringify({})
+                                    , saveTextdecrypt1List: JSON.stringify({})
+                                    , saveTextdecrypt2List: JSON.stringify({})
+                                    , viewList: JSON.stringify({}), key_aliasName: detail_key, key_value: $(this).attr("keyValue")
+                                    , ActionFlag: iif($(this).attr("keyValue") != "" && $(this).attr("keyValue") != "0", "modify", "write")
+                                    , RealPid: detail_frame.document.getElementById("RealPid").value
+                                    , parent_idx: detail_frame.document.getElementById("parent_idx").value
+                                    , MisJoinPid: detail_frame.document.getElementById("MisJoinPid").value
+                                }
+                            })
+                        });
+                    }
+
+                    if ($('iframe#ifr_treat0')[1]) {
+                        var detail_frame = getFrameObj("ifr_treat1");
+                        var detail_key = detail_frame.document.getElementById("key_aliasName").value;
+                        var detail_parent_idx = detail_frame.document.getElementById("parent_idx").value;
+
+                        $('tr[change="Y"][obj_index="1"]').each(function () {
+                            detail_obj = $(this).find('input, textarea, select');
+
+                            var saveList = {};
+
+                            detail_obj.each(function () {
+                                if (this.id && this.id != "") saveList[replaceAll(this.id, "udd_", "")] = this.value;
+                            });
+                            $.ajax({
+                                method: "POST",
+                                url: "save.php?tempDir=" + detail_frame.document.getElementById("tempDir").value
+                                    + iif(detail_frame.document.getElementById("parent_gubun").value != "", "&parent_gubun=" + detail_frame.document.getElementById("parent_gubun").value, "")
+                                    + iif(detail_parent_idx != "", "&parent_idx=" + detail_parent_idx, ""),
+                                data: {
+                                    saveList: replaceAll(JSON.stringify(saveList), ':', '@colon;')
+                                    , saveUploadList: JSON.stringify({})
+                                    , saveTextdecrypt1List: JSON.stringify({})
+                                    , saveTextdecrypt2List: JSON.stringify({})
+                                    , viewList: JSON.stringify({}), key_aliasName: detail_key, key_value: $(this).attr("keyValue")
+                                    , ActionFlag: iif($(this).attr("keyValue") != "" && $(this).attr("keyValue") != "0", "modify", "write")
+                                    , RealPid: detail_frame.document.getElementById("RealPid").value
+                                    , parent_idx: detail_frame.document.getElementById("parent_idx").value
+                                    , MisJoinPid: detail_frame.document.getElementById("MisJoinPid").value
+                                }
+                            })
+                        });
+                    }
+
+                }
+
+
+                /*사용자정의 디테일 내역 저장끝*/
+                if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                if (InStr(JSON.parse(result).resultMessage, '!') > 0) {
+                    toastr_obj.error(JSON.parse(result).resultMessage, "처리결과", { timeOut: 5000, positionClass: "toast-bottom-right" });
+                } else {
+                    toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                }
+                if (e.id == 'btn_save' && getCookie('select_device_id') == 'device-lg' || e.id == 'btn_saveClose') {
+                    if (parent.$("#grid").data("kendoGrid")) {
+                        parent.$("#grid").data("kendoGrid").dataSource.read();
+                    }
+                }
+                setTimeout('displayLoadingOff();', 0);
+                //document.getElementById("isMoveTime").value = "Y";
+
+                if ($('#BodyType').attr('add') == 'Y' && document.getElementById("ActionFlag").value == "write" && document.getElementById("BodyType").value == "save_templist") {
+
+                    //$('a#btn_save').removeClass('k-state-disabled');
+                    //$('a#btn_save').blur();
+                    //$('input#temp1').attr('pre_values','stop');
+
+                    //성공했을 경우 청소.
+                    if (JSON.parse(result).resultCode == 'success') {
+                        $("#grid_list5").data("kendoGrid").dataSource.read();
+                        $('a#btn_save').removeClass('k-state-disabled');
+
+                        if (typeof templist_write_form_clear == 'function') {
+                            templist_write_form_clear();
+                        } else {
+                            write_form_clear();
+                            if ($('form#frm input[type="text"][data-role]:visible')[0]) {
+                                $($('form#frm input[type="text"][data-role]:visible')[0]).focus();
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+
+
+                if (document.getElementById("ActionFlag").value == "modify") {
+
+
+                    /* push 전송 start : 위의 save.php 에서 이미 알림입력 MisReadList 은 완료된 상태임. */
+                    /*
+                    var mailList = JSON.parse(result).mailList;
+                    var pushList = JSON.parse(result).pushList;
+                    
+                    if(mailList!="" && mailList!="[]" && mailList!=undefined) {
+                        title = replaceAll(location.hostname,'www.','');
+                        contents = JSON.parse(result).pushMsg;
+                        if(document.getElementById("parent_idx").value!="") {
+    
+                            if(!isMainFrame() && parent.document.getElementById("gubun").value==document.getElementById("parent_gubun").value) {
+                                contents = "["+parent.document.getElementById("MenuName").value+" 의 "+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                                title = title + " 필독게시물 ["+parent.document.getElementById("MenuName").value+" 의 "+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"]";
+                            } else {
+                                contents = "["+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                                title = title + " 필독게시물 ["+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"]";
+                            }
+                            
+                            url = siteHome() + location.href.split('?')[0]+"?gubun="+document.getElementById("parent_gubun").value+"&idx="+document.getElementById("parent_idx").value+"&tabid="+document.getElementById("RealPid").value;
+    
+                            //댓글목록은 목록으로만 보여줘야 함.
+                            if(document.getElementById("RealPid").value!="speedmis000974") url = url +"&tabrealpid_idx="+document.getElementById("idx").value;
+                        } else {
+                            contents = "["+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                            url = siteHome() + location.href.split('?')[0]+"?gubun="+document.getElementById("gubun").value+"&idx="+document.getElementById("idx").value;
+                            title = title + ' ' + document.getElementById("MenuName").value + ' 의 새글';
+                        }
+                        contents = '내용은 다음과 같습니다 | <a href="'+url+'&isMenuIn=auto">열기</a><br><br>'+contents;
+                        email_sendGroupMessage(mailList, title, contents, '필독알리미');
+    
+                    }
+                    if(pushList!="" && pushList!="[]" && pushList!=undefined && document.getElementById("bot_name").value!="") {
+                        title = "자동설정에 의한 알림";
+                        contents = JSON.parse(result).pushMsg;
+                        if(uni_len(title+contents)>80) contents = uni_left(contents, 79-uni_len(title))+"..";
+                        if(document.getElementById("parent_idx").value!="") {
+    
+                            if(!isMainFrame() && parent.document.getElementById("gubun").value==document.getElementById("parent_gubun").value) {
+                                contents = "["+parent.document.getElementById("MenuName").value+" 의 "+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                            } else {
+                                contents = "["+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                            }
+                            
+                            url = siteHome() + location.href.split('?')[0]+"?gubun="+document.getElementById("parent_gubun").value+"&idx="+document.getElementById("parent_idx").value+"&tabid="+document.getElementById("RealPid").value;
+    
+                            //댓글목록은 목록으로만 보여줘야 함.
+                            if(document.getElementById("RealPid").value!="speedmis000974") url = url +"&tabrealpid_idx="+document.getElementById("idx").value;
+                        } else {
+                            contents = "["+document.getElementById("MenuName").value+" : "+document.getElementById("idx").value+"] " + contents;
+                            url = siteHome() + location.href.split('?')[0]+"?gubun="+document.getElementById("gubun").value+"&idx="+document.getElementById("idx").value;
+                        }
+                        //텔레그램 push
+                        telegram_sendGroupMessage(pushList, title+' <a href="'+url+'&isMenuIn=auto">'+contents+'</a>', '알리미');
+    
+                    }
+                    */
+                    /* push 전송 end */
+
+
+                    var afterScript = JSON.parse(result).afterScript;
+                    if (afterScript != "") eval(afterScript);
+                    if (e_id == "btn_saveClose") {
+                        $("a#btn_close").click();
+                    } else if (e_id == "btn_save" && document.getElementById("ActionFlag").value == "write") {
+                        if (isMainFrame()) {
+                            $("a#btn_list").click();
+                            //return false;
+                        } else if (parent.$("#grid").data("kendoGrid")) {
+                            parent.$("#grid").data("kendoGrid").dataSource.read();
+                        }
+                    } else if (e_id == "btn_saveView") {
+                        $("a#btn_view").click();
+                    } else if (parent.$("#grid").data("kendoGrid")) {
+                        parent.$("#grid").data("kendoGrid").dataSource.read();
+                    }
+
+                    //파일첨부 기능(html 에디터도 포함됨) 또는 템플릿이 있을 때만 reload 하고, 그외에는 안함.
+                    if ($('form#frm input[type="file"]').length > 0 || $('[grid_templete]').is(':visible') == true) read_idx(document.getElementById("idx").value);
+                    else {
+                        upList = JSON.parse(result).readResult;
+
+                        $.each(eval(replaceAll(JSON.parse(result).readResult, '@dda', '"'))[0], function (key, value) {
+                            if (document.getElementById("key_aliasName").value != key) {
+                                if ($('#frm div#' + key)[0]) {
+                                    //입력컨트롤이 아닌 것만 새로고침 시킴(자동수식합계등에 사용)
+                                    if ($('#frm div#' + key).attr('data-role') != 'treeview') {
+                                        $('#frm div#' + key)[0].innerText = value;
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                } else {
+
+                    if (document.getElementById("BodyType").value != "save_templist") {
+                        /* push 전송 start : 위의 save.php 에서 이미 알림입력 MisReadList 은 완료된 상태임. */
+                        /* 아래의 코딩을 기준으로 speedmis000990.php 에도 사용됨 */
+                        var mailList = JSON.parse(result).mailList;
+                        var pushList = JSON.parse(result).pushList;
+                        if (mailList != "" && mailList != "[]") {
+                            title = replaceAll(location.hostname, 'www.', '');
+                            json = JSON.parse(result).insertList;
+                            if (document.getElementById('RealPid').value == 'speedmis000974') {
+                                contents = '댓글 작성자 : ' + $('input#MisSession_UserName')[0].value + '<br>댓글 : ' + json['contents'];
+                            } else {
+                                contents = '새글 작성자 : ' + $('input#MisSession_UserName')[0].value + '<br>주요내용 : ';
+                                $.each(json, function (key, value) {
+                                    if (value != "" && value != undefined && value != null && value != "@null"
+                                        && value != "_noDDA_getdate()" && value != document.getElementById("MisSession_UserID").value && value != JSON.parse(result).newIdx) {
+                                        if (Right(contents, 3) == " : ") contents = contents + value;
+                                        else contents = contents + " / " + value;
+                                    }
+                                });
+                                contents = contents + " / ";
+                            }
+
+                            if (document.getElementById("parent_idx").value != "") {
+
+                                if (!isMainFrame() && parent.document.getElementById("gubun").value == document.getElementById("parent_gubun").value) {
+                                    if (document.getElementById("MenuName").value == '댓글' && parent.document.getElementById("MenuName").value != parent.parent.document.getElementById("MenuName").value) {
+                                        contents = '<br>메뉴명 : ' + parent.parent.document.getElementById("MenuName").value + '(idx='
+                                            + parent.document.getElementById("parent_idx").value + ') 의 '
+                                            + parent.document.getElementById("MenuName").value + ' 의 댓글'
+                                            + '<br>' + contents;
+                                        title = title + " " + parent.parent.document.getElementById("MenuName").value + '(idx='
+                                            + parent.document.getElementById("parent_idx").value + ') 의 '
+                                            + parent.document.getElementById("MenuName").value + ' 의 댓글 / ' + $('input#MisSession_UserName')[0].value;
+
+                                        url = siteHome() + location.href.split('?')[0] + '?gubun=' + parent.document.getElementById('parent_gubun').value + '&idx=' + parent.document.getElementById('parent_idx').value
+                                            + "&tabid=" + parent.document.getElementById("RealPid").value + "&tabrealpid_idx=" + document.getElementById("parent_idx").value + "&tabrealpid_tabid=" + document.getElementById("RealPid").value;
+                                    } else {
+                                        contents = '<br>메뉴명 : ' + parent.document.getElementById("MenuName").value
+                                            + '(idx=' + document.getElementById("parent_idx").value + ') 의 ' + document.getElementById("MenuName").value
+                                            + '<br>' + contents;
+                                        title = title + " " + parent.document.getElementById("MenuName").value
+                                            + '(idx=' + document.getElementById("parent_idx").value + ') 의 ' + iif(document.getElementById("MenuName").value == '댓글', '댓글', document.getElementById("MenuName").value + ' 의 새글') + ' / ' + $('input#MisSession_UserName')[0].value;
+                                        url = siteHome() + location.href.split('?')[0] + "?gubun=" + document.getElementById("parent_gubun").value + "&idx=" + document.getElementById("parent_idx").value + "&tabid=" + document.getElementById("RealPid").value;
+                                    }
+                                } else {
+                                    contents = "<br>메뉴명 : " + document.getElementById("MenuName").value
+                                        + '(idx=' + JSON.parse(result).newIdx + ')<br>' + contents;
+                                    title = title + " " + document.getElementById("MenuName").value + ' 의 새글 / ' + $('input#MisSession_UserName')[0].value;
+                                    url = siteHome() + location.href.split('?')[0] + "?gubun=" + document.getElementById("parent_gubun").value + "&idx=" + document.getElementById("parent_idx").value + "&tabid=" + document.getElementById("RealPid").value;
+                                }
+
+
+                                //댓글목록은 목록으로만 보여줘야 함.
+                                if (document.getElementById("RealPid").value != "speedmis000974") url = url + "&tabrealpid_idx=" + JSON.parse(result).newIdx;
+                                contents = iif(document.getElementById("MenuName").value == '댓글', '댓글', '새글') + '은 다음과 같습니다 | <a href="' + url + '&isMenuIn=auto">열기</a><br>' + contents;
+
+                            } else {
+                                contents = '<br>메뉴명 : ' + document.getElementById("MenuName").value
+                                    + '(idx=' + JSON.parse(result).newIdx + ')<br>' + contents;
+                                url = siteHome() + location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + JSON.parse(result).newIdx;
+                                title = title + ' ' + document.getElementById("MenuName").value + ' 의 새글 / ' + $('input#MisSession_UserName')[0].value;
+                                contents = '새글은 다음과 같습니다 | <a href="' + url + '&isMenuIn=auto">열기</a><br>' + contents;
+                            }
+                            email_sendGroupMessage(mailList, title, contents, '새글알리미');
+
+                        }
+                        if (typeof title == "string" && pushList != "" && pushList != "[]" && document.getElementById("bot_name").value != "") {
+                            if (InStr(title, ' 댓글 ') > 0) title = "댓글 안내"; else title = "새글 안내";
+
+                            json = JSON.parse(result).insertList;
+                            contents = "";
+                            $.each(json, function (key, value) {
+                                if (value != "" && value != undefined && value != null && value != "@null" && value != JSON.parse(result).newIdx) {
+
+                                    if ($('div#round_' + key).hasClass('hide') == false && $('div#round_' + key)[0]) {
+                                        if (InStr(value, "<") > 0 || InStr(value, ">") > 0) {
+                                            text = $("<div>" + value + "</div>").text();
+                                            text = replaceAll(text, "&nbsp;", " ");
+                                        } else {
+                                            text = value;
+                                        }
+
+                                        if (text != "" && text != undefined && text != null && text != "@null"
+                                            && text != '_noDDA_getdate()' && text != document.getElementById("MisSession_UserID").value) {
+                                            if (contents == "") contents = Left(text, 40);
+                                            else contents = contents + " / " + Left(text, 40);
+                                        }
+                                    }
+                                }
+                            });
+                            if (uni_len(title + contents) > 80) contents = uni_left(contents, 79 - uni_len(title)) + "..";
+                            if (document.getElementById("parent_idx").value != "") {
+
+                                if (document.getElementById("MenuName").value == '댓글' && parent.document.getElementById("MenuName").value != parent.parent.document.getElementById("MenuName").value) {
+                                    contents = "[" + parent.parent.document.getElementById("MenuName").value + '(idx='
+                                        + parent.document.getElementById("parent_idx").value + ') 의 ' + parent.document.getElementById("MenuName").value + " 의 댓글 : " + contents;
+
+                                    url = siteHome() + location.href.split('?')[0] + '?gubun=' + parent.document.getElementById('parent_gubun').value + '&idx=' + parent.document.getElementById('parent_idx').value
+                                        + "&tabid=" + parent.document.getElementById("RealPid").value + "&tabrealpid_idx=" + document.getElementById("parent_idx").value + "&tabrealpid_tabid=" + document.getElementById("RealPid").value;
+                                } else {
+                                    contents = '[' + parent.document.getElementById("MenuName").value
+                                        + '(idx=' + document.getElementById("parent_idx").value + ') 의 ' + document.getElementById("MenuName").value
+                                        + '] ' + contents;
+                                    url = siteHome() + location.href.split('?')[0] + "?gubun=" + document.getElementById("parent_gubun").value + "&idx=" + document.getElementById("parent_idx").value + "&tabid=" + document.getElementById("RealPid").value;
+                                }
+
+                                //댓글목록은 목록으로만 보여줘야 함.
+                                if (document.getElementById("RealPid").value != "speedmis000974") url = url + "&tabrealpid_idx=" + JSON.parse(result).newIdx;
+
+                            } else {
+                                contents = "[" + document.getElementById("MenuName").value + " : idx=" + JSON.parse(result).newIdx + "] " + contents;
+                                url = siteHome() + location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + JSON.parse(result).newIdx;
+                            }
+                            //텔레그램 push
+                            if (typeof viewLogic_beforeSendChangeMessage == "function") {
+                                contents = viewLogic_beforeSendChangeMessage(title, contents, url, JSON.parse(result).newIdx);
+                            } else {
+                                contents = title + ' <a href="' + url + '&isMenuIn=auto">' + contents + '</a>';
+                            }
+
+                            telegram_sendGroupMessage(pushList, contents);
+
+                        }
+                        /* push 전송 end */
+                    }
+
+
+
+
+                    var afterScript = JSON.parse(result).afterScript;
+                    if (afterScript != "") eval(afterScript);
+
+
+
+                    if (InStr(afterScript, "location.href") <= 0) {
+
+                        if (document.getElementById("BodyType").value == "save_templist") {
+                            if (save_actionFlag != 'templist') {
+                                url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                                    + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                                    + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                                    + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                                    + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "")
+                                    + iif(document.getElementById("isMenuIn").value == "S", "&isMenuIn=S", "")
+                                    + "&isAddURL=Y";
+                                go_mis_gubun(document.getElementById("gubun").value, url);
+                            }
+                        } else {
+                            url = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value
+                                + "&idx=" + JSON.parse(result).newIdx + "&ActionFlag=modify"
+                                + iif(document.getElementById("parent_gubun").value != "", "&parent_gubun=" + document.getElementById("parent_gubun").value, "")
+                                + iif(document.getElementById("parent_idx").value != "", "&parent_idx=" + document.getElementById("parent_idx").value, "")
+                                + iif(document.getElementById("pre").value != "", "&pre=" + document.getElementById("pre").value, "")
+                                + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "")
+                                + iif(document.getElementById("isMenuIn").value == "S", "&isMenuIn=S", "")
+                                + "&isAddURL=Y";
+                            go_mis_gubun(document.getElementById("gubun").value, url);
+                        }
+
+                        if (InStr(afterScript, "alert(") <= 0 && document.getElementById("isMenuIn").value == "S") {
+                            alert('정상적으로 제출되었습니다.');
+                            url = replaceAll(url, '&idx=' + JSON.parse(result).newIdx, '&idx=0')
+                            url = replaceAll(url, '&ActionFlag=modify', '&ActionFlag=write');
+                            location.href = url;
+                            return false;
+                        }
+                    }
+                }
+
+                displayLoadingOff();
+                if (parent.$('a.k-button.k-window-action[aria-label="Close"]')[0] && $('a.k-button.k-window-action[aria-label="Close"]')[0] == undefined) {
+                    parent.$('a.k-button.k-window-action[aria-label="Close"]').click();
+                }
+            })
+            .fail(function () {
+                setTimeout(function () {
+                    $('#BodyType').removeAttr('add');
+                    displayLoadingOff();
+                }, 100);
+                toastr.error("저장이 실패되었습니다.", "", { progressBar: true, timeOut: 5000, closeButton: false, positionClass: "toast-bottom-right" });
+                $('input#temp1').attr('pre_values', 'stop');
+                return false;
+            })
+            .always(function (data_or_jqXHR, textStatus, jqXHR_or_errorThrown) {
+                displayLoadingOff();
+            });
+
+    }
+
+
+
+
+
+    if (e.id == "btn_restore") {
+
+
+        var idxName = $("div#" + document.getElementById("key_aliasName").value + "[data-bind]").parent().parent().find("label").text();
+        if (!confirm(idxName + " : " + document.getElementById("idx").value + " 를 복원하시겠습니까?")) return false;
+
+        var deleteList = [];
+        deleteList.push(document.getElementById("idx").value);
+        $.ajax({
+            method: "POST",
+            url: "save.php",
+            data: {
+                deleteList: JSON.stringify(deleteList), key_aliasName: document.getElementById("key_aliasName").value
+                , ActionFlag: "restore", RealPid: document.getElementById("RealPid").value, MisJoinPid: document.getElementById("MisJoinPid").value
+            }
+        })
+            .done(function (result) {
+                if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                if (isMainFrame()) {
+                    $('input#temp1').attr('now_values', '');
+                    location.href = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "");
+                } else {
+                    $("a#btn_close").click();
+                    if (parent.$("#grid").data("kendoGrid")) parent.$("#grid").data("kendoGrid").dataSource.read();
+                }
+            })
+            .fail(function () {
+                debugger;
+                console.log("save error");
+            });
+
+    }
+
+
+
+    if (e.id == "btn_kill") {
+
+
+        var idxName = $("div#" + document.getElementById("key_aliasName").value + "[data-bind]").parent().parent().find("label").text();
+        if (!confirm(idxName + " : " + document.getElementById("idx").value + " 를 완전삭제하시겠습니까?")) return false;
+
+        var deleteList = [];
+        deleteList.push(document.getElementById("idx").value);
+        $.ajax({
+            method: "POST",
+            url: "save.php",
+            data: {
+                deleteList: JSON.stringify(deleteList), key_aliasName: document.getElementById("key_aliasName").value
+                , ActionFlag: "kill", RealPid: document.getElementById("RealPid").value, MisJoinPid: document.getElementById("MisJoinPid").value
+            }
+        })
+            .done(function (result) {
+                if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+                toastr_obj.success(JSON.parse(result).resultMessage, "처리결과", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                if (isMainFrame()) {
+                    $('input#temp1').attr('now_values', '');
+                    location.href = location.href.split('?')[0] + "?gubun=" + document.getElementById("gubun").value + iif(document.getElementById("isMenuIn").value == "Y", "&isMenuIn=Y", "");
+                } else {
+                    $("a#btn_close").click();
+                    if (parent.$("#grid").data("kendoGrid")) {
+                        parent.$("#grid").data("kendoGrid").dataSource.read();
+                    }
+                }
+            })
+            .fail(function () {
+                console.log("save error");
+            });
+    }
+
+
+
+
+}
+
+
+function span_cnt_init(p_this) {
+    li_cnt = $('li[tabid="' + $(p_this).attr('tabrealpid') + '"] span.cnt');
+    //li_cnt.attr('cnt',0);
+    //li_cnt[0].innerText = 0;
+}
+
+function status_view_url() {
+
+    var url = location.href.split("?")[0] + "?gubun=" + document.getElementById("gubun").value + "&idx=" + document.getElementById("idx").value + "&ActionFlag=" + document.getElementById("ActionFlag").value;
+    if (getUrlParameter("parent_idx") != undefined) url = url + "&parent_idx=" + getUrlParameter("parent_idx");
+    if (getUrlParameter("tabrealpid") != undefined) url = url + "&tabid=" + getUrlParameter("tabrealpid");
+    if (getUrlParameter("tabrealpid_idx") != undefined) url = url + "&tabrealpid_idx=" + getUrlParameter("tabrealpid_idx");
+    if (getUrlParameter("isMenuIn") != undefined) url = url + "&isMenuIn=" + getUrlParameter("isMenuIn");
+    if ($('li.k-state-active[tabid]')[0]) {
+        tabid = $('li.k-state-active[tabid]').attr('tabid');
+        if (tabid != 'idx') {
+            url = url + '&tabid=' + tabid;
+        }
+    }
+    url = url + '&isAddURL=Y';
+    return url;
+}
+
+var onToggles = 'off';
+function onToggle(e) {
+    //console.log('onToggle 입구'+$("body").attr("screenName"));
+    setTimeout(function () {
+        onToggles = 'off';
+    }, 100);
+    if (onToggles == 'on') {
+        setTimeout(function () {
+            console.log($("body").attr("screenName"));
+        }, 100);
+        return false;
+    }
+    //console.log('onToggle 진행'+$("body").attr("screenName"));
+    onToggles = 'on';
+    if (e.id == "btn_mMenu") {
+        mobile_line();
+        if (e.checked) {
+            $("div#panelbar-left").css("display", "block");
+        } else {
+            $("div#panelbar-left").css("display", "none");
+        }
+        $(window).resize();
+    }
+
+    if (e.id == "btn_mConfig") {
+        $("span.tc-activator.k-content").click();
+    }
+
+    if (e.id == "btn_fullScreen") {
+        //console.log('toggleFullScreen');
+        toggleFullScreen(e.checked);
+
+        if (!e.checked) {
+            $('a#btn_fullScreen').removeClass('k-toolbar-first-visible');
+            $('a#btn_fullScreen').removeClass('k-state-active');
+            $('a#btn_fullScreen').attr('aria-pressed', 'false');
+
+            $("body").attr("screenName", "normalScreen");
+            $("nav#js-tlrk-nav").css("display", "block");
+            setTimeout(function () {
+                if (typeof top.window_resize == 'function') {
+                    top.window_resize();
+                }
+            }, 100);
+            setTimeout(function () {
+                if (typeof top.window_resize == 'function') {
+                    top.window_resize();
+                }
+            }, 400);
+        } else {
+            $('a#btn_fullScreen').addClass('k-toolbar-first-visible');
+            $('a#btn_fullScreen').addClass('k-state-active');
+            $('a#btn_fullScreen').attr('aria-pressed', 'true');
+
+            $("body").attr("screenName", "fullScreen");
+            $("nav#js-tlrk-nav").css("display", "none");
+        }
+
+    }
+
+}
+
+function refreshGrid_index(p_index) {
+
+    obj_frame = $('div[data-role="tabstrip"] div[tabnumber=' + p_index + '] iframe');
+    if (obj_frame[0]) {
+        if (obj_frame.attr('real_src2') != undefined) {
+            if (InStr(window.frames[obj_frame[0].id].contentWindow.location.href, '&lite=Y') > 0) {
+                //obj_frame[0].src = obj_frame.attr('real_src2');
+                window.frames[obj_frame[0].id].contentWindow.location.replace(obj_frame.attr('real_src2'));
+            } else if (getFrameObj($(obj_frame).attr('id')).gridHeight) {
+                getFrameObj($(obj_frame).attr('id')).gridHeight();
+            }
+            obj_frame.removeAttr('real_src2');
+        }
+    }
+
+    setTimeout(function () {
+        $('.CodeMirror').each(function (i, el) {
+            el.CodeMirror.refresh();
+        });
+    }, 100);
+}
+
+//read_idx_first 유지.  read_idx_first1, read_idx_first2 로 분리해서 테스트했으나 개선되지 않음.
+function read_idx_first(result) {
+
+    if (document.getElementById("ActionFlag").value == "view" || document.getElementById("ActionFlag").value == "modify" || document.getElementById("ActionFlag").value == 'write') {
+        if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+        if (resultAll.d.__count == 0 && document.getElementById("ActionFlag").value != "write") {
+            if (document.getElementById("ActionFlag").value == "modify" && document.getElementById('BodyType').value == 'only_one_list') {
+                location.href = replaceAll(replaceAll(replaceAll(location.href, '&idx=' + document.getElementById('idx').value, ''), '&ActionFlag=modify', ''), '&isAddURL=Y', '');
+            } else {
+                if ($('body').is(':visible')) toastr_obj.error("조회할 내역이 없습니다.", "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+            }
+        } else if (document.getElementById("isDeleteList").value == "Y") {
+            if ($('body').is(':visible')) toastr_obj.warning("해당내역은 삭제된 내역입니다.", "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+        } else {
+            if (resultAll.d.resultCode == "success") {
+                if ($('body').is(':visible') && parent.$('span.view_resultMessage')[0]) {
+                    parent.$('span.view_resultMessage').closest('div[aria-live="polite"]').remove();
+                    if (typeof toastr_obj == "object") toastr_obj = toastr_obj; else toastr_obj = toastr;
+                    toastr_obj.success(resultAll.d.resultMessage, '<span class="view_resultMessage"></span>', { timeOut: 2000, positionClass: "toast-bottom-right" });
+                }
+                $("#btn_menuName").text("※ " + document.getElementById("MenuName").value);
+            } else {
+                if ($('body').is(':visible') && typeof toastr_obj == "object") toastr_obj.error(resultAll.d.resultMessage, "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+            }
+        }
+
+        if (resultAll.d.__devQuery_url && isMobile() == false) {
+            if ($('body').is(':visible')) {
+                $('a.dev_view_query').closest('div[aria-live="polite"]').remove();
+                toastr.info('<a class="dev_view_query" href="javascript:;" onclick="query_popup(\'' + resultAll.d.__devQuery_url + '\');">내용조회쿼리를 보시려면 여기를 클릭하세요!</a>', '', { timeOut: 7000 });
+            }
+        }
+
+
+        $.each(result, function (key, value) {
+            //if(key=='MenuType') debugger;
+            //if(key=='geomsagubun') debugger;
+            if (value == null) value = '';
+
+            if ($('#frm #' + key).attr("type") == "checkbox") {
+                if ($('#frm #' + key).attr("Grid_Schema_Type") == "boolean") {
+                    if (value == true) viewModel[key + "Checked"] = true; else viewModel[key + "Checked"] = false;
+                } else {
+                    if (value == "Y") viewModel[key + "Checked"] = true; else viewModel[key + "Checked"] = false;
+                }
+            } else if ($('#frm #' + key).attr("type") == "file") {
+                if (document.getElementById("ActionFlag").value != "write") {
+
+                    var info_url = "info.php?RealPid=" + document.getElementById("RealPid").value + "&MisJoinPid=" + document.getElementById("MisJoinPid").value + "&key_aliasName=" + document.getElementById("key_aliasName").value + "&thisAlias=" + key + "&key_idx=" + document.getElementById("idx").value;
+                    if (value != "") {
+                        var savedFiles = ajax_url_return(info_url + "&flag=upload");
+                        if (InStr(savedFiles, 'declare @sql') > 0) {
+                            if ($('body').is(':visible')) {
+                                savedFiles = replaceAll(replaceAll(savedFiles, '<!--', ''), '-->', '');
+                                rnd = getRandomArbitrary(101, 400);
+                                toastr_obj.error('<a id="rnd' + rnd + '" href="javascript:;" onclick="query_error_popup(this);">첨부파일 오류입니다. key : ' + key + ' 여기를 클릭하세요.</a>', '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                                $('a#rnd' + rnd).attr('msg', savedFiles);
+                            }
+                        } else {
+                            savedFiles = replaceAll(savedFiles, "\n", "");
+                            if (savedFiles != "" && savedFiles != "[]") {
+                                if (savedFiles.length > 2) {
+                                    savedFiles = JSON.parse(savedFiles);
+                                    $('#frm #' + key).attr("data-files", JSON.stringify(savedFiles));
+
+                                } else {
+                                    $('form#frm').attr('upload_change', 'Y');
+                                    if ($('body').is(':visible')) toastr_obj.warning("첨부파일 오류입니다. key : " + key, "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                                }
+                            }
+                        }
+                    }
+                    if ($('#frm #' + key).data("kendoUpload")) {
+                        $('#frm #' + key).closest("div.k-widget.k-upload")[0].outerHTML = $('#frm #' + key)[0].outerHTML;
+                    }
+
+                }
+
+            } else {
+                var tag_name = '';
+                if ($('#frm #' + key)[0]) tag_name = $('#frm #' + key)[0].tagName;
+
+                if ($('#frm #' + key).attr("data-role") == "timepicker") {
+                    viewModel[key + "Value"] = new Date(Left(new Date().yyyymmddhhmm16(), 11) + value);
+                } else if (tag_name == "SELECT") {
+
+                    //if($('#frm #'+key).attr('data-role')=='multiselect') debugger;
+                    //if(key=="g01") debugger;
+                    //[{sangdamhyeongtae: "천재"},{sangdamhyeongtae: "천재"}]
+
+                    if ($('#frm #' + key).attr("Grid_Items") != undefined && $('#frm #' + key).attr("Grid_Items") != '' && $('#frm #' + key).attr("Grid_Items") != "{Grid_Items}") {
+
+                        var selectItems = eval($('#frm #' + key).attr("Grid_Items"));
+
+                        if (InStr(value, '\t') > 0) {
+                            value = replaceAll(value, '\t', ' ');
+                            col_name = $('div#round_' + key).find('label[grid_columns_title0]').attr('grid_columns_title0');
+                            alert(col_name + ' 항목의 값 ' + value + ' 에 비정상적인 값인 탭이 포함되어 있어 제거했습니다.');
+                        }
+                        value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                        //value.remByVal({"value":""});
+                        value = removeItem(value, { "value": "" });
+                        if (value.length > 0) {
+                            if (value[0]['text'] == undefined && value[0]['value'] != undefined) {
+                                for (j = 0; j < value.length; j++) {
+                                    v = getObjects(selectItems, 'value', value[j]['value']);
+                                    if (v.length > 0) value[j]['text'] = v[0]["text"];
+                                    else value[j]['text'] = value[j]['value'];
+                                }
+                            }
+                        }
+
+                        value2 = JSON.parse(JSON.stringify(value));
+                        /*
+                        if(Array.isArray(value2)) {
+                            if(value2.length==1) {
+                                value2 = value2[0].value;
+                            }
+                        }
+                        */
+
+                        forMax = selectItems.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            //value.remByVal(selectItems[ii]);
+                            value = removeItem(value, selectItems[ii]);
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            selectItems.push(value[ii]);
+                        }
+
+                        /*
+                        if(value2.length==0) {
+                            value2 = '';
+                        } else {
+                            if(getObjects(selectItems,'value',value2).length==0) selectItems.push({value: value2});
+                        }
+                        */
+                        var $select = $('select#' + key);
+                        if ($('#frm #' + key).attr('data-role') != undefined) {
+                            viewModel[key + "Source"] = selectItems;
+                            if (value2.length > 0) {
+                                if ($('#frm #' + key).attr('data-role') == 'multiselect' || $('#frm #' + key).attr('data-role') == 'dropdowntree') {
+                                    viewModel[key + "Value"] = value2;
+                                } else {
+                                    viewModel[key + "Value"] = value2[0].value;
+                                }
+                            } else {
+                                viewModel[key + "Value"] = null;
+                            }
+
+
+                        } else {    //모바일용 select dropdownitem
+
+                            // 3. 기존 옵션 제거 (선택 사항: 기존 옵션이 있다면 초기화)
+                            $select.empty();
+
+                            // 4. 배열을 반복하여 <option> 요소를 생성하고 <select>에 추가
+                            $.each(selectItems, function (index, item) {
+                                // jQuery의 편리한 기능: <option> 태그를 생성하고 속성을 설정하여 추가
+                                $("<option>").val(item.value).text(item.text).appendTo($select);
+                            });
+                            if (value2.length == 0) {
+                                value3 = '';
+                            } else {
+                                value3 = value2[0].value;
+                            }
+                            $select.val(value3);
+
+                        }
+
+
+                    } else {
+                        //if(key=='virtual_fieldQnprint_apply' || key=='zinswaeyangsikURL') debugger;
+                        if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && resultAll.d.results[0] != undefined) {
+                            value = columns_templete(resultAll.d.results[0], key);
+                            //columns_templete('', 'zjeogyongbeomwi')
+                        }
+
+                        if ($('#frm #' + key).attr('Grid_Items') == '{Grid_Items}') {
+                            value = eval('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                        }
+
+
+                        //dropdownitem 일때만 아래와 같이 진행.
+                        if (InStr(viewModel[key + "Source"].options.transport.read.url, 'list_grid_items.php') > 0 && $('#frm #' + key).attr('data-role') != 'multiselect') {
+                            v = result[key];
+                            default_value = v;
+                            viewModel[key + "Source"].options.transport.read.url = viewModel[key + "Source"].options.transport.read.url + '&default_value=' + encodeURIComponent(default_value);
+                            viewModel[key + "Value"] = value[0].value;
+
+
+                            if ($('#frm #' + key).attr('Grid_Templete') == 'Y') {
+                                setTimeout(function (p_key) {
+                                    $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                                }, 0, key);
+                            } else if ($('#frm #' + key).attr('data-role') == 'dropdownlist') {
+                                setTimeout(function (p_viewModel, p_key, p_value) {
+                                    p_viewModel[p_key + "Value"] = p_value;
+                                }, 0, viewModel, key, value[0].value);
+                            }
+                        } else {
+                            viewModel[key + "Value"] = value;
+
+                            if ($('#frm #' + key).attr('Grid_Templete') == 'Y') {
+                                setTimeout(function (p_key) {
+                                    $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                                }, 0, key);
+                            } else if ($('#frm #' + key).attr('data-role') == 'dropdownlist') {
+                                setTimeout(function (p_key, p_value, p_result) {
+                                    //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoDropDownList').value());
+
+                                    if (p_value != '' && $('#frm #' + p_key).data('kendoDropDownList').value() == '') {
+                                        //이 경우가 기본리스트를 벗어난 코드값임.
+                                        p_text = $('#frm #' + p_key).attr('data-text-field');
+                                        v = p_result[p_key];
+                                        t = p_result[p_text];
+                                        t = t.replace(/\r/g, '');
+                                        if (t == null) {
+                                            t = '(미확인코드:' + v + ')';
+                                        }
+                                        if ($('#frm #' + p_key).data('kendoDropDownList').dataSource.options.group) { //{field: 'group_item'} 를 의미함.
+                                            json_text = JSON.parse('{ "' + p_text + '": "' + t + '", "' + p_key + '": "' + v + '", "group_item": "미확인코드" }');
+                                        } else {
+                                            json_text = JSON.parse('{ "' + p_text + '": "' + t + '", "' + p_key + '": "' + v + '" }');
+                                        }
+
+                                        $('#frm #' + p_key).data('kendoDropDownList').dataSource.add(json_text);
+                                    }
+                                    $('#frm #' + p_key).data('kendoDropDownList').value(p_value);
+
+                                    setTimeout(function (pp_key, pp_value, pp_result) {
+                                        //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoDropDownList').value());
+
+                                        if (pp_value != '' && $('#frm #' + pp_key).data('kendoDropDownList').value() == '') {
+                                            //이 경우가 기본리스트를 벗어난 코드값임.
+                                            pp_text = $('#frm #' + pp_key).attr('data-text-field');
+                                            v = pp_result[pp_key];
+                                            t = pp_result[pp_text];
+                                            t = t.replace(/\r/g, '');
+                                            if (t == null) {
+                                                t = '(미확인코드:' + v + ')';
+                                            }
+                                            if ($('#frm #' + p_key).data('kendoDropDownList').dataSource.options.group) { //{field: 'group_item'} 를 의미함.
+                                                json_text = JSON.parse('{ "' + pp_text + '": "' + t + '", "' + pp_key + '": "' + v + '", "group_item": "미확인코드" }');
+                                            } else {
+                                                json_text = JSON.parse('{ "' + pp_text + '": "' + t + '", "' + pp_key + '": "' + v + '" }');
+                                            }
+
+                                            $('#frm #' + pp_key).data('kendoDropDownList').dataSource.add(json_text);
+                                        }
+                                        $('#frm #' + pp_key).data('kendoDropDownList').value(pp_value);
+                                    }, 100, p_key, p_value, p_result);
+                                }, 100, key, value, resultAll.d.results[0]);    //이곳은 확실히 100, 100 으로 해야함.
+                            } else if ($('#frm #' + key).attr('data-role') == 'multiselect') {
+                                setTimeout(function (p_key, p_value, p_result) {
+                                    //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoMultiSelect').value());
+
+                                    if (p_value != '' && $('#frm #' + p_key).data('kendoMultiSelect').value() == '') {
+                                        //이 경우가 기본리스트를 벗어난 코드값임.
+                                        p_text = $('#frm #' + p_key).attr('data-text-field');
+                                        v = p_result[p_key];
+                                        t = p_result[p_text];
+                                        //debugger;
+                                        json_text = JSON.parse('{ "' + p_text + '": "' + t + '", "' + p_key + '": "' + v + '" }');
+                                        $('#frm #' + p_key).data('kendoMultiSelect').dataSource.add(json_text);
+                                    }
+                                    $('#frm #' + p_key).data('kendoMultiSelect').value(p_value);
+                                }, 0, key, value, resultAll.d.results[0]);
+                            }
+                        }
+
+
+
+                    }
+                } else {
+
+                    //if(key=='virtual_fieldQnprint_apply' || key=='zinswaeyangsikURL') debugger;
+
+                    if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && resultAll.d.results[0] != undefined) {
+                        value = columns_templete(resultAll.d.results[0], key);
+                    }
+                    if ($('#frm #' + key).attr("Grid_CtlName_ori") == "check") {
+                        if (value == "1" || value == "Y") value = "Y";
+                        else if (value == "0" || value == "N") value = "N";
+                        else value = '';
+                    }
+                    if (document.getElementById("jsonUrl").value != '' && $('#frm #' + key).attr("data-bind")) {
+                        if ($('#frm #' + key).attr("data-bind").split(":")[0] == "html") {
+                            siteUrl = '';
+                            objUrl = document.getElementById("jsonUrl").value.split("/");
+                            for (z = 0; z < objUrl.length - 2; z++) {
+                                siteUrl = siteUrl + objUrl[z] + "/";
+                            }
+                            value = replaceAll(value, '"/uploadFiles/', '"' + siteUrl + 'uploadFiles/');
+                        }
+                    }
+
+                    if ($('#frm #' + key).attr("data-mask") != undefined) {
+                        value = $('<input>').val(value).kendoMaskedTextBox({ mask: $('#frm #' + key).attr("data-mask") }).data('kendoMaskedTextBox').value();
+                    }
+
+                    viewModel[key + "Value"] = value;
+                    if ($("#frm #" + key + "[default]").length == 1 && document.getElementById('ActionFlag').value == 'write') {
+                        if ($('#frm #' + key).attr('default') != undefined && $('#frm #' + key).attr('default') != '') {
+                            $("#frm #" + key).attr("system_default", $('#frm #' + key).attr('default'));
+                        }
+                        $("#frm #" + key + "[default]").attr("default", value);
+                    }
+
+                    if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && (document.getElementById('ActionFlag').value != 'write' || document.getElementById('idx').value == '0')) {
+                        setTimeout(function (p_key) {
+                            $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                        }, 0, key);
+                    } else if ($('#frm #' + key).attr('data-format') != '' && $('#frm #' + key).attr('data-format') != undefined && $('#frm #' + key).attr('grid_templete') != 'Y' && document.getElementById('ActionFlag').value == 'view') {
+                        setTimeout(function (p_key) {
+                            v = $('#frm #' + p_key).text();
+                            if (isNumeric(v)) {
+                                v = kendo.toString(v * 1, Trim($('#frm #' + p_key).attr('data-format')));
+                                $('#frm #' + p_key).html(v);
+                            }
+
+                        }, 0, key);
+                    }
+                }
+
+                //if(key=="addLogic") debugger;
+                //if($("div#round_"+key+".html").length==1) {
+                //    debugger;
+                //}
+            }
+        });
+
+        if (typeof thisLogic_view_after_resultAll_and_load == "function") {
+            setTimeout(function (p_resultAll) {
+                thisLogic_view_after_resultAll_and_load(p_resultAll);
+            }, 0, resultAll);
+
+        }
+    }
+
+
+    if (document.getElementById("ActionFlag").value == 'write' || document.getElementById("ActionFlag").value == "modify") {
+        //dropdowntree 만의 이슈 처리.
+        var defaultObj = $('form#frm div[data-role="treeview"][Grid_Items]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = $(defaultObj[i]).attr("id");
+
+            if (document.getElementById("ActionFlag").value == "modify") {
+                defaultValues = "," + resultAll['d']['results'][0][key] + ",";
+            } else {
+                defaultValues = "," + $(defaultObj[i]).attr("default") + ",";
+            }
+
+            console.log(defaultValues);
+            //var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+            aa = $(defaultObj[i]).attr("Grid_Items");
+            aa_json = eval(aa);
+
+            aa_json[0].items.forEach(function (k, i) {
+                if (InStr(defaultValues, ',' + k.value + ',') > 0) {
+                    aa_json[0].items[i].checked = true;
+                }
+            });
+            aa = JSON.stringify(aa_json);
+            TF = false;
+            if (aa_json[0].items[0]) {
+                if (InStr(aa_json[0].items[0].text, '>') > 0) TF = true;
+            }
+            //tree 구조답게 > 기호가 있을 경우와 없는 경우로 나눠서 계산.
+            if (TF) {
+
+
+
+                ss = aa.split(' | ');
+                rr0 = '{ text: "@text", expanded: true, items: [@items] }';
+                if (document.getElementById("ActionFlag").value == "view") rr = '';
+                else rr = '[';
+                for (ii = 1; ii < ss.length; ii++) {
+                    gg_prev = '';
+                    gg_next = '';
+                    gg = ss[ii].split(' > ')[0];
+                    if (ii > 0) gg_prev = ss[ii - 1].split(' > ')[0];
+                    if (ii < ss.length - 1) gg_next = ss[ii + 1].split(' > ')[0];
+                    if (document.getElementById("ActionFlag").value == "view") {
+                        if (InStr(defaultValues, ',' + aa_json[0].items[ii - 1].value + ',') > 0) rr = rr + aa_json[0].items[ii - 1].text + "<br>";
+                    } else {
+                        if (ii == 0 || gg_prev != gg) {
+                            rr = rr + iif(ii <= 1, '', ',') + replaceAll(rr0, '@text', gg);
+                        }
+                        rr = replaceAll(rr, '@items', '{"value":"' + aa_json[0].items[ii - 1].value + '","text":"' + aa_json[0].items[ii - 1].text + '"' + iif(aa_json[0].items[ii - 1].checked, ', "checked": true', '') + '},@items');
+                    }
+                    if (gg_next != gg) rr = replaceAll(rr, ',@items', '');
+                }
+
+                rr = rr + ']';
+                rr = replaceAll(replaceAll(rr, String.fromCharCode(10), ''), String.fromCharCode(13), '');
+                rr = replaceAll(rr, '},@items] }]', '}] }]');
+                var selectItems = eval(rr);
+
+                if (selectItems) viewModel[key + "Source"] = selectItems;
+
+
+            } else {
+
+                viewModel[key + "Source"] = aa_json;
+
+            }
+
+        }
+
+        var defaultObj = $('form#frm select[data-role="dropdownlist"]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = $(defaultObj[i]).attr("id");
+
+            setTimeout(function (p_key) {
+
+                if ($('textarea#helplist_' + p_key).val() != '' && $('textarea#helplist_' + p_key).val() != undefined) {
+
+                    if (isJsonString($('textarea#helplist_' + p_key).val()) == false) {
+                        return false;
+                    }
+                    delta = 0;
+                    //index.php style 또는 서버로직에 설정된 help width 캐치
+                    if ($('div.k-list-container.helplist-container').length == 0) {
+                        $('body').append('<div class="k-list-container helplist-container"></div>');
+                        helpfullwith = $('div.k-list-container.helplist-container').width();
+                        $('div.k-list-container.helplist-container').remove();
+                    }
+                    helplistwidth = '';
+                    //console.log("표시는="+options.field);
+                    //console.log("값은="+getNextKey_key(options.model.fields, options.field));
+                    helplist = JSON.parse($('textarea#helplist_' + p_key).val());
+
+                    headerTemplate = '';
+                    tot_iwidth = 0;
+                    for (t = 0; t < helplist.length; t++) {
+                        item = helplist[t];
+                        if (isNumeric(item)) {
+                            helpfullwith = item;
+                            $('#style_helplist_container')[0].innerHTML =
+                                `
+body[ismobile="N"] div.k-list-container.helplist-container {
+width: `+ helpfullwith + `px!important;
+min-height: 320px!important;
+}
+`;
+                        } else {
+                            if (InStr(item, '.') > 0) {
+                                iwidth = item.split('.')[1] * 1;
+                            } else {
+                                if ($('label[grid_columns_title="' + item.split('.')[0] + '"]')[0]) {
+                                    iwidth = Math.abs($('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('grid_columns_width') * 1 - 14) / 8;
+                                } else iwidth = 20;
+                                if (iwidth <= 1) iwidth = 20;
+                            }
+                            tot_iwidth = tot_iwidth + iwidth;
+                        }
+                    }
+                    if (isMobile()) {
+                        if ($(document).width() > helpfullwith) document_width = helpfullwith;
+                        else document_width = $(document).width();
+                    } else {
+                        document_width = helpfullwith;
+                    }
+
+
+
+                    delta = document_width / tot_iwidth / 7;   //좌우꽉찬화면구현
+                    for (t = 0; t < helplist.length; t++) {
+                        item = helplist[t];
+                        if (isNumeric(item)) {
+
+                        } else {
+                            item_field = $('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('for');
+                            if (InStr(item, '.') > 0) {
+                                iwidth = item.split('.')[1] * 1;
+                            } else {
+                                if ($('label[grid_columns_title="' + item.split('.')[0] + '"]')[0]) {
+                                    iwidth = Math.abs($('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('grid_columns_width') * 1 - 14) / 8;
+                                } else iwidth = 20;
+                                if (iwidth <= 1) iwidth = 20;
+                            }
+                            item = item.split('.')[0];
+
+                            if ($('input#' + item_field).attr('data-role') == 'numerictextbox') helplist_align = 'R';
+                            else helplist_align = '';
+
+                            iwidth = Math.floor(iwidth * delta);
+                            helplistwidth = helplistwidth + iwidth + '.' + helplist_align + iif(t < helplist.length - 1, ';', '');
+
+                            if (iwidth > uni_len(item)) {
+                                headerTemplate = headerTemplate + iif(headerTemplate == '', '', '&nbsp;|&nbsp;') + item + '&nbsp;'.repeat(iwidth - uni_len(item));
+                            } else {
+                                headerTemplate = headerTemplate + iif(headerTemplate == '', '', '&nbsp;|&nbsp;') + item;
+                            }
+                        }
+                    }
+                    if (helplistwidth != '') {
+                        $('div#div_headerTemplate_' + p_key)[0].innerHTML = headerTemplate;
+                        $('.helplist').closest('.k-list-container').addClass('helplist-container');
+                        if (isMobile()) $('.helplist').closest('.k-list-container').parent().addClass('helplist-container');
+                    } else {
+                        $('div#div_headerTemplate_' + p_key).remove();
+                    }
+                } else {
+                    $('div#div_headerTemplate_' + p_key).remove();
+                }
+            }, 0, key);
+        }
+    }
+
+
+
+
+    if (document.getElementById("ActionFlag").value == "modify") {
+        //dropdownlist
+
+        //virtual_field 의 경우 리턴값이 없어서 별도조치.
+        var defaultObj = $('form#frm select[Grid_Items][id^="virtual_field"]');
+
+        for (i = 0; i < defaultObj.length; i++) {
+
+            if ($(defaultObj[i]).attr("Grid_Items") != '{Grid_Items}') {
+
+                key = $(defaultObj[i]).attr("id");
+                var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+
+                value = $(defaultObj[i]).attr("default");
+                if (Left(value, 2) == '[{') {
+                    value = JSON.parse(value);
+                } else {
+                    value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                }
+
+                //value.remByVal({"value":""});
+                value = removeItem(value, { "value": "" });
+                value2 = JSON.parse(JSON.stringify(value));
+
+                if (selectItems) {
+                    if (selectItems[0]) {
+                        if (selectItems[0].items) real_items = selectItems[0].items;
+                        else real_items = selectItems;
+
+                        forMax = real_items.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            if (getObjects(value, "value", real_items[ii].value).length > 0) {
+                                real_items[ii].checked = true;
+
+                                //value.remByVal(real_items[ii]);
+                                value = removeItem(value, real_items[ii]);
+                            }
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            real_items.push(value[ii]);
+                        }
+
+                        if (selectItems[0].items) selectItems[0].items = real_items;
+                        else selectItems = real_items;
+                        viewModel[key + "Source"] = selectItems;
+
+                    }
+                }
+                //viewModel[key+"Value"] = value2;      //mvvm 에서 미리 정의하면 이상하게 에러남.
+            }
+
+        }
+
+    }
+    if (document.getElementById("ActionFlag").value == 'write') {
+        var defaultObj = $('form#frm select[Grid_Items]');
+
+        for (i = 0; i < defaultObj.length; i++) {
+
+            if ($(defaultObj[i]).attr("Grid_Items") != '{Grid_Items}') {
+
+                key = $(defaultObj[i]).attr("id");
+                var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+
+                value = $(defaultObj[i]).attr("default");
+                if (Left(value, 2) == '[{') {
+                    value = JSON.parse(value);
+                } else {
+                    value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                }
+
+                //value.remByVal({"value":""});
+                value = removeItem(value, { "value": "" });
+                value2 = JSON.parse(JSON.stringify(value));
+
+                if (selectItems) {
+                    if (selectItems[0]) {
+                        if (selectItems[0].items) real_items = selectItems[0].items;
+                        else real_items = selectItems;
+
+                        forMax = real_items.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            if (getObjects(value, "value", real_items[ii].value).length > 0) {
+                                real_items[ii].checked = true;
+
+                                //value.remByVal(real_items[ii]);
+                                value = removeItem(value, real_items[ii]);
+                            }
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            real_items.push(value[ii]);
+                        }
+
+                        if (selectItems[0].items) selectItems[0].items = real_items;
+                        else selectItems = real_items;
+
+                        viewModel[key + "Source"] = selectItems;
+
+
+                    }
+                }
+                //viewModel[key+"Value"] = value2;      //mvvm 에서 미리 정의하면 이상하게 에러남.
+            }
+
+        }
+
+        var defaultObj = $('form#frm select[data-role="multiselect"][default]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = defaultObj[i].id;
+            if ($(defaultObj[i]).attr("default") != "") {
+                //defaultObj[i].value = $(defaultObj[i]).attr("default");
+                value = $(defaultObj[i]).attr("default");
+                value2 = [];
+                value.split(',').forEach(function (v, i) {
+                    value2.push({ 'value': v });
+                });
+                viewModel[key + "Value"] = value2;
+            } else if (document.getElementById("idx").value == "0") {
+                viewModel[key + "Value"] = [];
+            }
+        }
+
+        var defaultObj = $("form#frm input[default], form#frm textarea[default]");
+        for (i = 0; i < defaultObj.length; i++) {
+            key = defaultObj[i].id;
+
+            //defaultObj[i].value = $(defaultObj[i]).attr("default");
+            value = $(defaultObj[i]).attr("default");
+
+            if ($(defaultObj[i]).attr("type") == "checkbox") {
+                if ($(defaultObj[i]).attr("Grid_Schema_Type") == "boolean") {
+                    if (value == "1") viewModel[key + "Checked"] = true;
+                    else viewModel[key + "Checked"] = false;
+                } else {
+                    if (value == "Y") viewModel[key + "Checked"] = true;
+                    else viewModel[key + "Checked"] = false;
+                }
+            } else {
+                viewModel[key + "Value"] = value;
+            }
+
+        }
+
+        params = location.search.split('?')[1].split('&');
+        for (i = 0; i < params.length; i++) {
+            params_name = params[i].split('=')[0];
+            key = Mid(params_name, 6, 50);
+            params_value = params[i].split('=')[1];
+            if (Left(params_name, 5) == 'form_' && params_value != '') {
+                params_value = decodeURI(params_value);
+                defaultObj = $('form#frm [id="' + key + '"]');
+                defaultObj.attr('default', params_value);
+                //debugger;
+                if (defaultObj.attr("type") == "checkbox") {
+                    if (defaultObj.attr("Grid_Schema_Type") == "boolean") {
+                        if (params_value == "1") viewModel[key + "Checked"] = true;
+                        else viewModel[key + "Checked"] = false;
+                    } else {
+                        if (params_value == "Y") viewModel[key + "Checked"] = true;
+                        else viewModel[key + "Checked"] = false;
+                    }
+                } else {
+                    viewModel[key + "Value"] = params_value;
+                    console.log(key + '=' + params_value);
+                }
+            }
+        }
+        if (resultAll.d.results[0] != undefined) {
+            $('#frm [Grid_Templete="Y"]').each(function () {
+                key = this.id;
+                //debugger;//111
+                if ($('#frm #' + key).attr('templete_treat') != 'Y') {
+                    value = columns_templete(resultAll.d.results[0], key);
+
+                    viewModel[key + "Value"] = value;
+
+                    setTimeout(function (p_key) {
+                        if ($('#frm #' + p_key).attr('templete_treat') != 'Y') {
+                            $('#frm #' + p_key).attr('templete_treat', 'Y');
+                            $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                        }
+                    }, 0, key);
+                }
+
+            })
+        } else {
+            //현재는 위와 로직이 같으나 변경해야할 수도 있음.
+            $('#frm [Grid_Templete="Y"]').each(function () {
+                key = this.id;
+                fun_string = columns_templete.toString();
+
+                //debugger;//222
+                if (InStr(fun_string, "'" + key + "'") + InStr(fun_string, '"' + key + '"') > 0
+                    && fun_string.split('return p_dataItem[').length == fun_string.split('p_dataItem[').length && $('#frm #' + key).attr('templete_treat') != 'Y') {
+                    value = columns_templete(resultAll.d.results[0], key);
+                    viewModel[key + "Value"] = value;
+                    setTimeout(function (p_key) {
+                        if ($('#frm #' + p_key).attr('templete_treat') != 'Y') {
+                            $('#frm #' + p_key).attr('templete_treat', 'Y');
+                            $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                        }
+                    }, 0, key);
+                }
+            })
+        }
+    }
+}
+
+
+function read_idx_first1(result) {
+
+    if (document.getElementById("ActionFlag").value == "view" || document.getElementById("ActionFlag").value == "modify" || document.getElementById("ActionFlag").value == 'write') {
+
+        if (typeof parent.toastr == "object") toastr_obj = parent.toastr; else toastr_obj = toastr;
+        if (resultAll.d.__count == 0 && document.getElementById("ActionFlag").value != "write") {
+            if (document.getElementById("ActionFlag").value == "modify" && document.getElementById('BodyType').value == 'only_one_list') {
+                location.href = replaceAll(replaceAll(replaceAll(location.href, '&idx=' + document.getElementById('idx').value, ''), '&ActionFlag=modify', ''), '&isAddURL=Y', '');
+            } else {
+                if ($('body').is(':visible')) toastr_obj.error("조회할 내역이 없습니다.", "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+            }
+        } else if (document.getElementById("isDeleteList").value == "Y") {
+            if ($('body').is(':visible')) toastr_obj.warning("해당내역은 삭제된 내역입니다.", "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+        } else {
+            if (resultAll.d.resultCode == "success") {
+                if ($('body').is(':visible') && parent.$('span.view_resultMessage')[0]) {
+                    parent.$('span.view_resultMessage').closest('div[aria-live="polite"]').remove();
+                    if (typeof toastr_obj == "object") toastr_obj = toastr_obj; else toastr_obj = toastr;
+                    toastr_obj.success(resultAll.d.resultMessage, '<span class="view_resultMessage"></span>', { timeOut: 2000, positionClass: "toast-bottom-right" });
+                }
+                $("#btn_menuName").text("※ " + document.getElementById("MenuName").value);
+            } else {
+                if ($('body').is(':visible') && typeof toastr_obj == "object") toastr_obj.error(resultAll.d.resultMessage, "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+            }
+        }
+
+        if (resultAll.d.__devQuery_url && isMobile() == false) {
+            if ($('body').is(':visible')) {
+                $('a.dev_view_query').closest('div[aria-live="polite"]').remove();
+                toastr.info('<a class="dev_view_query" href="javascript:;" onclick="query_popup(\'' + resultAll.d.__devQuery_url + '\');">내용조회쿼리를 보시려면 여기를 클릭하세요!</a>', '', { timeOut: 7000 });
+            }
+        }
+        $.each(result, function (key, value) {
+            //if(key=='MenuType') debugger;
+            //if(key=='geomsagubun') debugger;
+            if (value == null) value = '';
+
+            if ($('#frm #' + key).attr("type") == "checkbox") {
+                if ($('#frm #' + key).attr("Grid_Schema_Type") == "boolean") {
+                    if (value == true) viewModel[key + "Checked"] = true; else viewModel[key + "Checked"] = false;
+                } else {
+                    if (value == "Y") viewModel[key + "Checked"] = true; else viewModel[key + "Checked"] = false;
+                }
+            } else if ($('#frm #' + key).attr("type") == "file") {
+                if (document.getElementById("ActionFlag").value != "write") {
+
+                    var info_url = "info.php?RealPid=" + document.getElementById("RealPid").value + "&MisJoinPid=" + document.getElementById("MisJoinPid").value + "&key_aliasName=" + document.getElementById("key_aliasName").value + "&thisAlias=" + key + "&key_idx=" + document.getElementById("idx").value;
+                    if (value != "") {
+                        var savedFiles = ajax_url_return(info_url + "&flag=upload");
+                        if (InStr(savedFiles, 'declare @sql') > 0) {
+                            if ($('body').is(':visible')) {
+                                savedFiles = replaceAll(replaceAll(savedFiles, '<!--', ''), '-->', '');
+                                rnd = getRandomArbitrary(101, 400);
+                                toastr_obj.error('<a id="rnd' + rnd + '" href="javascript:;" onclick="query_error_popup(this);">첨부파일 오류입니다. key : ' + key + ' 여기를 클릭하세요.</a>', '', { progressBar: true, timeOut: 7000, positionClass: "toast-bottom-right" });
+                                $('a#rnd' + rnd).attr('msg', savedFiles);
+                            }
+                        } else {
+                            savedFiles = replaceAll(savedFiles, "\n", "");
+                            if (savedFiles != "" && savedFiles != "[]") {
+                                if (savedFiles.length > 2) {
+                                    savedFiles = JSON.parse(savedFiles);
+                                    $('#frm #' + key).attr("data-files", JSON.stringify(savedFiles));
+
+                                } else {
+                                    $('form#frm').attr('upload_change', 'Y');
+                                    if ($('body').is(':visible')) toastr_obj.warning("첨부파일 오류입니다. key : " + key, "", { timeOut: 2000, positionClass: "toast-bottom-right" });
+                                }
+                            }
+                        }
+                    }
+                    if ($('#frm #' + key).data("kendoUpload")) {
+                        $('#frm #' + key).closest("div.k-widget.k-upload")[0].outerHTML = $('#frm #' + key)[0].outerHTML;
+                    }
+
+                }
+
+            } else {
+                var tag_name = '';
+                if ($('#frm #' + key)[0]) tag_name = $('#frm #' + key)[0].tagName;
+
+                if ($('#frm #' + key).attr("data-role") == "timepicker") {
+                    viewModel[key + "Value"] = new Date(Left(new Date().yyyymmddhhmm16(), 11) + value);
+                } else if (tag_name == "SELECT") {
+
+                    //if($('#frm #'+key).attr('data-role')=='multiselect') debugger;
+                    //if(key=="g01") debugger;
+                    //[{sangdamhyeongtae: "천재"},{sangdamhyeongtae: "천재"}]
+
+                    if ($('#frm #' + key).attr("Grid_Items") != undefined && $('#frm #' + key).attr("Grid_Items") != '' && $('#frm #' + key).attr("Grid_Items") != "{Grid_Items}") {
+
+                        var selectItems = eval($('#frm #' + key).attr("Grid_Items"));
+
+                        if (InStr(value, '\t') > 0) {
+                            value = replaceAll(value, '\t', ' ');
+                            col_name = $('div#round_' + key).find('label[grid_columns_title0]').attr('grid_columns_title0');
+                            alert(col_name + ' 항목의 값 ' + value + ' 에 비정상적인 값인 탭이 포함되어 있어 제거했습니다.');
+                        }
+                        value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                        //value.remByVal({"value":""});
+                        value = removeItem(value, { "value": "" });
+                        if (value.length > 0) {
+                            if (value[0]['text'] == undefined && value[0]['value'] != undefined) {
+                                for (j = 0; j < value.length; j++) {
+                                    v = getObjects(selectItems, 'value', value[j]['value']);
+                                    if (v.length > 0) value[j]['text'] = v[0]["text"];
+                                    else value[j]['text'] = value[j]['value'];
+                                }
+                            }
+                        }
+
+                        value2 = JSON.parse(JSON.stringify(value));
+                        /*
+                        if(Array.isArray(value2)) {
+                            if(value2.length==1) {
+                                value2 = value2[0].value;
+                            }
+                        }
+                        */
+
+                        forMax = selectItems.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            //value.remByVal(selectItems[ii]);
+                            value = removeItem(value, selectItems[ii]);
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            selectItems.push(value[ii]);
+                        }
+
+                        /*
+                        if(value2.length==0) {
+                            value2 = '';
+                        } else {
+                            if(getObjects(selectItems,'value',value2).length==0) selectItems.push({value: value2});
+                        }
+                        */
+
+                        viewModel[key + "Source"] = selectItems;
+                        if (value2.length > 0) {
+                            if ($('#frm #' + key).attr('data-role') == 'multiselect' || $('#frm #' + key).attr('data-role') == 'dropdowntree') {
+                                viewModel[key + "Value"] = value2;
+                            } else {
+                                viewModel[key + "Value"] = value2[0].value;
+                            }
+                        } else viewModel[key + "Value"] = null;
+
+
+
+                    }
+                } else {
+
+                    //if(key=='virtual_fieldQnprint_apply' || key=='zinswaeyangsikURL') debugger;
+
+                    if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && resultAll.d.results[0] != undefined) {
+                        value = columns_templete(resultAll.d.results[0], key);
+                    }
+                    if ($('#frm #' + key).attr("Grid_CtlName_ori") == "check") {
+                        if (value == "1" || value == "Y") value = "Y";
+                        else if (value == "0" || value == "N") value = "N";
+                        else value = '';
+                    }
+                    if (document.getElementById("jsonUrl").value != '' && $('#frm #' + key).attr("data-bind")) {
+                        if ($('#frm #' + key).attr("data-bind").split(":")[0] == "html") {
+                            siteUrl = '';
+                            objUrl = document.getElementById("jsonUrl").value.split("/");
+                            for (z = 0; z < objUrl.length - 2; z++) {
+                                siteUrl = siteUrl + objUrl[z] + "/";
+                            }
+                            value = replaceAll(value, '"/uploadFiles/', '"' + siteUrl + 'uploadFiles/');
+                        }
+                    }
+
+                    if ($('#frm #' + key).attr("data-mask") != undefined) {
+                        value = $('<input>').val(value).kendoMaskedTextBox({ mask: $('#frm #' + key).attr("data-mask") }).data('kendoMaskedTextBox').value();
+                    }
+
+                    viewModel[key + "Value"] = value;
+                    if ($("#frm #" + key + "[default]").length == 1 && document.getElementById('ActionFlag').value == 'write') {
+                        if ($('#frm #' + key).attr('default') != undefined && $('#frm #' + key).attr('default') != '') {
+                            $("#frm #" + key).attr("system_default", $('#frm #' + key).attr('default'));
+                        }
+                        $("#frm #" + key + "[default]").attr("default", value);
+                    }
+
+
+                }
+
+            }
+        });
+
+    }
+
+    if (document.getElementById("ActionFlag").value == 'write' || document.getElementById("ActionFlag").value == "modify") {
+        //dropdowntree 만의 이슈 처리.
+        var defaultObj = $('form#frm div[data-role="treeview"][Grid_Items]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = $(defaultObj[i]).attr("id");
+
+            if (document.getElementById("ActionFlag").value == "modify") {
+                defaultValues = "," + resultAll['d']['results'][0][key] + ",";
+            } else {
+                defaultValues = "," + $(defaultObj[i]).attr("default") + ",";
+            }
+
+            console.log(defaultValues);
+            //var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+            aa = $(defaultObj[i]).attr("Grid_Items");
+            aa_json = eval(aa);
+
+            aa_json[0].items.forEach(function (k, i) {
+                if (InStr(defaultValues, ',' + k.value + ',') > 0) {
+                    aa_json[0].items[i].checked = true;
+                }
+            });
+            aa = JSON.stringify(aa_json);
+            TF = false;
+            if (aa_json[0].items[0]) {
+                if (InStr(aa_json[0].items[0].text, '>') > 0) TF = true;
+            }
+            //tree 구조답게 > 기호가 있을 경우와 없는 경우로 나눠서 계산.
+            if (TF) {
+
+
+
+                ss = aa.split(' | ');
+                rr0 = '{ text: "@text", expanded: true, items: [@items] }';
+                if (document.getElementById("ActionFlag").value == "view") rr = '';
+                else rr = '[';
+                for (ii = 1; ii < ss.length; ii++) {
+                    gg_prev = '';
+                    gg_next = '';
+                    gg = ss[ii].split(' > ')[0];
+                    if (ii > 0) gg_prev = ss[ii - 1].split(' > ')[0];
+                    if (ii < ss.length - 1) gg_next = ss[ii + 1].split(' > ')[0];
+                    if (document.getElementById("ActionFlag").value == "view") {
+                        if (InStr(defaultValues, ',' + aa_json[0].items[ii - 1].value + ',') > 0) rr = rr + aa_json[0].items[ii - 1].text + "<br>";
+                    } else {
+                        if (ii == 0 || gg_prev != gg) {
+                            rr = rr + iif(ii <= 1, '', ',') + replaceAll(rr0, '@text', gg);
+                        }
+                        rr = replaceAll(rr, '@items', '{"value":"' + aa_json[0].items[ii - 1].value + '","text":"' + aa_json[0].items[ii - 1].text + '"' + iif(aa_json[0].items[ii - 1].checked, ', "checked": true', '') + '},@items');
+                    }
+                    if (gg_next != gg) rr = replaceAll(rr, ',@items', '');
+                }
+
+                rr = rr + ']';
+                rr = replaceAll(replaceAll(rr, String.fromCharCode(10), ''), String.fromCharCode(13), '');
+                rr = replaceAll(rr, '},@items] }]', '}] }]');
+                var selectItems = eval(rr);
+
+                if (selectItems) viewModel[key + "Source"] = selectItems;
+
+
+            } else {
+
+                viewModel[key + "Source"] = aa_json;
+
+            }
+
+        }
+
+
+    }
+
+    if (document.getElementById("ActionFlag").value == "modify") {
+        //dropdownlist
+
+        //virtual_field 의 경우 리턴값이 없어서 별도조치.
+        var defaultObj = $('form#frm select[Grid_Items][id^="virtual_field"]');
+
+        for (i = 0; i < defaultObj.length; i++) {
+
+            if ($(defaultObj[i]).attr("Grid_Items") != '{Grid_Items}') {
+
+                key = $(defaultObj[i]).attr("id");
+                var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+
+                value = $(defaultObj[i]).attr("default");
+                if (Left(value, 2) == '[{') {
+                    value = JSON.parse(value);
+                } else {
+                    value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                }
+
+                //value.remByVal({"value":""});
+                value = removeItem(value, { "value": "" });
+                value2 = JSON.parse(JSON.stringify(value));
+
+                if (selectItems) {
+                    if (selectItems[0]) {
+                        if (selectItems[0].items) real_items = selectItems[0].items;
+                        else real_items = selectItems;
+
+                        forMax = real_items.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            if (getObjects(value, "value", real_items[ii].value).length > 0) {
+                                real_items[ii].checked = true;
+
+                                //value.remByVal(real_items[ii]);
+                                value = removeItem(value, real_items[ii]);
+                            }
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            real_items.push(value[ii]);
+                        }
+
+                        if (selectItems[0].items) selectItems[0].items = real_items;
+                        else selectItems = real_items;
+                        viewModel[key + "Source"] = selectItems;
+
+                    }
+                }
+                //viewModel[key+"Value"] = value2;      //mvvm 에서 미리 정의하면 이상하게 에러남.
+            }
+
+        }
+
+    }
+    if (document.getElementById("ActionFlag").value == 'write') {
+        var defaultObj = $('form#frm select[Grid_Items]');
+
+        for (i = 0; i < defaultObj.length; i++) {
+
+            if ($(defaultObj[i]).attr("Grid_Items") != '{Grid_Items}') {
+
+                key = $(defaultObj[i]).attr("id");
+                var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+
+                value = $(defaultObj[i]).attr("default");
+                if (Left(value, 2) == '[{') {
+                    value = JSON.parse(value);
+                } else {
+                    value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                }
+
+                //value.remByVal({"value":""});
+                value = removeItem(value, { "value": "" });
+                value2 = JSON.parse(JSON.stringify(value));
+
+                if (selectItems) {
+                    if (selectItems[0]) {
+                        if (selectItems[0].items) real_items = selectItems[0].items;
+                        else real_items = selectItems;
+
+                        forMax = real_items.length;
+                        for (ii = 0; ii < forMax; ii++) {
+                            if (getObjects(value, "value", real_items[ii].value).length > 0) {
+                                real_items[ii].checked = true;
+
+                                //value.remByVal(real_items[ii]);
+                                value = removeItem(value, real_items[ii]);
+                            }
+                        }
+
+                        for (ii = 0; ii < value.length; ii++) {
+                            real_items.push(value[ii]);
+                        }
+
+                        if (selectItems[0].items) selectItems[0].items = real_items;
+                        else selectItems = real_items;
+
+                        viewModel[key + "Source"] = selectItems;
+
+
+                    }
+                }
+                //viewModel[key+"Value"] = value2;      //mvvm 에서 미리 정의하면 이상하게 에러남.
+            }
+
+        }
+
+        var defaultObj = $('form#frm select[data-role="multiselect"][default]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = defaultObj[i].id;
+            if ($(defaultObj[i]).attr("default") != "") {
+                //defaultObj[i].value = $(defaultObj[i]).attr("default");
+                value = $(defaultObj[i]).attr("default");
+                value2 = [];
+                value.split(',').forEach(function (v, i) {
+                    value2.push({ 'value': v });
+                });
+                viewModel[key + "Value"] = value2;
+            } else if (document.getElementById("idx").value == "0") {
+                viewModel[key + "Value"] = [];
+            }
+        }
+
+        var defaultObj = $("form#frm input[default], form#frm textarea[default]");
+        for (i = 0; i < defaultObj.length; i++) {
+            key = defaultObj[i].id;
+
+            //defaultObj[i].value = $(defaultObj[i]).attr("default");
+            value = $(defaultObj[i]).attr("default");
+
+            if ($(defaultObj[i]).attr("type") == "checkbox") {
+                if ($(defaultObj[i]).attr("Grid_Schema_Type") == "boolean") {
+                    if (value == "1") viewModel[key + "Checked"] = true;
+                    else viewModel[key + "Checked"] = false;
+                } else {
+                    if (value == "Y") viewModel[key + "Checked"] = true;
+                    else viewModel[key + "Checked"] = false;
+                }
+            } else {
+                viewModel[key + "Value"] = value;
+            }
+
+        }
+
+        params = location.search.split('?')[1].split('&');
+        for (i = 0; i < params.length; i++) {
+            params_name = params[i].split('=')[0];
+            key = Mid(params_name, 6, 50);
+            params_value = params[i].split('=')[1];
+            if (Left(params_name, 5) == 'form_' && params_value != '') {
+                params_value = decodeURI(params_value);
+                defaultObj = $('form#frm [id="' + key + '"]');
+                defaultObj.attr('default', params_value);
+                //debugger;
+                if (defaultObj.attr("type") == "checkbox") {
+                    if (defaultObj.attr("Grid_Schema_Type") == "boolean") {
+                        if (params_value == "1") viewModel[key + "Checked"] = true;
+                        else viewModel[key + "Checked"] = false;
+                    } else {
+                        if (params_value == "Y") viewModel[key + "Checked"] = true;
+                        else viewModel[key + "Checked"] = false;
+                    }
+                } else {
+                    viewModel[key + "Value"] = params_value;
+                    console.log(key + '=' + params_value);
+                }
+            }
+        }
+
+    }
+}
+
+function read_idx_first2(result) {
+
+    if (document.getElementById("ActionFlag").value == "view" || document.getElementById("ActionFlag").value == "modify" || document.getElementById("ActionFlag").value == 'write') {
+
+
+        $.each(result, function (key, value) {
+            //if(key=='MenuType') debugger;
+            //if(key=='geomsagubun') debugger;
+            if (value == null) value = '';
+
+            if ($('#frm #' + key).attr("type") == "checkbox") {
+
+            } else if ($('#frm #' + key).attr("type") == "file") {
+
+
+            } else {
+                var tag_name = '';
+                if ($('#frm #' + key)[0]) tag_name = $('#frm #' + key)[0].tagName;
+
+                if ($('#frm #' + key).attr("data-role") == "timepicker") {
+
+                } else if (tag_name == "SELECT") {
+
+                    //if($('#frm #'+key).attr('data-role')=='multiselect') debugger;
+                    //if(key=="g01") debugger;
+                    //[{sangdamhyeongtae: "천재"},{sangdamhyeongtae: "천재"}]
+
+                    if ($('#frm #' + key).attr("Grid_Items") != undefined && $('#frm #' + key).attr("Grid_Items") != '' && $('#frm #' + key).attr("Grid_Items") != "{Grid_Items}") {
+
+
+
+
+                    } else {
+                        //if(key=='virtual_fieldQnprint_apply' || key=='zinswaeyangsikURL') debugger;
+                        if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && resultAll.d.results[0] != undefined) {
+                            value = columns_templete(resultAll.d.results[0], key);
+                            //columns_templete('', 'zjeogyongbeomwi')
+                        }
+
+                        if ($('#frm #' + key).attr('Grid_Items') == '{Grid_Items}') {
+                            value = eval('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+                        }
+
+
+                        //dropdownitem 일때만 아래와 같이 진행.
+                        if (InStr(viewModel[key + "Source"].options.transport.read.url, 'list_grid_items.php') > 0 && $('#frm #' + key).attr('data-role') != 'multiselect') {
+                            v = result[key];
+                            default_value = v;
+                            viewModel[key + "Source"].options.transport.read.url = viewModel[key + "Source"].options.transport.read.url + '&default_value=' + encodeURIComponent(default_value);
+                            viewModel[key + "Value"] = value[0].value;
+
+
+                            if ($('#frm #' + key).attr('Grid_Templete') == 'Y') {
+                                setTimeout(function (p_key) {
+                                    $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                                }, 0, key);
+                            } else if ($('#frm #' + key).attr('data-role') == 'dropdownlist') {
+                                setTimeout(function (p_viewModel, p_key, p_value) {
+                                    viewModel[p_key + "Value"] = p_value;
+                                }, 0, viewModel, p_key, value[0].p_value);
+                            }
+                        } else {
+                            viewModel[key + "Value"] = value;
+
+                            if ($('#frm #' + key).attr('Grid_Templete') == 'Y') {
+                                setTimeout(function (p_key) {
+                                    $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                                }, 0, key);
+                            } else if ($('#frm #' + key).attr('data-role') == 'dropdownlist') {
+                                //setTimeout( function(p_key,p_value,p_result) {
+                                //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoDropDownList').value());
+
+                                if (value != '' && $('#frm #' + key).data('kendoDropDownList').value() == '') {
+                                    //이 경우가 기본리스트를 벗어난 코드값임.
+                                    text = $('#frm #' + key).attr('data-text-field');
+                                    v = result[key];
+                                    t = result[text];
+                                    //debugger;
+                                    json_text = JSON.parse('{ "' + text + '": "' + t + '", "' + key + '": "' + v + '" }');
+                                    $('#frm #' + key).data('kendoDropDownList').dataSource.add(json_text);
+                                }
+                                $('#frm #' + key).data('kendoDropDownList').value(value);
+                                /*
+                                                                    setTimeout( function(pp_key,pp_value,pp_result) {
+                                                                    //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoDropDownList').value());
+                                                                    
+                                                                        if(pp_value!='' && $('#frm #'+pp_key).data('kendoDropDownList').value()=='') {
+                                                                            //이 경우가 기본리스트를 벗어난 코드값임.
+                                                                            pp_text = $('#frm #'+pp_key).attr('data-text-field');
+                                                                            v = pp_result[pp_key];
+                                                                            t = pp_result[pp_text];
+                                                                            //debugger;
+                                                                            json_text = JSON.parse('{ "'+pp_text+'": "'+t+'", "'+pp_key+'": "'+v+'" }');
+                                                                            $('#frm #'+pp_key).data('kendoDropDownList').dataSource.add(json_text);
+                                                                        }
+                                                                        $('#frm #'+pp_key).data('kendoDropDownList').value(pp_value);
+                                                                    },0,p_key,p_value,p_result);
+                                */
+                                //},0,key,value,resultAll.d.results[0]);    //이곳은 확실히 100, 100 으로 해야함.
+                            } else if ($('#frm #' + key).attr('data-role') == 'multiselect') {
+                                //setTimeout( function(p_key,p_value,p_result) {
+                                //console.log(p_key + ' :: ' + p_value + ' :: '+$('#frm #'+p_key).data('kendoMultiSelect').value());
+
+                                if (value != '' && $('#frm #' + key).data('kendoMultiSelect').value() == '') {
+                                    //이 경우가 기본리스트를 벗어난 코드값임.
+                                    text = $('#frm #' + key).attr('data-text-field');
+                                    v = result[key];
+                                    t = result[text];
+                                    //debugger;
+                                    json_text = JSON.parse('{ "' + text + '": "' + t + '", "' + key + '": "' + v + '" }');
+                                    $('#frm #' + key).data('kendoMultiSelect').dataSource.add(json_text);
+                                }
+                                $('#frm #' + key).data('kendoMultiSelect').value(value);
+                                //},0,key,value,resultAll.d.results[0]);
+                            }
+                        }
+
+
+
+                    }
+                } else {
+
+
+
+                    if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && resultAll.d.results[0] != undefined) {
+                        value = columns_templete(resultAll.d.results[0], key);
+                    }
+                    if ($('#frm #' + key).attr("Grid_CtlName_ori") == "check") {
+                        if (value == "1" || value == "Y") value = "Y";
+                        else if (value == "0" || value == "N") value = "N";
+                        else value = '';
+                    }
+                    if (document.getElementById("jsonUrl").value != '' && $('#frm #' + key).attr("data-bind")) {
+                        if ($('#frm #' + key).attr("data-bind").split(":")[0] == "html") {
+                            siteUrl = '';
+                            objUrl = document.getElementById("jsonUrl").value.split("/");
+                            for (z = 0; z < objUrl.length - 2; z++) {
+                                siteUrl = siteUrl + objUrl[z] + "/";
+                            }
+                            value = replaceAll(value, '"/uploadFiles/', '"' + siteUrl + 'uploadFiles/');
+                        }
+                    }
+
+                    if ($('#frm #' + key).attr("data-mask") != undefined) {
+                        value = $('<input>').val(value).kendoMaskedTextBox({ mask: $('#frm #' + key).attr("data-mask") }).data('kendoMaskedTextBox').value();
+                    }
+
+                    viewModel[key + "Value"] = value;
+
+
+                    if ($('#frm #' + key).attr('Grid_Templete') == 'Y' && (document.getElementById('ActionFlag').value != 'write' || document.getElementById('idx').value == '0')) {
+                        setTimeout(function (p_key) {
+                            $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                        }, 0, key);
+                    } else if ($('#frm #' + key).attr('data-format') != '' && $('#frm #' + key).attr('data-format') != undefined && $('#frm #' + key).attr('grid_templete') != 'Y' && document.getElementById('ActionFlag').value == 'view') {
+                        setTimeout(function (p_key) {
+                            v = $('#frm #' + p_key).text();
+                            if (isNumeric(v)) {
+                                v = kendo.toString(v * 1, Trim($('#frm #' + p_key).attr('data-format')));
+                                $('#frm #' + p_key).html(v);
+                            }
+                        }, 0, key);
+                    }
+                }
+
+            }
+        });
+
+        if (typeof thisLogic_view_after_resultAll_and_load == "function") {
+            setTimeout(function (p_resultAll) {
+                thisLogic_view_after_resultAll_and_load(p_resultAll);
+            }, 0, resultAll);
+
+        }
+    }
+
+    if (document.getElementById("ActionFlag").value == 'write' || document.getElementById("ActionFlag").value == "modify") {
+        //dropdowntree 만의 이슈 처리.
+
+
+        var defaultObj = $('form#frm select[data-role="dropdownlist"]');
+        for (i = 0; i < defaultObj.length; i++) {
+            key = $(defaultObj[i]).attr("id");
+
+            setTimeout(function (p_key) {
+
+                if ($('textarea#helplist_' + p_key).val() != '' && $('textarea#helplist_' + p_key).val() != undefined) {
+
+                    if (isJsonString($('textarea#helplist_' + p_key).val()) == false) {
+                        return false;
+                    }
+
+                    delta = 0;
+                    //index.php style 또는 서버로직에 설정된 help width 캐치
+                    if ($('div.k-list-container.helplist-container').length == 0) {
+                        $('body').append('<div class="k-list-container helplist-container"></div>');
+                        helpfullwith = $('div.k-list-container.helplist-container').width();
+                        $('div.k-list-container.helplist-container').remove();
+                    }
+                    helplistwidth = '';
+                    //console.log("표시는="+options.field);
+                    //console.log("값은="+getNextKey_key(options.model.fields, options.field));
+                    helplist = JSON.parse($('textarea#helplist_' + p_key).val());
+
+                    headerTemplate = '';
+                    tot_iwidth = 0;
+                    for (t = 0; t < helplist.length; t++) {
+                        item = helplist[t];
+                        if (isNumeric(item)) {
+                            helpfullwith = item;
+                            $('#style_helplist_container')[0].innerHTML =
+                                `
+body[ismobile="N"] div.k-list-container.helplist-container {
+width: `+ helpfullwith + `px!important;
+min-height: 320px!important;
+}
+`;
+                        } else {
+                            if (InStr(item, '.') > 0) {
+                                iwidth = item.split('.')[1] * 1;
+                            } else {
+                                if ($('label[grid_columns_title="' + item.split('.')[0] + '"]')[0]) {
+                                    iwidth = Math.abs($('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('grid_columns_width') * 1 - 14) / 8;
+                                } else iwidth = 20;
+                                if (iwidth <= 1) iwidth = 20;
+                            }
+                            tot_iwidth = tot_iwidth + iwidth;
+                        }
+                    }
+                    if (isMobile()) {
+                        if ($(document).width() > helpfullwith) document_width = helpfullwith;
+                        else document_width = $(document).width();
+                    } else {
+                        document_width = helpfullwith;
+                    }
+
+
+
+                    delta = document_width / tot_iwidth / 7;   //좌우꽉찬화면구현
+                    for (t = 0; t < helplist.length; t++) {
+                        item = helplist[t];
+                        if (isNumeric(item)) {
+
+                        } else {
+                            item_field = $('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('for');
+                            if (InStr(item, '.') > 0) {
+                                iwidth = item.split('.')[1] * 1;
+                            } else {
+                                if ($('label[grid_columns_title="' + item.split('.')[0] + '"]')[0]) {
+                                    iwidth = Math.abs($('label[grid_columns_title="' + item.split('.')[0] + '"]').attr('grid_columns_width') * 1 - 14) / 8;
+                                } else iwidth = 20;
+                                if (iwidth <= 1) iwidth = 20;
+                            }
+                            item = item.split('.')[0];
+
+                            if ($('input#' + item_field).attr('data-role') == 'numerictextbox') helplist_align = 'R';
+                            else helplist_align = '';
+
+                            iwidth = Math.floor(iwidth * delta);
+                            helplistwidth = helplistwidth + iwidth + '.' + helplist_align + iif(t < helplist.length - 1, ';', '');
+
+                            if (iwidth > uni_len(item)) {
+                                headerTemplate = headerTemplate + iif(headerTemplate == '', '', '&nbsp;|&nbsp;') + item + '&nbsp;'.repeat(iwidth - uni_len(item));
+                            } else {
+                                headerTemplate = headerTemplate + iif(headerTemplate == '', '', '&nbsp;|&nbsp;') + item;
+                            }
+                        }
+                    }
+                    if (helplistwidth != '') {
+                        $('div#div_headerTemplate_' + p_key)[0].innerHTML = headerTemplate;
+                        $('.helplist').closest('.k-list-container').addClass('helplist-container');
+                        if (isMobile()) $('.helplist').closest('.k-list-container').parent().addClass('helplist-container');
+                    } else {
+                        $('div#div_headerTemplate_' + p_key).remove();
+                    }
+                } else {
+                    $('div#div_headerTemplate_' + p_key).remove();
+                }
+            }, 0, key);
+        }
+    }
+
+    if (document.getElementById("ActionFlag").value == 'write') {
+
+
+
+        if (resultAll.d.results[0] != undefined) {
+            $('#frm [Grid_Templete="Y"]').each(function () {
+                key = this.id;
+                //debugger;//111
+                if ($('#frm #' + key).attr('templete_treat') != 'Y') {
+                    value = columns_templete(resultAll.d.results[0], key);
+
+                    viewModel[key + "Value"] = value;
+
+                    setTimeout(function (p_key) {
+                        if ($('#frm #' + p_key).attr('templete_treat') != 'Y') {
+                            $('#frm #' + p_key).attr('templete_treat', 'Y');
+                            $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                        }
+                    }, 0, key);
+                }
+
+            })
+        } else {
+            //현재는 위와 로직이 같으나 변경해야할 수도 있음.
+            $('#frm [Grid_Templete="Y"]').each(function () {
+                key = this.id;
+                fun_string = columns_templete.toString();
+
+                //debugger;//222
+                if (InStr(fun_string, "'" + key + "'") + InStr(fun_string, '"' + key + '"') > 0
+                    && fun_string.split('return p_dataItem[').length == fun_string.split('p_dataItem[').length && $('#frm #' + key).attr('templete_treat') != 'Y') {
+                    value = columns_templete(resultAll.d.results[0], key);
+                    viewModel[key + "Value"] = value;
+                    //setTimeout( function(p_key) {
+                    if ($('#frm #' + key).attr('templete_treat') != 'Y') {
+                        $('#frm #' + key).attr('templete_treat', 'Y');
+                        $('#frm #' + key).html($('#frm #' + key).text());
+                    }
+                    //},0,key);
+                }
+            })
+        }
+    }
+
+}
+function write_form_clear() {
+    var defaultObj = $('form#frm [data-role="dropdownlist"]');
+
+    for (i = 0; i < defaultObj.length; i++) {
+
+        key = $(defaultObj[i]).attr("id");
+
+        if ($(defaultObj[i]).attr("Grid_Items") != '{Grid_Items}' && $(defaultObj[i]).attr("Grid_Items") != undefined) {
+
+
+            var selectItems = eval($(defaultObj[i]).attr("Grid_Items"));
+
+            value = $(defaultObj[i]).attr("default");
+            if (Left(value, 2) == '[{') {
+                value = JSON.parse(value);
+            } else {
+                value = JSON.parse('[{"value":"' + replaceAll(value, ',', '"},{"value":"') + '"}]');
+            }
+
+            //value.remByVal({"value":""});
+            value = removeItem(value, { "value": "" });
+            value2 = JSON.parse(JSON.stringify(value));
+
+            if (selectItems) {
+                if (selectItems[0]) {
+                    if (selectItems[0].items) real_items = selectItems[0].items;
+                    else real_items = selectItems;
+
+                    forMax = real_items.length;
+                    for (ii = 0; ii < forMax; ii++) {
+                        if (getObjects(value, "value", real_items[ii].value).length > 0) {
+                            real_items[ii].checked = true;
+
+                            //value.remByVal(real_items[ii]);
+                            value = removeItem(value, real_items[ii]);
+                        }
+                    }
+
+                    for (ii = 0; ii < value.length; ii++) {
+                        real_items.push(value[ii]);
+                    }
+
+                    if (selectItems[0].items) selectItems[0].items = real_items;
+                    else selectItems = real_items;
+
+                    //과제 : 디폴트 맞는지
+                    viewModel[key + "Source"] = selectItems;
+
+                }
+            }
+        } else {
+            //과제 : 디폴트 맞는지
+            if ($(defaultObj[i]).attr('default') != undefined) v = $(defaultObj[i]).attr('default');
+            else v = '';
+            viewModel[key + "Value"] = v;
+        }
+
+    }
+
+    var defaultObj = $('form#frm select[data-role="multiselect"][default]');
+    for (i = 0; i < defaultObj.length; i++) {
+        key = defaultObj[i].id;
+        if ($(defaultObj[i]).attr("default") != "") {
+            //defaultObj[i].value = $(defaultObj[i]).attr("default");
+            value = $(defaultObj[i]).attr("default");
+            value2 = [];
+            value.split(',').forEach(function (v, i) {
+                value2.push({ 'value': v });
+            });
+        }
+    }
+
+    var defaultObj = $("form#frm input[default], form#frm input[selvalue], form#frm textarea[default]");
+    for (i = 0; i < defaultObj.length; i++) {
+        key = defaultObj[i].id;
+        //if(key=='virtual_fieldQnprint_apply' || key=='zinswaeyangsikURL') debugger;
+
+        //defaultObj[i].value = $(defaultObj[i]).attr("default");
+        if ($(defaultObj[i]).attr("default") != undefined) value = $(defaultObj[i]).attr("default");
+        else value = '';
+
+        if ($(defaultObj[i]).attr("type") == "checkbox") {
+            if ($(defaultObj[i]).attr("Grid_Schema_Type") == "boolean") {
+                if (value == "1") defaultObj[i].checked = true;
+                else defaultObj[i].checked = false;
+            } else {
+                if (value == "Y") defaultObj[i].checked = true;
+                else defaultObj[i].checked = false;
+            }
+        } else {
+            if (defaultObj[i].type != 'file') defaultObj[i].value = value;
+        }
+
+    }
+    $('input[selvalue]').each(function () {
+        $(this).attr('selvalue', '');
+    });
+
+    params = location.search.split('?')[1].split('&');
+    for (i = 0; i < params.length; i++) {
+        params_name = params[i].split('=')[0];
+        key = Mid(params_name, 6, 50);
+        params_value = params[i].split('=')[1];
+        if (Left(params_name, 5) == 'form_' && params_value != '') {
+            defaultObj = $('form#frm [id="' + key + '"]');
+            defaultObj.attr('default', params_value);
+            //debugger;
+            if (defaultObj.attr("type") == "checkbox") {
+                if (defaultObj.attr("Grid_Schema_Type") == "boolean") {
+                    if (params_value == "1") defaultObj.checked = true;
+                    else defaultObj.checked = false;
+                } else {
+                    if (params_value == "Y") defaultObj.checked = true;
+                    else defaultObj.checked = false;
+                }
+            } else {
+                defaultObj.value = params_value;
+                console.log(key + '=' + params_value);
+            }
+        }
+    }
+    if (resultAll.d.results[0] != undefined) {
+        $('#frm [Grid_Templete="Y"]').each(function () {
+            key = this.id;
+            //debugger;//333
+            if ($('#frm #' + key).attr('templete_treat') != 'Y') {
+                value = columns_templete(resultAll.d.results[0], key);
+                //Grid_Templete 초기화 과제
+                viewModel[key + "Value"] = value;
+
+                setTimeout(function (p_key) {
+                    if ($('#frm #' + p_key).attr('templete_treat') != 'Y') {
+                        $('#frm #' + p_key).attr('templete_treat', 'Y');
+                        $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                    }
+                }, 0, key);
+            }
+        });
+    } else {
+        //현재는 위와 로직이 같으나 변경해야할 수도 있음.
+        $('#frm [Grid_Templete="Y"]').each(function () {
+            key = this.id;
+            fun_string = columns_templete.toString();
+
+            //Grid_Templete 초기화 과제
+            //debugger;//44
+            if (InStr(fun_string, "'" + key + "'") + InStr(fun_string, '"' + key + '"') > 0
+                && resultAll.d.results[0] != undefined && fun_string.split('return p_dataItem[').length > 0 && fun_string.split('p_dataItem[').length > 0 && $('#frm #' + key).attr('templete_treat') != 'Y') {
+
+                value = columns_templete(resultAll.d.results[0], key);
+                viewModel[key + "Value"] = value;
+                setTimeout(function (p_key) {
+                    if ($('#frm #' + p_key).attr('templete_treat') != 'Y') {
+                        $('#frm #' + p_key).attr('templete_treat', 'Y');
+                        $('#frm #' + p_key).html($('#frm #' + p_key).text());
+                    }
+                }, 0, key);
+            }
+        });
+    }
+
+}
+/*
+function onSuccess_common(e) {
+    debugger;
+    var msg = e.response[0].result;
+    if(InStr(msg,"실패")>0) parent.toastr.error(msg);
+    else parent.toastr.success(msg);
+}
+
+function onError_common(e) {
+    debugger;
+    parent.toastr.error("비정상적인 에러입니다.");
+}
+
+
+function onRemove_common(e) {
+    debugger;
+    var msg = e.response[0].result;
+    if(InStr(msg,"실패")>0) parent.toastr.error(msg);
+    else parent.toastr.success(msg);
+}
+*/

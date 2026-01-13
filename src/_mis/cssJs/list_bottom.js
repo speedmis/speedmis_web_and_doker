@@ -1,0 +1,243 @@
+﻿
+
+function k_file_createClick(p_info_url) {
+
+    p_this = $(".k-file-name:not([style])");
+
+    if (p_this.length > 0) {
+        for (n = 0; n < p_this.length; n++) {
+            var fileName = p_this[n].innerText;
+            var url = ajax_url_return(p_info_url + "&flag=download&fileName=" + encodeURI(fileName));
+            url = replaceAll(url, '\n', '');
+            if (isImage(url)) {
+                $(p_this[n]).closest('li').find('span.k-file-group-wrapper').html('<img style="cursor:pointer;" src="thumbnail.php?' + url + '" onclick="window.open(\'' + url + '\');"/>');
+            }
+
+        }
+
+        $(".k-file-name:not([style])").click(function (e) {
+            var fileName = this.innerText;
+            var url = ajax_url_return(p_info_url + "&flag=download&fileName=" + encodeURI(fileName));
+            downloadURI(url, fileName);
+        });
+        $(".k-file-name:not([style])").css("cursor", "pointer");
+        $(".k-file-extension-wrapper:not([style])").click(function (e) {
+            $(this).parent().find(".k-file-name").click();
+        });
+        $("li.k-file img.image-preview").click(function (e) {
+            $(this).parent().find(".k-file-name").click();
+        });
+        $(".k-file-extension-wrapper:not([style])").css("cursor", "pointer");
+        $("li.k-file img.image-preview").css("cursor", "pointer");
+
+    }
+
+}
+
+
+if (isMainFrame() || getUrlParameter("isSplitter") == "Y" || Left(windowID(), 10) == 'ifr_window') {
+    var $vertical = $("#vertical");
+    var $horizontal = $("#horizontal");
+    $vertical.kendoSplitter({
+        orientation: "vertical",
+        panes: [
+            { collapsible: false, size: "100%" },
+            { collapsible: false, resizable: true, size: "0%" }
+        ],
+        resize: function () {
+            if (event) {
+
+                var splitter = $vertical.data("kendoSplitter");
+                var size = splitter.size(".k-pane:first");
+                if (size != "100%") splitter.size(".k-pane:first", "100%");
+
+                if ($("div#right-pane").width() > 30) {
+                    setCookie('viewTarget', 'right', 1000);
+                    $('div.tc-theme-list div.viewTarget a').addClass('screenModeBtn');
+                    if (getCookie('rframe') == '' || getCookie('rframe') == null) {
+                        $('div.tc-theme-list div.viewTarget a.right1').removeClass('screenModeBtn');
+                    } else if (getCookie('rframe') == '12') {
+                        $('div.tc-theme-list div.viewTarget a.right12').removeClass('screenModeBtn');
+                    } else if (getCookie('rframe') == '2') {
+                        $('div.tc-theme-list div.viewTarget a.right2').removeClass('screenModeBtn');
+                    }
+
+                } else {
+                    var splitter = $horizontal.data("kendoSplitter");
+                    var size = splitter.size(".k-pane:first");
+                    if (size != "100%") splitter.size(".k-pane:first", "100%");
+                }
+                if (typeof kendoSplitter_reisze == "function") kendoSplitter_reisze('right', size);
+
+                //setCookie('viewTarget','popup',1000);
+                //$('div.tc-theme-list div.viewTarget a').addClass('screenModeBtn');
+                //$('div.tc-theme-list div.viewTarget a.popup').removeClass('screenModeBtn');
+
+            }
+            setTimeout(function () {
+                gridHeight();
+            }, 0);
+        }
+    });
+
+    $horizontal.kendoSplitter({
+        panes: [
+            { collapsible: false, size: "100%" },
+            { collapsible: false, resizable: true, size: "0%" }
+        ],
+        resize: function () {
+            if (event) {
+                if ($("div#right-pane").width() > 100) {
+                    var splitter = $horizontal.data("kendoSplitter");
+                    var size = splitter.size(".k-pane:first");
+                    setCookie('lastSize_right', size, 1000);
+                    setCookie('viewTarget', 'right', 1000);
+                    $('div.tc-theme-list div.viewTarget a').addClass('screenModeBtn');
+                    if (getCookie('rframe') == '' || getCookie('rframe') == null) {
+                        $('div.tc-theme-list div.viewTarget a.right1').removeClass('screenModeBtn');
+                    } else if (getCookie('rframe') == '12') {
+                        $('div.tc-theme-list div.viewTarget a.right12').removeClass('screenModeBtn');
+                    } else if (getCookie('rframe') == '2') {
+                        $('div.tc-theme-list div.viewTarget a.right2').removeClass('screenModeBtn');
+                    }
+                    if (typeof kendoSplitter_reisze == "function") kendoSplitter_reisze('right', size);
+                } else {
+
+                    var splitter = $horizontal.data("kendoSplitter");
+                    var size = splitter.size(".k-pane:first");
+                    if (size != "100%") splitter.size(".k-pane:first", "100%");
+
+
+                    var splitter = $vertical.data("kendoSplitter");
+                    var size = splitter.size(".k-pane:first");
+                    if (size != "100%") splitter.size(".k-pane:first", "100%");
+
+                    if (typeof kendoSplitter_reisze == "function") kendoSplitter_reisze('bottom', size);
+                }
+
+                resize_ifr_split();
+                //console.log('splitter event resize');
+            } else {
+                //이 지점이 kendoSplitter 의 첫 로딩되는 이벤트임.
+                var splitter = $horizontal.data("kendoSplitter");
+                splitter.bind("resize", function () {
+                    //console.log('splitter resize');
+                    resize_ifr_split();
+                });
+                $('div#horizontal').kendoDropTarget({
+                    'dragenter': function (e) {
+                        console.log('splitter dragenter');
+                        resize_ifr_split();
+                    }
+                });
+                $('div#horizontal .k-splitbar').kendoDraggable({
+                    hint: function (element) {
+                        $('div#right-pane .k-splitter-overlay.k-overlay').mouseenter(function () {
+                            console.log('splitter overlay');
+                            resize_ifr_split();
+                        });
+                        //console.log('splitter hint');
+                        resize_ifr_split();
+                        return element.clone();
+                    }
+                });
+                $('div#right-pane .pane-content.k-widget').mouseenter(function () {
+                    //console.log('splitter mouseenter');
+                    resize_ifr_split();
+                });
+            }
+        }
+    });
+} else {
+
+    $(document).ready(function () {
+
+        $(window).resize();
+    });
+
+
+
+    $("div#right-pane")[0].outerHTML = "";
+}
+
+$(document).ready(function () {
+    //그리드에서 빠르게 클릭하면 편집이 안되는 현상 때문. 더큰문제가 발생하여 주석처리(튕김현상)
+    //$('table[role="grid"]').unbind( "mousedown" );
+    if ($('a.TK-Menu-Item-Link.TK-Item--Selected')[0]) {
+        if ($('a.TK-Menu-Item-Link.TK-Item--Selected')[0].innerText == 'GLOBAL ADMIN') $('li#btn_addMenu_overflow').remove();
+    } else {
+        $('li#btn_addMenu_overflow').remove();
+    }
+    if ($('div#toolbar span.k-datepicker').length == 0 && $('div#toolbar .schema_type_date,div#toolbar .schema_type_datetime')[0]) {
+        $('div#toolbar .schema_type_date,div#toolbar .schema_type_datetime').kendoDatePicker();
+    }
+
+    if ($('input#spreadsheets_url')[0]) {
+        if ($('input#spreadsheets_url')[0].value != '') {
+            $('a#btn_reload').after('<a role="button" href="" class="k-button k-button-icontext" id="btn_spreadsheets_url"><span class="k-icon k-i-k-icon k-i-hyperlink-open"></span>스프레드URL</a>');
+            $('a#btn_spreadsheets_url').click(function () {
+                window.open($('input#spreadsheets_url')[0].value);
+            });
+        }
+    }
+
+
+    setTimeout(function () {
+        if (isMobile() == true) {
+            $('.k-splitbar').off("mousedown");   //이거 없으면 안드로이드탭에서 그리드우측영역 터치 시, 높이가 이상하게 됨. css 로 대체가 안됨.
+        }
+        if (getID("MenuType").value == "13") {
+            $("div#main")[0].innerHTML = "<iframe src='" + getID("AddURL").value + "' js='list_bottom.js' width='100%' height='100%'></iframe>";
+        }
+        if (isMainFrame()) {
+
+            $('.k-grid-header').after(`
+            <div id="header_filter" style="position: absolute;
+                cursor: pointer;
+                right: 1px;
+                top: 0px;
+                color: black;
+                background-color: transparent;">▲</div>
+            `);
+            if (InStr(decodeURI(location.href), '"operator":"contains"') > 0) {
+                $('div#header_filter')[0].style.color = 'blue';
+            }
+            $('div#header_filter').click(function () {
+                if ($('tr.k-filter-row')[0].style.display == 'none') {
+                    $('tr.k-filter-row')[0].style.display = 'table-row';
+                    $('div#header_filter')[0].innerText = '▲';
+                    setCookie('header_filter_display', 'table-row');
+                } else {
+                    $('tr.k-filter-row')[0].style.display = 'none';
+                    $('div#header_filter')[0].innerText = '▼';
+                    setCookie('header_filter_display', 'none');
+                }
+                gridHeight();
+            });
+            if (getCookie('header_filter_display') == 'none') {
+                $('div#header_filter').click();
+            }
+        } else {
+
+            if (parent.$('li[tabid="' + getID('RealPid').value + '"]')[0]) {
+                if (getUrlParameter('helpbox') == undefined) {
+                    tag = parent.$('li[tabid="' + getID('RealPid').value + '"] span.k-link')[0].innerHTML;
+                    if (InStr(tag, '<') > 0) tag = '<' + tag.split('<')[1]; else tag = '';
+                    //child 컨트롤의 tabid 가 2개 이상이면 title 동기화 안함.
+                    if (parent.$('li[tabid="' + getID('RealPid').value + '"] span.k-link').length == 1 && parent.$('li[tabid="' + getID('RealPid').value + '"]').attr('tabnumber') != '1') {
+                        parent.$('li[tabid="' + getID('RealPid').value + '"] span.k-link')[0].innerHTML = getID('MenuName').value + tag;
+                    }
+                }
+            }
+        }
+
+        $('body').attr('headrows', $('thead > tr').length - 1 - iif($($('thead > tr:visible')[1]).height() <= 1, 1, 0));
+
+        if (getUrlParameter('treemenu') == 'Y' && $('body').attr('auto_open_refuse') == undefined && getCookie('viewTarget') == 'right') setTimeout(function () {
+            if ($("div#right-pane").width() <= 30 && isMobile() == false) btn_downup_click();
+        }, 1000);
+
+    });
+
+
+});

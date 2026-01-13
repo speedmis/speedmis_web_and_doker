@@ -1,0 +1,53 @@
+
+--dbalias : 1st
+
+
+--count sql :
+select count(*) from MisCustCounsel_Master table_m 
+ where 9=9  and table_m.useflag='1'
+
+
+--select sql :
+select bbb.* from (select @RANKT := @RANKT + 1 as "rowNumber",aaa.* from (select table_m.idx as "idx"
+,table_m.성명 as "seongmyeong"
+,table_m.연락처 as "yeollakcheo"
+,table_m.메일주소 as "meiljuso"
+,table_m.직업 as "jigeop"
+,rtrim(left(replace(ltrim(concat(ifnull(table_m.현장우편주소,''),' ',ifnull(table_m.현장주소,''))),' ',LPAD('',10,' ')),10)) as "zjiyeok"
+,table_m.현장우편번호 as "hyeonjangupyeombeonho"
+,table_m.현장우편주소 as "hyeonjangupyeonjuso"
+,table_m.현장주소 as "hyeonjangjuso"
+,table_방문경로코드.kname as "table_bangmunggyeongnokodeuQnkname"
+,table_m.방문경로코드 as "bangmunggyeongnokodeu"
+,(select count(*) from MisCustCounsel_Detail where midx=table_m.idx and useflag='1') as "zsangdamsangse"
+,(select sub_code.kname from MisCustCounsel_Detail sub_meet left outer join MisCommonTable sub_code on sub_code.kcode = sub_meet.계약전망코드 and sub_code.gcode='speedmis000724' where sub_meet.midx=table_m.idx and sub_meet.useflag='1' order by sub_meet.idx desc limit 1) as "zchoegeunjeommang"
+,(select remark from MisCustCounsel_Detail where midx=table_m.idx and useflag='1' order by idx desc limit 1) as "zchoegeunsangdam"
+,table_m.예상제작비 as "yesangjejakbi"
+,table_m.최종구매가 as "choejonggumaega"
+-- ,nULL as "zsangsenaeyeok"
+,table_m.관계직원 as "gwanggyejigwon"
+,table_m.현장사진 as "hyeonjangsajin"
+-- ,nULL as "jongnyobogoseo"
+,table_m.관리종료일 as "gwallijongnyoil"
+,case when datediff(case when ifnull(table_m.관리종료일,'')='' then '2100-01-01' else table_m.관리종료일 end,NOW())<0 then '관리종료' else '관리중' end as "zgwalligogaek"
+,table_m.HIT as "HIT"
+,table_m.IP as "IP"
+,date_format(table_m.wdate,'%Y-%m-%d %H:%i:%s') as "wdate"
+,table_wdater.username as "table_wdaterQnusername"
+,table_m.wdater as "wdater"
+-- ,nULL as "lastupdate"
+,table_lastupdater.username as "table_lastupdaterQnusername"
+,table_m.lastupdater as "lastupdater"
+,case when datediff(case when ifnull(table_m.관리종료일,'')='' then '2100-01-01' else table_m.관리종료일 end,NOW())<0 and 'gadmin'<>'gadmin' then 1 else 0 end as "read_only_condition"
+from MisCustCounsel_Master table_m
+left outer join MisCommonTable table_방문경로코드 on table_방문경로코드.kcode = table_m.방문경로코드
+ and table_방문경로코드.gcode='speedmis000714'
+left outer join MisUser table_wdater on table_wdater.UniqueNum = table_m.wdater
+left outer join MisUser table_lastupdater on table_m.lastupdater=table_lastupdater.UniqueNum
+, (select @RANKT := 0) XX where 9=9  and table_m.useflag='1'
+ order by table_m.idx desc limit 100) aaa order by idx desc) bbb where rowNumber between 1 and 100
+
+--app Sql :
+
+-----------------------------------------------
+    

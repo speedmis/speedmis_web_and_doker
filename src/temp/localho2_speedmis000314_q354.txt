@@ -1,0 +1,4 @@
+
+-- update sql :
+
+ update MisMenuList set upRealPid='speedmis001058',MenuName='초기값과 정렬을 변경',briefTitle='',isMenuHidden='N',SortG2=1,SortG4=7,SortG6=1,new_gidx=52,AuthCode='02',MenuType='06',MisJoinPid='speedmis001162',AddURL='&allFilter=[{"operator":"contains","value":"김래원","field":"gh0"}]&orderby=gh4,gh2 desc',remark='',isCoreProgram='N',help_update_deny=0,help_title='초기 필터링값과 정렬 파라미터에 의해 목록이 구성됩니다.',help_contents='<p>성명은 김래원, 정렬은 언어, 학기 역순 으로 정렬된 예입니다.</p><p>어느 프로그램이던지 우측상단의 ... 메뉴에서 URL 복사나 새창열기를 통해 적절한 파라미터를 복사하고 메뉴관리에서 붙여넣기 하시면 쉽게 구현이 가능합니다.</p>',lastupdate=CURRENT_TIMESTAMP,lastupdater='gadmin' where idx='1059';

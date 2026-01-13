@@ -1,0 +1,213 @@
+﻿
+
+body {
+    overflow-y: hidden;
+}
+body[parentmenutype="22"][menutype="22"] .themechooser {
+	display: none!important;
+}
+body[ispopup="N"] .themechooser {
+    border-bottom: 1px solid #dbdbdb!important;
+}
+
+body[parentmenutype="22"][menutype="22"] div#example > iframe {
+    height: calc(100%)!important;
+}
+
+#example {
+    height: 100%;
+}
+
+body[screenName="fullScreen"] div#dashboard > div {
+    max-height: calc(100% - 82px) !important;
+}
+body[screenName="normalScreen"][ismenuin="N"] .panel-wrap {
+    xheight: calc(100% - 37px);
+}
+body[screenName="normalScreen"][ismenuin="N"] div#dashboard > div {
+    xmax-height: calc(100% - 37px) !important;
+}
+
+
+
+#left-pane, #right-pane {
+    color: #000;
+    background-color: #eee;
+    overflow-y: hidden;
+}
+
+.pane-content {
+    padding: 0;
+    height: 100%;
+}
+
+tr.k-footer-template > td {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: normal;
+    text-align: right;
+}
+
+
+
+div.k-animation-container div.k-list-container.k-popup.k-group.k-reset.k-state-border-up {
+    height: auto!important;
+    max-height: 220px;
+}
+
+body[ismainframe="Y"] td[comment="Y"] {
+    position: relative;
+}
+
+body[ismainframe="Y"] td[comment="Y"]:before {
+    color: blue;
+    font-size: 10px;
+    float: right;
+    position: absolute;
+    top: -5px;
+    font-family: Arial;
+    right: 1px;
+    background-color: yellow;
+    height: 16px;
+}
+
+
+body[ismainframe="Y"] td.cnt01:before  {
+    content: "1";
+}
+body[ismainframe="Y"] td.cnt02:before  {
+    content: "2";
+}
+body[ismainframe="Y"] td.cnt03:before {
+    content: "3";
+}
+body[ismainframe="Y"] td.cnt04:before  {
+    content: "4";
+}
+body[ismainframe="Y"] td.cnt05:before  {
+    content: "5";
+}
+body[ismainframe="Y"] td.cnt06:before  {
+    content: "6";
+}
+body[ismainframe="Y"] td.cnt07:before  {
+    content: "7";
+}
+body[ismainframe="Y"] td.cnt08:before  {
+    content: "8";
+}
+body[ismainframe="Y"] td.cnt09:before  {
+    content: "9";
+}
+body[ismainframe="Y"] td.cnt09P:before  {
+    content: "9+";
+}
+
+
+
+input.likeField {
+    border: 1px solid #dbdbdb!important;
+    width: 100px!important;
+    height: 12px!important;
+}
+
+a#btn_close, a#btn_saveClose, a#btn_list {
+    display: none!important;
+}
+
+
+.selectableClass {
+    width: max-width:50px!important;
+}
+
+
+
+
+
+        /* Page Template for the exported PDF */
+        .pdf-template {
+            font-family: "DejaVu Sans", "Arial", sans-serif;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+          }
+          .pdf-template .header {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            border-bottom: 1px solid #888;
+            color: #888;
+          }
+          .pdf-template .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            right: 30px;
+            border-top: 1px solid #888;
+            text-align: center;
+            color: #888;
+          }
+          .pdf-template .watermark {
+            font-weight: bold;
+            font-size: 400%;
+            text-align: center;
+            margin-top: 30%;
+            color: #aaaaaa;
+            opacity: 0.1;
+            transform: rotate(-35deg) scale(1.7, 1.5);
+          }
+          .k-pdf-export tr.k-filter-row
+          {
+              display: none;
+          }
+  
+  
+  
+      .col-template-val {
+          margin: 0 0 1em .5em;
+      }
+
+
+a#sidebar-toggle {
+    display: none;
+}
+
+
+body[ismobile="Y"] ul.k-pager-numbers.k-reset {
+    top: 5px;
+}
+
+
+body[ismainframe="N"] div#vertical, body[ismainframe="N"] div#exampleWrap {
+    height: calc(100% - 53px) !important;
+}
+body[ismainframe="N"] div#grid {
+    height: calc(100% - 62px)!important;
+}
+body[ismainframe="N"] div#grid div.k-grid-content.k-auto-scrollable {
+    height: calc(100% - 176px)!important;
+}
+body[ispopup="N"][ismobile="Y"] div#grid div.k-grid-content.k-auto-scrollable {
+    height: calc(100% - 136px)!important;
+}
+
+body[screenmode="1"] div.k-grouping-header, body[screenmode="2"] div.k-grouping-header {
+    display: none;
+}
+.k-listview-content {
+    overflow: hidden;
+}
+@media screen and (max-width: 510px) {
+    .k-toolbar .k-overflow-anchor {
+        right: 0px!important;
+    }
+}
+@media screen and (max-width: 1199px) {
+
+
+}
+
